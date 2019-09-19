@@ -1,27 +1,38 @@
-import java.util.ArrayList;
-import java.util.List;
 
-public class Punto {
+public class Pixel {
 	private Float[] data;
-
 	/**
-	 * Constructor de la clase Punto
+	 * Constructor de la clase Pixel
 	 * @param strings
 	 */
-	public Punto(String[] strings) {
-		List<Float> puntos = new ArrayList<Float>();
-		for (String string : strings) {
-			puntos.add(Float.parseFloat(string));
-		}
-		this.data = puntos.toArray(new Float[strings.length]);
-	}
-
-	public Punto(Float[] data) {
+	public Pixel(Float[] data) {
 		this.data = data;
 	}
 
+	/**
+	 * 0 - alpha
+	 * 1 - red
+	 * 2 - green
+	 * 3 - blue
+	 */
 	public float get(int index) {
 		return data[index];
+	}
+	
+	public int alpha() {
+		return data[0].intValue();
+	}
+	
+	public int red() {
+		return data[1].intValue();
+	}
+
+	public int green() {
+		return data[2].intValue();
+	}
+
+	public int blue() {
+		return data[3].intValue();
 	}
 
 	/**
@@ -50,7 +61,7 @@ public class Punto {
 	 * @param destino
 	 * @return flotante de precision doble
 	 */
-	public Double distanciaEuclideana(Punto destino) {
+	public Double distanciaEuclideana(Pixel destino) {
 		Double d = 0d;
 		for (int i = 0; i < data.length; i++) {
 			d += Math.pow(data[i] - destino.get(i), 2);
@@ -64,7 +75,7 @@ public class Punto {
 	 */	
 	@Override
 	public boolean equals(Object obj) {
-		Punto other = (Punto) obj;
+		Pixel other = (Pixel) obj;
 		for (int i = 0; i < data.length; i++) {
 			if (data[i] != other.get(i)) {
 				return false;

@@ -12,16 +12,20 @@ public class Start {
 		// Creacion de archivos de lectura y escrtura
 		// get the BufferedImage, using the ImageIO class
 		BufferedImage image = ImageIO.read(new File(filename+"." + format));
-		//BufferedImage result = Kmeans_Processor.renderkmeans(image);
-		BufferedImage result = ImgScalar.render(image,0.222f,0.707f,0.071f);
-
-		File file = null;
-		try {
-			file = new File(filename + "_result."+ format);
-			ImageIO.write(result, format, file);
-		} catch (IOException e) {
-			System.out.println("Error: " + e);
-		}
+		
+		Histogram histograma = new Histogram(ImgConvert.toPixelArrayList(image));
+		System.out.println(histograma);
+		
+		//BufferedImage result = Kmeans_Processor.renderkmeans(image, 4);
+//		BufferedImage result = ImgScalar.render(image,0.222f,0.707f,0.071f);
+//
+//		File file = null;
+//		try {
+//			file = new File(filename + "_result."+ format);
+//			ImageIO.write(result, format, file);
+//		} catch (IOException e) {
+//			System.out.println("Error: " + e);
+//		}
 
 		System.out.println("Terminado.");
 	}

@@ -14,7 +14,7 @@ public class KMeansResultado {
 		return clusters;
 	}
 
-	public Punto getCentroide(Punto punto) {
+	public Pixel getCentroide(Pixel punto) {
 		int cluster_index = -1;
 		
 		while(!clusters.get(++cluster_index).contains(punto));

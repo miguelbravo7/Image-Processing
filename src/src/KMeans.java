@@ -5,7 +5,7 @@ import java.util.Random;
 
 public class KMeans {
 	
-	public KMeansResultado calcular(List<Punto> puntos, Integer k) {
+	public KMeansResultado calcular(List<Pixel> puntos, Integer k) {
 		List<Cluster> clusters = elegirCentroides(puntos, k);
 
 		while (!finalizo(clusters)) {
@@ -25,7 +25,7 @@ public class KMeans {
 	 * @param k(numero de clases)
 	 * @return centroides
 	 */
-	private List<Cluster> elegirCentroides(List<Punto> puntos, Integer k) {
+	private List<Cluster> elegirCentroides(List<Pixel> puntos, Integer k) {
 		List<Cluster> centroides = new ArrayList<Cluster>();
 
 		List<Float> maximos = new ArrayList<Float>();
@@ -35,7 +35,7 @@ public class KMeans {
 		for (int i = 0; i < puntos.get(0).getGrado(); i++) {
 			Float min = Float.POSITIVE_INFINITY, max = Float.NEGATIVE_INFINITY;
 
-			for (Punto punto : puntos) {
+			for (Pixel punto : puntos) {
 				min = min > punto.get(i) ? punto.get(0) : min;
 				max = max < punto.get(i) ? punto.get(i) : max;
 			}
@@ -55,7 +55,7 @@ public class KMeans {
 			}
 
 			Cluster c = new Cluster();
-			Punto centroide = new Punto(data);
+			Pixel centroide = new Pixel(data);
 			c.setCentroide(centroide);
 			centroides.add(c);
 		}
@@ -92,8 +92,8 @@ public class KMeans {
 	 * @param puntos
 	 * @param clusters
 	 */
-	private void asignarPuntos(List<Punto> puntos, List<Cluster> clusters) {
-		for (Punto punto : puntos) {
+	private void asignarPuntos(List<Pixel> puntos, List<Cluster> clusters) {
+		for (Pixel punto : puntos) {
 			Cluster masCercano = clusters.get(0);
 			Double distanciaMinima = Double.MAX_VALUE;
 			for (Cluster cluster : clusters) {
@@ -121,14 +121,14 @@ public class KMeans {
 			Float[] d = new Float[c.getPuntos().get(0).getGrado()];
 			Arrays.fill(d, 0f);
 
-			for (Punto p : c.getPuntos()) {
+			for (Pixel p : c.getPuntos()) {
 				for (int i = 0; i < p.getGrado(); i++) {
 					d[i] += (p.get(i) / c.getPuntos().size());
 				}
 			}
 
 			//Establecido el nuevo punto se compara con el anterior para ver si se ha movido
-			Punto nuevoCentroide = new Punto(d);
+			Pixel nuevoCentroide = new Pixel(d);
 
 			if (nuevoCentroide.equals(c.getCentroide())) {
 				c.setTermino(true);
@@ -147,7 +147,7 @@ public class KMeans {
 		Double ofv = 0d;
 
 		for (Cluster cluster : clusters) {
-			for (Punto punto : cluster.getPuntos()) {
+			for (Pixel punto : cluster.getPuntos()) {
 				ofv += punto.distanciaEuclideana(cluster.getCentroide());
 			}
 		}

@@ -6,19 +6,19 @@ import java.util.Set;
 
 public class Kmeans_Processor {
 
-	static public BufferedImage renderkmeans(BufferedImage image) {
+	static public BufferedImage renderkmeans(BufferedImage image, int k) {
 		BufferedImage img = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
 
 		// Instanciacion de los puntos a partir de los valores de la imagen
-		Set<Punto> pixels = new HashSet<Punto>();
-		List<Punto> pixels_ordered = new ArrayList<Punto>();
+		Set<Pixel> pixels = new HashSet<Pixel>();
+		List<Pixel> pixels_ordered = new ArrayList<Pixel>();
 
-		int w = image.getWidth();
-		int h = image.getHeight();
+		int width = image.getWidth();
+		int height = image.getHeight();
 
 
-		for (int i = 0; i < h; i++) {
-			for (int j = 0; j < w; j++) {
+		for (int i = 0; i < height; i++) {
+			for (int j = 0; j < width; j++) {
 
 				int pixel = image.getRGB(j, i);
 
@@ -27,30 +27,22 @@ public class Kmeans_Processor {
 				int green = (pixel >> 8) & 0xff;
 				int blue = (pixel) & 0xff;
 
-				Punto p = new Punto(new Float[] { (float) alpha, (float) red, (float) green, (float) blue });
+				Pixel p = new Pixel(new Float[] { (float) alpha, (float) red, (float) green, (float) blue });
 				pixels.add(p);
 				pixels_ordered.add(p);
 			}
 		}
 		
-		int linea = 0, k= 4;
 		KMeans kmeans = new KMeans();
-		List<Punto> pixel_list = new ArrayList<Punto>();
+		ArrayList<Pixel> pixel_list = new ArrayList<Pixel>();
 		pixel_list.addAll(pixels);
 		KMeansResultado resultado = kmeans.calcular(pixel_list, k);
-
-		for (int i = 0; i < h; i++) {
-			for (int j = 0; j < w; j++) {
-				Punto centroide = resultado.getCentroide(pixels_ordered.get(linea++));
-
-				int pixel = ((int)centroide.get(0) << 24) 
-						| ((int)centroide.get(1) << 16) 
-						| ((int)centroide.get(2) << 8)
-						| (int)centroide.get(3); // pixel
-
-				img.setRGB(j, i, pixel);
-			}
+		
+		for (int i = 0; i < width*height; i++) {
+			pixel_list.add(resultado.getCentroide(pixels_ordered.get(i++)));			
 		}
+
+		ImgConvert.toBuffImg(pixel_list, width, height);
 //		System.out.println(" Width:" + img.getWidth()+" Height:"+img.getHeight() +"\nCENTROIDES:");
 //		for (Cluster p : resultado.getClusters()) {
 //			System.out.println(p.getCentroide());
