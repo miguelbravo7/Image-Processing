@@ -1,9 +1,9 @@
 import java.awt.image.BufferedImage;
 import java.util.List;
 
-public class ImgScalar {
-	
-	static public BufferedImage render(BufferedImage image, float percr, float percg, float percb) {
+public class ImgNegative {
+
+	static public BufferedImage render(BufferedImage image) {
 		BufferedImage img = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
 
 		// Instanciacion de los puntos a partir de los valores de la imagen
@@ -14,14 +14,14 @@ public class ImgScalar {
 			for (int j = 0; j < image.getWidth(); j++) {
 
 				int pixel = (pixels.get(linea).alpha() << 24) 
-						| ((int)(pixels.get(linea).red()*percr) << 16) 
-						| ((int)(pixels.get(linea).green()*percg) << 8)
-						| (int)(pixels.get(linea++).blue()*percb) ; // pixel
+						| (255 - pixels.get(linea).red() << 16) 
+						| (255 - pixels.get(linea).green() << 8)
+						| 255 - pixels.get(linea++).blue() ; // pixel
 
 				img.setRGB(j, i, pixel);
 			}
 		}
-		System.out.println("ImgScalar done.");
+		System.out.println("ImgNegative done.");
 		return img;
 	}
 }

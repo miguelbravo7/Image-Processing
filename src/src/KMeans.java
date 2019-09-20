@@ -33,7 +33,7 @@ public class KMeans {
 		// se buscan los maximos y minimos de cada dimension
 
 		for (int i = 0; i < puntos.get(0).getGrado(); i++) {
-			Float min = Float.POSITIVE_INFINITY, max = Float.NEGATIVE_INFINITY;
+			Float min = 255f, max = 0f;
 
 			for (Pixel punto : puntos) {
 				min = min > punto.get(i) ? punto.get(0) : min;

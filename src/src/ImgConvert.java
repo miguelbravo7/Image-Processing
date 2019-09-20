@@ -1,6 +1,5 @@
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.util.List;
 
 public class ImgConvert {
 
@@ -8,8 +7,8 @@ public class ImgConvert {
 		// Instanciacion de los puntos a partir de los valores de la imagen
 		ArrayList<Pixel> pixels = new ArrayList<Pixel>();
 
-		for (int i = 0; i < image.getWidth(); i++) {
-			for (int j = 0; j < image.getHeight(); j++) {
+		for (int i = 0; i < image.getHeight(); i++) {
+			for (int j = 0; j < image.getWidth(); j++) {
 
 				int pixel = image.getRGB(j, i);
 
@@ -33,8 +32,8 @@ public class ImgConvert {
 			for (int j = 0; j < width; j++) {
 				int pixel = ((int)pixel_list.get(linea).alpha() << 24) 
 						| ((int)pixel_list.get(linea).red() << 16) 
-						| ((int)pixel_list.get(linea).blue() << 8)
-						| (int)pixel_list.get(linea++).green(); // pixel
+						| ((int)pixel_list.get(linea).green() << 8)
+						| (int)pixel_list.get(linea++).blue(); // pixel
 
 				img.setRGB(j, i, pixel);
 			}
