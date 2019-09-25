@@ -5,13 +5,17 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.ToolTipManager;
 
 public class Histogram implements Runnable {
 	ArrayList<Pixel> image = new ArrayList<Pixel>();
@@ -63,7 +67,6 @@ public class Histogram implements Runnable {
 			}
 		}
 		image.clear();
-		System.out.println(this.toString());
 		graphicHisogram();
 	}
 
@@ -72,10 +75,9 @@ public class Histogram implements Runnable {
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.setLayout(new BorderLayout());
 		Container container = new Container();
-//		container.add(new JScrollPane());
-		container.add(new Graph(red, "red"));
-		container.add(new Graph(green, "green"));
-		container.add(new Graph(blue, "blue"));
+		container.add(new Graph(red, "red", accr / tamaño));
+		container.add(new Graph(green, "green", accg / tamaño));
+		container.add(new Graph(blue, "blue", accb / tamaño));
 		container.setLayout(new GridLayout(3, 1));
 		frame.add(container);
 		frame.pack();
@@ -85,18 +87,35 @@ public class Histogram implements Runnable {
 
 	protected class Graph extends JPanel {
 		private static final long serialVersionUID = 1L;
-		protected static final int MIN_BAR_WIDTH = 2;
+		protected static final int MIN_BAR_WIDTH = 3;
 		private Map<Integer, Integer> mapHistory;
+		private Map<Rectangle2D, Integer> rectValue = new HashMap<Rectangle2D, Integer>();
 		private String color;
-
-		public Graph(Map<Integer, Integer> mapHistory, String color) {
+		private Integer median;
+		
+		public Graph(Map<Integer, Integer> mapHistory, String color, Integer median) {
 			this.mapHistory = mapHistory;
 			this.color = color;
-			int width = (mapHistory.size() * MIN_BAR_WIDTH) + 11;
-			Dimension minSize = new Dimension(width, 128);
-			Dimension prefSize = new Dimension(width, 256);
-			setMinimumSize(minSize);
-			setPreferredSize(prefSize);
+			this.median = median;
+			int width = (mapHistory.size() * MIN_BAR_WIDTH) + 11;			
+			
+			setMinimumSize(new Dimension(width, 128));
+			setPreferredSize(new Dimension(width, 256));
+			
+			addMouseMotionListener(new MouseMotionListener() {			     
+		        @Override
+		        public void mouseMoved(MouseEvent e) {
+		        	for(Rectangle2D rect : rectValue.keySet()) {
+			            if(rect.contains(e.getPoint()))
+			                setToolTipText(rectValue.get(rect).toString());		        		
+		        	}
+			         
+			        ToolTipManager.sharedInstance().mouseMoved(e);
+			    }
+			     
+			    @Override
+			    public void mouseDragged(MouseEvent e) {}
+			});
 		}
 
 		@Override
@@ -114,31 +133,41 @@ public class Histogram implements Runnable {
 				g2d.setColor(Color.DARK_GRAY);
 				g2d.drawRect(xOffset, yOffset, width, height);
 				
-				//TODO cambiar a iteracion sobre valores
-				for (Integer value : mapHistory.values()) {
+				for (Integer value : mapHistory.values()) 
 					maxValue = Math.max(maxValue, value);
-				}
 				
 				int xPos = xOffset;
 				for (Integer key : mapHistory.keySet()) {
 					int value = mapHistory.get(key);
-					int barHeight = Math.round((value / (float) maxValue) * height);
+					int barHeight = Math.round((value / (float) maxValue) * height);					
+					int yPos = height + yOffset - barHeight;	
 					
-					int yPos = height + yOffset - barHeight;
+					Rectangle2D bar;
+
+					if(key.equals(median)) {
+						bar = new Rectangle2D.Float(xPos, yOffset, barWidth, height);
+						g2d.fill(bar);
+						g2d.draw(bar);
+					}
 					
 					g2d.setColor(new Color(color == "red" ? key : 0,
 									color == "green" ? key : 0,
 									color == "blue" ? key : 0));
-					//Rectangle bar = new Rectangle(xPos, yPos, barWidth, barHeight);
-					Rectangle2D bar = new Rectangle2D.Float(xPos, yPos, barWidth, barHeight);
+					
+					bar = new Rectangle2D.Float(xPos, yPos, barWidth, barHeight);
+					rectValue.put(bar, barHeight);
+					
 					g2d.fill(bar);
 					g2d.setColor(Color.DARK_GRAY);
 					g2d.draw(bar);
+					
+					
 					xPos += barWidth;
 				}
 				
 				g2d.dispose();
 			}
 		}
+		
 	}
 }
