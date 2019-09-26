@@ -9,11 +9,13 @@ public class Kmeans_Processor {
 		List<Pixel> pixels_ordered = new ArrayList<Pixel>(ImgConvert.toPixelArrayList(image));
 		ArrayList<Pixel> pixel_list = new ArrayList<Pixel>();		
 		
+		System.out.println("Searching centroids.");
 		KMeans kmeans = new KMeans();
 		KMeansResultado resultado = kmeans.calcular(pixels_ordered, k);
 		
 		pixel_list.ensureCapacity(image.getWidth()*image.getHeight());
 		
+		System.out.println("Assigning centroids.");
 		for (int i = 0; i < image.getWidth()*image.getHeight(); i++) {
 			pixel_list.add(resultado.getCentroide(pixels_ordered.get(i)));	
 		}

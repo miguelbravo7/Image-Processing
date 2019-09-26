@@ -118,7 +118,7 @@ public class KMeans {
 				continue;
 			}
 
-			Float[] d = new Float[c.getPuntos().get(0).getGrado()];
+			Float[] d = new Float[4];
 			Arrays.fill(d, 0f);
 
 			for (Pixel p : c.getPuntos()) {

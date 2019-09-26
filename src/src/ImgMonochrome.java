@@ -1,9 +1,9 @@
 import java.awt.image.BufferedImage;
 import java.util.List;
 
-public class ImgScalar {
+public class ImgMonochrome {
 	
-	static public BufferedImage render(BufferedImage image, float percr, float percg, float percb) {
+	static public BufferedImage renderPal(BufferedImage image) {
 		BufferedImage img = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
 
 		// Instanciacion de los puntos a partir de los valores de la imagen
@@ -13,15 +13,17 @@ public class ImgScalar {
 		for (int i = 0; i < image.getHeight(); i++) {
 			for (int j = 0; j < image.getWidth(); j++) {
 
-				int pixel = (pixels.get(linea).alpha() << 24) 
-						| ((int)(pixels.get(linea).red()*percr) << 16) 
-						| ((int)(pixels.get(linea).green()*percg) << 8)
-						| (int)(pixels.get(linea++).blue()*percb) ; // pixel
+				int grey_value = (int) (pixels.get(linea).red()*0.222 + pixels.get(linea).green()*0.707 + pixels.get(linea).blue()*0.071);
+				
+				int pixel = (pixels.get(linea++).alpha() << 24) 
+						| (grey_value << 16) 
+						| (grey_value << 8)
+						| grey_value ; // pixel
 
 				img.setRGB(j, i, pixel);
 			}
 		}
-		System.out.println("ImgScalar done.");
+		System.out.println("ImgMonochrome PAL done.");
 		return img;
 	}
 }

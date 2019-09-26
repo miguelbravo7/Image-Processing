@@ -1,9 +1,7 @@
 import java.awt.BorderLayout;
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -12,8 +10,8 @@ import javax.swing.JLabel;
 
 public class Start {
 	private static final int WINDOW_SIZE = 800;
-	final static String format = "png";
-	final static String filename = "Windows_XP";
+	final static String format = "jpg";
+	final static String filename = "rojo-azul";
 
 	public static void main(String[] args) {
 		// Creacion de archivos de lectura y escrtura
@@ -34,12 +32,15 @@ public class Start {
 		
 		BufferedImage result = image;
 		
-//		result = ImgScalar.render(result, 0.299f, 0.587f, 0.114f);		
+//		result = ImgMonochrome.renderPal(result);		
 //		new ImageViewer(result);
 //		
 //		result = ImgNegative.render(result);
 //		new ImageViewer(result);
-//		result = Kmeans_Processor.renderkmeans(result, 4);
+		
+		result = Kmeans_Processor.renderkmeans(result, 4);
+		new ImageViewer(result);
+		
 //		result = ImgConvert.toBuffImg(ImgConvert.toPixelArrayList(image), image.getWidth(), image.getHeight());
 		
 		
@@ -49,11 +50,11 @@ public class Start {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setSize(WINDOW_SIZE, WINDOW_SIZE);
 		frame.setLocation(100, 100);
-//		frame.add(new JLabel(new ImageIcon(result)), BorderLayout.CENTER);
+		frame.add(new JLabel(new ImageIcon(image)), BorderLayout.CENTER);
 		
 
 
-//		frame.setVisible(true);
+		frame.setVisible(true);
 //		try {
 //			Process process = new ProcessBuilder("explorer.exe", "/select,C:\\directory\\selectedFile").start();
 //			new BufferedReader(new InputStreamReader(process.getInputStream()));

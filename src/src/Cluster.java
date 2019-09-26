@@ -1,8 +1,8 @@
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Cluster {
-	private List<Pixel> puntos = new ArrayList<Pixel>();
+	private Set<Pixel> puntos = new HashSet<Pixel>();
 	private Pixel centroide;
 	private boolean termino = false;
 
@@ -14,7 +14,7 @@ public class Cluster {
 		this.centroide = centroide;
 	}
 
-	public List<Pixel> getPuntos() {
+	public Set<Pixel> getPuntos() {
 		return puntos;
 	}
 
