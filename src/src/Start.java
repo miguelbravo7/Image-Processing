@@ -4,9 +4,8 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
+import javax.swing.JTabbedPane;
 
 public class Start {
 	private static final int WINDOW_SIZE = 800;
@@ -26,33 +25,35 @@ public class Start {
 			System.out.println("Error: " + e);
 			Utility.getAllFiles(file, "");
 		}
-		
+		JTabbedPane tabbedPane = new JTabbedPane();
 		Histogram histograma = new Histogram(ImgConvert.toPixelArrayList(image));
 //		System.out.println(histograma);
 		
 		BufferedImage result = image;
+		tabbedPane.addTab("Image", new ImageViewer(result).getContentPane());
 		
-//		result = ImgMonochrome.renderPal(result);		
+		result = ImgMonochrome.renderPal(result);		
 //		new ImageViewer(result);
+		tabbedPane.addTab("PAL Monochrome", new ImageViewer(result).getContentPane());
 //		
-//		result = ImgNegative.render(result);
+		result = ImgNegative.render(result);
 //		new ImageViewer(result);
+		tabbedPane.addTab("Negative", new ImageViewer(result).getContentPane());
 		
 		result = Kmeans_Processor.renderkmeans(result, 4);
-		new ImageViewer(result);
-		
+//		new ImageViewer(result);
+		tabbedPane.addTab("4 k-means", new ImageViewer(result).getContentPane());
+
 //		result = ImgConvert.toBuffImg(ImgConvert.toPixelArrayList(image), image.getWidth(), image.getHeight());
-		
-		
-		//Interfaz grafica
+//		tabbedPane.addTab("PAL Monochrome", new ImageViewer(result).getContentPane());
+				
+		//Interfaz grafica		new JLabel(new ImageIcon(image))
 		JFrame frame = new JFrame(filename);
 		frame.setLayout(new BorderLayout());
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setSize(WINDOW_SIZE, WINDOW_SIZE);
 		frame.setLocation(100, 100);
-		frame.add(new JLabel(new ImageIcon(image)), BorderLayout.CENTER);
-		
-
+		frame.add(tabbedPane, BorderLayout.CENTER);
 
 		frame.setVisible(true);
 //		try {

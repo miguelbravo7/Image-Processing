@@ -24,7 +24,6 @@ public class ImageViewer extends JFrame{
 
         this.pack();
         this.setLocationByPlatform(true);
-        this.setVisible(true);
     }
 
     /** Set the image as icon of the image canvas (display it). */

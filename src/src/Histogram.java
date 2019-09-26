@@ -89,7 +89,7 @@ public class Histogram implements Runnable {
 		private static final long serialVersionUID = 1L;
 		protected static final int MIN_BAR_WIDTH = 3;
 		private Map<Integer, Integer> mapHistory;
-		private Map<Rectangle2D, Integer> rectValue = new HashMap<Rectangle2D, Integer>();
+		private Map<Rectangle2D, String> rectValue = new HashMap<Rectangle2D, String>();
 		private String color;
 		private Integer median;
 		
@@ -107,7 +107,7 @@ public class Histogram implements Runnable {
 		        public void mouseMoved(MouseEvent e) {
 		        	for(Rectangle2D rect : rectValue.keySet()) {
 			            if(rect.contains(e.getPoint()))
-			                setToolTipText(rectValue.get(rect).toString());		        		
+			                setToolTipText(rectValue.get(rect));		        		
 		        	}
 			         
 			        ToolTipManager.sharedInstance().mouseMoved(e);
@@ -146,6 +146,7 @@ public class Histogram implements Runnable {
 
 					if(key.equals(median)) {
 						bar = new Rectangle2D.Float(xPos, yOffset, barWidth, height);
+						rectValue.put(bar, "Valor medio:"+key);
 						g2d.fill(bar);
 						g2d.draw(bar);
 					}
@@ -155,7 +156,7 @@ public class Histogram implements Runnable {
 									color == "blue" ? key : 0));
 					
 					bar = new Rectangle2D.Float(xPos, yPos, barWidth, barHeight);
-					rectValue.put(bar, barHeight);
+					rectValue.put(bar, String.valueOf(value));
 					
 					g2d.fill(bar);
 					g2d.setColor(Color.DARK_GRAY);
