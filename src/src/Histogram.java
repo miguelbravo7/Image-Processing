@@ -24,7 +24,7 @@ public class Histogram implements Runnable {
 	Map<Integer, Integer> green = new TreeMap<Integer, Integer>();
 	Map<Integer, Integer> blue = new TreeMap<Integer, Integer>();
 	int[][] valores, acumulados;
-	Integer tamaño = 0, acc[];
+	Integer tamaÃ±o = 0, acc[];
 	Integer med[];
 	Integer min[], max[];
 	Integer color_bits;
@@ -59,13 +59,13 @@ public class Histogram implements Runnable {
 	public String toString() {
 		String msg = new String();
 		if(color_bits == 3)
-			msg = "Media: r " + med[0] + ",g " + med[1] + ",b " + med[2] + ": " + (acc[0] + acc[1] +acc[2])/tamaño
+			msg = "Media: r " + med[0] + ",g " + med[1] + ",b " + med[2] + ": " + (acc[0] + acc[1] +acc[2])/tamaÃ±o
 				+"\nMin/Max:\n\t red ["+ min[0] +","+ max[0] +"]\n\t green ["+ min[1] +","+ max[1] +"]\n\t blue ["+ min[2] +","+ max[2] +"]\n";
 		else {
 			msg ="Media:\n";
 			for (int i = 0; i < color_bits; i++) {
-				 msg += "valor "+ i + " -" +med[i];
-				 msg += " : " + (acc[0]*3)/tamaño
+				 msg += "valor "+ i + " ->" +med[i];
+				 msg += " : " + (acc[0]*3)/tamaÃ±o
 						+"\nMin/Max:\n";
 				 msg += "\t valor "+i+"["+ min[i] +","+ max[i] +"]\n";				
 			}
@@ -75,7 +75,7 @@ public class Histogram implements Runnable {
 
 	@Override
 	public void run() {
-		tamaño = image.size();
+		tamaÃ±o = image.size();
 
 		for (Pixel pixel : image) {
 			for (int j = 0; j < color_bits; j++) {	
@@ -116,7 +116,7 @@ public class Histogram implements Runnable {
 				++value;
 			}
 			for (int j = 0; j < med.length; j++) {	
-				med[j] = acc[j] / tamaño;
+				med[j] = acc[j] / tamaÃ±o;
 			}
 		}
 		

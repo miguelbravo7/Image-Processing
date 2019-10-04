@@ -4,7 +4,7 @@ import java.util.List;
 public class ImgMonochrome {
 	
 	static public BufferedImage renderPal(BufferedImage image) {
-		BufferedImage img = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
+		BufferedImage img = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
 
 		// Instanciacion de los puntos a partir de los valores de la imagen
 		List<Pixel> pixels = ImgConvert.toPixelArrayList(image);

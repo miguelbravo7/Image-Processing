@@ -1,6 +1,5 @@
 import java.awt.Component;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
@@ -36,15 +35,6 @@ public class Buttons extends JPanel{
 		this.frame = program.frame;
 		
 		// Set up a panel for the buttons
-		JButton btnS = new JButton("Cargar");
-	    add(btnS);
-	    btnS.addActionListener(new ActLoadFile());
-		JButton btnP = new JButton("Guardar");
-	    add(btnP);
-	    btnP.addActionListener(new ActSaveFile());
-		JButton btnC = new JButton("filtros");
-	    add(btnC);
-	    btnC.addActionListener(new ActFilterImage());
 	    
 	    chk = new JCheckBox("Show trace");
 	    chk.setSelected(true);
@@ -79,11 +69,53 @@ public class Buttons extends JPanel{
         button.addActionListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                JOptionPane.showMessageDialog(getParent(), "Asignatura: PAI\nPráctica: 12\nDescripción: Simulador de proyectiles");
+                JOptionPane.showMessageDialog(getParent(), "Asignatura: PAI\nPrï¿½ctica: 12\nDescripciï¿½n: Simulador de proyectiles");
             }
         });
         add(textarea = new JTextArea("0"));
         
+	}
+	
+	public JButton getButtonLoad() {
+		JButton btnS = new JButton("Cargar");
+	    add(btnS);
+	    btnS.addActionListener(new ActLoadFile());
+		return btnS;		
+	}
+	
+	public JButton getButtonSave() {
+		JButton btnP = new JButton("Guardar");
+	    add(btnP);
+	    btnP.addActionListener(new ActSaveFile());
+		return btnP;		
+	}
+	
+	public JButton getButtonsFilterNeg() {
+		JButton btnC = new JButton("Negativo");
+	    add(btnC);
+	    btnC.addActionListener(new ActFilterImageNeg());
+		return btnC;		
+	}
+	
+	public JButton getButtonsFilterPal() {
+		JButton btnC = new JButton("EU-PAL");
+	    add(btnC);
+	    btnC.addActionListener(new ActFilterImagePal());
+		return btnC;		
+	}
+	
+	public JButton getButtonsFilterKmeans() {
+		JButton btnC = new JButton("K-means");
+	    add(btnC);
+	    btnC.addActionListener(new ActFilterImageKmeans());
+		return btnC;		
+	}
+	
+	public JButton getButtonsHistogram() {
+		JButton btnC = new JButton("Histogram");
+	    add(btnC);
+	    btnC.addActionListener(new ActImageHist());
+		return btnC;		
 	}
 
 	public class ActLoadFile implements ActionListener {
@@ -131,9 +163,44 @@ public class Buttons extends JPanel{
 		}
 	}
 
-	public class ActFilterImage implements ActionListener {
+	public class ActFilterImageNeg implements ActionListener {
 		public void actionPerformed(ActionEvent evt) {
-			
+		    Component drawpanel = program.tabbedPane.getSelectedComponent();
+		    BufferedImage awtImage = new BufferedImage(drawpanel.getWidth(), drawpanel.getHeight(), BufferedImage.TYPE_INT_RGB);
+		    Graphics g = awtImage.getGraphics();
+		    drawpanel.printAll(g);
+		    program.addNegativeImage(awtImage);
+		}
+	}
+
+	public class ActFilterImagePal implements ActionListener {
+		public void actionPerformed(ActionEvent evt) {
+		    Component drawpanel = program.tabbedPane.getSelectedComponent();
+		    BufferedImage awtImage = new BufferedImage(drawpanel.getWidth(), drawpanel.getHeight(), BufferedImage.TYPE_INT_RGB);
+		    Graphics g = awtImage.getGraphics();
+		    drawpanel.printAll(g);
+		    program.addPalImage(awtImage);
+		}
+	}
+
+	public class ActFilterImageKmeans implements ActionListener {
+		public void actionPerformed(ActionEvent evt) {
+			int means = 4;
+		    Component drawpanel = program.tabbedPane.getSelectedComponent();
+		    BufferedImage awtImage = new BufferedImage(drawpanel.getWidth(), drawpanel.getHeight(), BufferedImage.TYPE_INT_RGB);
+		    Graphics g = awtImage.getGraphics();
+		    drawpanel.printAll(g);
+		    program.addKMeansImage(awtImage, means);
+		}
+	}
+
+	public class ActImageHist implements ActionListener {
+		public void actionPerformed(ActionEvent evt) {
+		    Component drawpanel = program.tabbedPane.getSelectedComponent();
+		    BufferedImage awtImage = new BufferedImage(drawpanel.getWidth(), drawpanel.getHeight(), BufferedImage.TYPE_INT_RGB);
+		    Graphics g = awtImage.getGraphics();
+		    drawpanel.printAll(g);
+		    program.makeHistogram(awtImage);
 		}
 	}
 

@@ -1,10 +1,13 @@
 import java.awt.BorderLayout;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
 import javax.swing.JTabbedPane;
 
 public class Menu {
@@ -22,10 +25,34 @@ public class Menu {
 		frame.setSize(WINDOW_SIZE, WINDOW_SIZE);
 		frame.setLocation(100, 100);
 		frame.add(tabbedPane, BorderLayout.CENTER);	
-		frame.add(new Buttons(this), BorderLayout.NORTH);
+		Buttons botones = new Buttons(this);
+		
+		//Create the menu bar.
+		JMenuBar menuBar = new JMenuBar();
+		
+		//Build the first menu.
+		JMenu menu = new JMenu("Archivo");
+		menu.setMnemonic(KeyEvent.VK_A);
+		menu.getAccessibleContext().setAccessibleDescription("The only menu in this program that has menu items");
+		menuBar.add(menu);
+		menu.add(botones.getButtonLoad());
+		menu.add(botones.getButtonSave());
+
+		JMenu menu2 = new JMenu("Filtros");
+		JMenu submenu = new JMenu("Operaciones sobre punto");
+		submenu.add(botones.getButtonsFilterPal());
+		submenu.add(botones.getButtonsFilterNeg());
+		submenu.add(botones.getButtonsFilterKmeans());
+		menu2.add(submenu);
+		
+		menuBar.add(menu2);
+		
+		menuBar.add(botones.getButtonsHistogram());
+		
+		
+		frame.add(menuBar, BorderLayout.NORTH);
 		frame.setVisible(true);		
 
-		System.out.println("Terminado.");
 	}
 	
 	public void addImage(BufferedImage image) {
@@ -45,6 +72,7 @@ public class Menu {
 	}
 
 	public void makeHistogram(BufferedImage image) {
+		System.out.println(image.getType());
 		new Histogram(ImgConvert.toPixelArrayList(image), 3);
 		new Histogram(ImgConvert.toPixelArrayList(image), 1);
 	}
