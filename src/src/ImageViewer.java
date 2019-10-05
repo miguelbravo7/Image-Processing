@@ -6,7 +6,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
+//import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
 
 public class ImageViewer extends JFrame{
@@ -23,7 +23,7 @@ public class ImageViewer extends JFrame{
 		this.setImage(image);
 
         this.pack();
-        this.setLocationByPlatform(true);
+//        this.setLocationByPlatform(true);
     }
 
     /** Set the image as icon of the image canvas (display it). */
@@ -38,7 +38,9 @@ public class ImageViewer extends JFrame{
 	
 	    JPanel imagecenter = new JPanel(new GridBagLayout());
 	    imagecenter.add(imagecanvas);
-	    JScrollPane imagescroll = new JScrollPane(imagecenter);
-	    add(imagescroll, BorderLayout.CENTER);
+//	    JScrollPane imagescroll = new JScrollPane(imagecenter);
+//	    add(imagescroll, BorderLayout.CENTER);
+	    add(imagecenter, BorderLayout.CENTER);
+	    
     }
 }
