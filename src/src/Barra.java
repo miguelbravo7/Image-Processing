@@ -110,9 +110,15 @@ public class Barra extends JMenuBar implements ActionListener,ItemListener{
 		menu2.add(submenu);		
 		this.add(menu2);
 
+
+		JMenu menu3 = new JMenu("Grafos");
 		JMenuItem hist =new JMenuItem("Histograma");
 		hist.addActionListener(new ActImageHist());
-		this.add(hist);
+		menu3.add(hist);
+		JMenuItem histacc =new JMenuItem("Histograma acumulado");
+		histacc.addActionListener(new ActImageHistAcc());
+		menu3.add(histacc);
+		this.add(menu3);
         
 	}
 	
@@ -183,6 +189,13 @@ public class Barra extends JMenuBar implements ActionListener,ItemListener{
 	public class ActImageHist implements ActionListener {
 		public void actionPerformed(ActionEvent evt) {
 		    program.makeHistogram(getImageFromComponent(program.tabbedPane.getSelectedComponent()));
+		    program.imagetype.add(BufferedImage.TYPE_INT_ARGB);
+		}
+	}
+
+	public class ActImageHistAcc implements ActionListener {
+		public void actionPerformed(ActionEvent evt) {
+		    program.makeAccumulatedHistogram(getImageFromComponent(program.tabbedPane.getSelectedComponent()));
 		    program.imagetype.add(BufferedImage.TYPE_INT_ARGB);
 		}
 	}

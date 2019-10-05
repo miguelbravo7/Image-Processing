@@ -20,19 +20,26 @@ import javax.swing.ToolTipManager;
 
 public class Histogram implements Runnable {
 	ArrayList<Pixel> image = new ArrayList<Pixel>();
-	Map<Integer, Integer> red = new TreeMap<Integer, Integer>();
-	Map<Integer, Integer> green = new TreeMap<Integer, Integer>();
-	Map<Integer, Integer> blue = new TreeMap<Integer, Integer>();
+	ArrayList<Map<Integer, Integer>> colores, colores_acc;	
+	boolean flagacc;
 	int[][] valores, acumulados;
 	Integer tamano = 0, acc[];
 	Integer med[];
 	Integer min[], max[];
 	Integer color_bits;
 
-	public Histogram(ArrayList<Pixel> imagen, int color_bits) {
-
+	public Histogram(ArrayList<Pixel> imagen, int color_bits, boolean acumulado) {
+		this.flagacc = acumulado;
 		this.image = imagen;
 		this.color_bits = color_bits;
+		
+		colores = new ArrayList<Map<Integer, Integer>>(color_bits);
+		colores_acc = new ArrayList<Map<Integer, Integer>>(color_bits);
+		
+		for (int i = 0; i < color_bits; i++) {
+			colores.add(i, new TreeMap<Integer, Integer>());
+			colores_acc.add(i, new TreeMap<Integer, Integer>());
+		}
 		
 		acumulados = new int[256][color_bits];
 		valores = new int[256][color_bits];
@@ -83,25 +90,13 @@ public class Histogram implements Runnable {
 			}
 		}
 
+
 		//valores minimos maximos y paso de valores al hashmap
 		for (int i = 0; i < valores.length; i++) {
-			if (color_bits == 1) {				
-				red.put(i, valores[i][0]);
-				if (min[0] == -1 && valores[i][0] != 0) min[0] = i;
-				if (valores[i][0] != 0) max[0] = i;
-			}else {
-
-				red.put(i, valores[i][0]);
-				if (min[0] == -1 && valores[i][0] != 0) min[0] = i;
-				if (valores[i][0] != 0) max[0] = i;
-				
-				green.put(i, valores[i][1]);
-				if (min[1] == -1 && valores[i][1] != 0) min[1] = i;
-				if (valores[i][1] != 0) max[1] = i;
-				
-				blue.put(i, valores[i][2]);
-				if (min[2] == -1 && valores[i][2] != 0) min[2] = i;
-				if (valores[i][2] != 0) max[2] = i;
+			for (int j = 0; j < color_bits; j++) {
+				colores.get(j).put(i, valores[i][j]);
+				if (min[j] == -1 && valores[i][j] != 0) min[j] = i;
+				if (valores[i][j] != 0) max[j] = i;
 			}
 		}
 		
@@ -111,7 +106,7 @@ public class Histogram implements Runnable {
 			for (int[] pixel : valores) {
 				for (int j = 0; j < color_bits; j++) {	
 					acc[j] += pixel[j] * value;
-					acumulados[value][j] = pixel[j] + acumulados[value-1 <0 ? 0 : value-1][j];
+					colores_acc.get(j).put(value, pixel[j] + colores_acc.get(j).getOrDefault(value-1 <0 ? 0 : value-1, 0));
 				}
 				++value;
 			}
@@ -130,15 +125,27 @@ public class Histogram implements Runnable {
 		frame.setLayout(new BorderLayout());
 		Container container = new Container();
 		
-		if (color_bits == 3) {
-			container.add(new Graph(red, "red", med[0]));
-			container.add(new Graph(green, "green", med[1]));
-			container.add(new Graph(blue, "blue", med[2]));
-		}else {
-			for (int i = 0; i < color_bits; i++) {
-				container.add(new Graph(red, "grey", med[i]));
+		for (int i = 0; i < color_bits; i++) {
+			if (flagacc) {
+				if (color_bits == 3) {						
+					container.add(new Graph(colores_acc.get(0), "red", med[0]));
+					container.add(new Graph(colores_acc.get(1), "green", med[1]));
+					container.add(new Graph(colores_acc.get(2), "blue", med[2]));
+				}else
+					container.add(new Graph(colores_acc.get(i), "grey", med[i]));
+				break;
 			}
-		}		
+			else {
+				if (color_bits == 3) {						
+					container.add(new Graph(colores.get(0), "red", med[0]));
+					container.add(new Graph(colores.get(1), "green", med[1]));
+					container.add(new Graph(colores.get(2), "blue", med[2]));
+				}else
+					container.add(new Graph(colores.get(i), "grey", med[i]));
+				break;
+			}		
+		}	
+			
 		
 		container.setLayout(new GridLayout(color_bits, 1));
 		frame.add(container);

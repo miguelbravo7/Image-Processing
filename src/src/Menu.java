@@ -48,9 +48,16 @@ public class Menu {
 
 	public void makeHistogram(BufferedImage image) {
 		if(imagetype.get(tabbedPane.getSelectedIndex()) == BufferedImage.TYPE_INT_ARGB)
-			new Histogram(ImgConvert.toPixelArrayList(image), 3);
+			new Histogram(ImgConvert.toPixelArrayList(image), 3, false);
 		if(imagetype.get(tabbedPane.getSelectedIndex()) == BufferedImage.TYPE_BYTE_GRAY)
-		new Histogram(ImgConvert.toPixelArrayList(image), 1);
+			new Histogram(ImgConvert.toPixelArrayList(image), 1, false);
+	}
+
+	public void makeAccumulatedHistogram(BufferedImage image) {
+		if(imagetype.get(tabbedPane.getSelectedIndex()) == BufferedImage.TYPE_INT_ARGB)
+			new Histogram(ImgConvert.toPixelArrayList(image), 3, true);
+		if(imagetype.get(tabbedPane.getSelectedIndex()) == BufferedImage.TYPE_BYTE_GRAY)
+			new Histogram(ImgConvert.toPixelArrayList(image), 1, true);
 	}
 	
 	public void openImage(String filepath) {
