@@ -90,7 +90,6 @@ public class Histogram implements Runnable {
 			}
 		}
 
-
 		//valores minimos maximos y paso de valores al hashmap
 		for (int i = 0; i < valores.length; i++) {
 			for (int j = 0; j < color_bits; j++) {
@@ -125,26 +124,23 @@ public class Histogram implements Runnable {
 		frame.setLayout(new BorderLayout());
 		Container container = new Container();
 		
-		for (int i = 0; i < color_bits; i++) {
-			if (flagacc) {
-				if (color_bits == 3) {						
-					container.add(new Graph(colores_acc.get(0), "red", med[0]));
-					container.add(new Graph(colores_acc.get(1), "green", med[1]));
-					container.add(new Graph(colores_acc.get(2), "blue", med[2]));
-				}else
-					container.add(new Graph(colores_acc.get(i), "grey", med[i]));
-				break;
-			}
-			else {
-				if (color_bits == 3) {						
-					container.add(new Graph(colores.get(0), "red", med[0]));
-					container.add(new Graph(colores.get(1), "green", med[1]));
-					container.add(new Graph(colores.get(2), "blue", med[2]));
-				}else
-					container.add(new Graph(colores.get(i), "grey", med[i]));
-				break;
-			}		
-		}	
+		if (flagacc) {
+			if (color_bits == 3) {						
+				container.add(new Graph(colores_acc.get(0), "red", med[0]));
+				container.add(new Graph(colores_acc.get(1), "green", med[1]));
+				container.add(new Graph(colores_acc.get(2), "blue", med[2]));
+			}else
+				container.add(new Graph(colores_acc.get(0), "grey", med[0]));
+		}
+		else {
+			if (color_bits == 3) {						
+				container.add(new Graph(colores.get(0), "red", med[0]));
+				container.add(new Graph(colores.get(1), "green", med[1]));
+				container.add(new Graph(colores.get(2), "blue", med[2]));
+			}else
+				container.add(new Graph(colores.get(0), "grey", med[0]));
+		}		
+		
 			
 		
 		container.setLayout(new GridLayout(color_bits, 1));

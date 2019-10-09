@@ -8,14 +8,12 @@ import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JSlider;
 import javax.swing.JTextArea;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -167,7 +165,10 @@ public class Barra extends JMenuBar implements ActionListener,ItemListener{
 	public class ActFilterImageNeg implements ActionListener {
 		public void actionPerformed(ActionEvent evt) {
 		    program.addNegativeImage(getImageFromComponent(program.tabbedPane.getSelectedComponent()));
-		    program.imagetype.add(BufferedImage.TYPE_INT_ARGB);
+		    if(program.imagetype.get(program.tabbedPane.getSelectedIndex()) == BufferedImage.TYPE_BYTE_GRAY)
+		    	program.imagetype.add(BufferedImage.TYPE_BYTE_GRAY);
+		    else
+		    	program.imagetype.add(BufferedImage.TYPE_INT_ARGB);
 		}
 	}
 
@@ -182,21 +183,22 @@ public class Barra extends JMenuBar implements ActionListener,ItemListener{
 		public void actionPerformed(ActionEvent evt) {
 			int means = 4;
 		    program.addKMeansImage(getImageFromComponent(program.tabbedPane.getSelectedComponent()), means);
-		    program.imagetype.add(BufferedImage.TYPE_INT_ARGB);
+		    if(program.imagetype.get(program.tabbedPane.getSelectedIndex()) == BufferedImage.TYPE_BYTE_GRAY)
+		    	program.imagetype.add(BufferedImage.TYPE_BYTE_GRAY);
+		    else
+		    	program.imagetype.add(BufferedImage.TYPE_INT_ARGB);
 		}
 	}
 
 	public class ActImageHist implements ActionListener {
 		public void actionPerformed(ActionEvent evt) {
 		    program.makeHistogram(getImageFromComponent(program.tabbedPane.getSelectedComponent()));
-		    program.imagetype.add(BufferedImage.TYPE_INT_ARGB);
 		}
 	}
 
 	public class ActImageHistAcc implements ActionListener {
 		public void actionPerformed(ActionEvent evt) {
 		    program.makeAccumulatedHistogram(getImageFromComponent(program.tabbedPane.getSelectedComponent()));
-		    program.imagetype.add(BufferedImage.TYPE_INT_ARGB);
 		}
 	}
 	
