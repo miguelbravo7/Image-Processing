@@ -5,6 +5,7 @@ public class ImgConvert {
 
 	static ArrayList<Pixel> toPixelArrayList(BufferedImage image){
 		// Instanciacion de los puntos a partir de los valores de la imagen
+		System.out.println(image.getWidth()*image.getHeight() +" =>" +image.getHeight() + " * " + image.getWidth());
 		ArrayList<Pixel> pixels = new ArrayList<Pixel>();
 
 		for (int i = 0; i < image.getHeight(); i++) {
@@ -20,7 +21,6 @@ public class ImgConvert {
 				pixels.add(new Pixel(new Float[] {(float) alpha, (float) red, (float) green, (float) blue}));
 			}
 		}
-		
 		return pixels;
 	}
 	

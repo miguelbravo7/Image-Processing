@@ -6,9 +6,8 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
-import java.io.File;
 
-import javax.swing.JCheckBox;
+//import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -22,7 +21,7 @@ public class Barra extends JMenuBar implements ActionListener,ItemListener{
 	private static final long serialVersionUID = 1L;
 	Menu program;
 	JFrame frame;
-	private JCheckBox chk;
+//	private JCheckBox chk;
     JSlider degrees;
     JSlider velocity;
 	JTextArea textarea;
@@ -116,6 +115,12 @@ public class Barra extends JMenuBar implements ActionListener,ItemListener{
 		JMenuItem histacc =new JMenuItem("Histograma acumulado");
 		histacc.addActionListener(new ActImageHistAcc());
 		menu3.add(histacc);
+		JMenuItem normhist =new JMenuItem("Histograma normalizado");
+		normhist.addActionListener(new ActImageNormHist());
+		menu3.add(normhist);
+		JMenuItem normhistacc =new JMenuItem("Histograma normalizado acumulado");
+		normhistacc.addActionListener(new ActImageNormHistAcc());
+		menu3.add(normhistacc);
 		this.add(menu3);
         
 	}
@@ -127,11 +132,10 @@ public class Barra extends JMenuBar implements ActionListener,ItemListener{
 		    chooser.setFileFilter(new FileNameExtensionFilter("JPG & PNG Images", "jpg", "png"));
 		    int returnVal = chooser.showOpenDialog(frame);
 		    if(returnVal == JFileChooser.APPROVE_OPTION) {
-		       System.out.println("You chose to open this file: " +
-		            (filepath = chooser.getSelectedFile().getAbsolutePath()));
+		       System.out.println("You chose to open this file: " + (filepath = chooser.getSelectedFile().getAbsolutePath()));
+		       program.openImage(filepath);
+		       program.imagetype.add(BufferedImage.TYPE_INT_ARGB);	
 		    }
-		    program.openImage(filepath);
-		    program.imagetype.add(BufferedImage.TYPE_INT_ARGB);	
 		}
 	}
 
@@ -139,32 +143,20 @@ public class Barra extends JMenuBar implements ActionListener,ItemListener{
 		public void actionPerformed(ActionEvent evt) {
 			JFileChooser chooser = new JFileChooser(".");
 		    String filepath = "";
-		    chooser.setControlButtonsAreShown( false );
-		    chooser.setFileFilter(new FolderFilter());
+		    chooser.setControlButtonsAreShown( true );
+		    chooser.setDialogTitle("Specify a file to save");  
 		    chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-		    int returnVal = chooser.showOpenDialog(frame);
-		    if(returnVal == JFileChooser.DIRECTORIES_ONLY) {
-		       System.out.println("You chose to save on this folder: " +
-		            (filepath = chooser.getSelectedFile().getAbsolutePath()));
+		    int returnVal = chooser.showSaveDialog(frame);
+		    if(returnVal == JFileChooser.APPROVE_OPTION) {
+		       System.out.println("You chose to save on this folder: " + (filepath = chooser.getSelectedFile().getPath()));
+		       program.saveImage(currentImage(), filepath);
 		    }
-		    program.saveImage(getImageFromComponent(program.tabbedPane.getSelectedComponent()), filepath);
-		}
-		private class FolderFilter extends javax.swing.filechooser.FileFilter {
-			@Override
-			public boolean accept( File file ) {
-				return file.isDirectory();
-			}
-			
-			@Override
-			public String getDescription() {
-				return "Selecciona el directorio de guardado";
-			}
 		}
 	}
 
 	public class ActFilterImageNeg implements ActionListener {
 		public void actionPerformed(ActionEvent evt) {
-		    program.addNegativeImage(getImageFromComponent(program.tabbedPane.getSelectedComponent()));
+		    program.addNegativeImage(currentImage());
 		    if(program.imagetype.get(program.tabbedPane.getSelectedIndex()) == BufferedImage.TYPE_BYTE_GRAY)
 		    	program.imagetype.add(BufferedImage.TYPE_BYTE_GRAY);
 		    else
@@ -174,7 +166,7 @@ public class Barra extends JMenuBar implements ActionListener,ItemListener{
 
 	public class ActFilterImagePal implements ActionListener {
 		public void actionPerformed(ActionEvent evt) {
-		    program.addPalImage(getImageFromComponent(program.tabbedPane.getSelectedComponent()));
+		    program.addPalImage(currentImage());
 		    program.imagetype.add(BufferedImage.TYPE_BYTE_GRAY);
 		}
 	}
@@ -182,7 +174,7 @@ public class Barra extends JMenuBar implements ActionListener,ItemListener{
 	public class ActFilterImageKmeans implements ActionListener {
 		public void actionPerformed(ActionEvent evt) {
 			int means = 4;
-		    program.addKMeansImage(getImageFromComponent(program.tabbedPane.getSelectedComponent()), means);
+		    program.addKMeansImage(currentImage(), means);
 		    if(program.imagetype.get(program.tabbedPane.getSelectedIndex()) == BufferedImage.TYPE_BYTE_GRAY)
 		    	program.imagetype.add(BufferedImage.TYPE_BYTE_GRAY);
 		    else
@@ -192,13 +184,25 @@ public class Barra extends JMenuBar implements ActionListener,ItemListener{
 
 	public class ActImageHist implements ActionListener {
 		public void actionPerformed(ActionEvent evt) {
-		    program.makeHistogram(getImageFromComponent(program.tabbedPane.getSelectedComponent()));
+		    program.makeHistogram(currentImage());
 		}
 	}
 
 	public class ActImageHistAcc implements ActionListener {
 		public void actionPerformed(ActionEvent evt) {
-		    program.makeAccumulatedHistogram(getImageFromComponent(program.tabbedPane.getSelectedComponent()));
+		    program.makeAccumulatedHistogram(currentImage());
+		}
+	}
+
+	public class ActImageNormHist implements ActionListener {
+		public void actionPerformed(ActionEvent evt) {
+		    program.makeNormHistogram(currentImage());
+		}
+	}
+
+	public class ActImageNormHistAcc implements ActionListener {
+		public void actionPerformed(ActionEvent evt) {
+		    program.makeNormAccumulatedHistogram(currentImage());
 		}
 	}
 	
@@ -207,6 +211,10 @@ public class Barra extends JMenuBar implements ActionListener,ItemListener{
 	    Graphics g = awtImage.getGraphics();
 	    component.printAll(g);
 		return awtImage;
+	}
+	
+	private BufferedImage currentImage() {
+		return getImageFromComponent(program.getComponentImg(program.tabbedPane.getSelectedIndex()));
 	}
 
 	@Override

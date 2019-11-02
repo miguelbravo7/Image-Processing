@@ -15,7 +15,11 @@ public class ImageViewer extends JFrame{
     JLabel imagecanvas;
 
     public ImageViewer(BufferedImage image) {
+    	
     	super("Image Viewer");
+	    
+    	this.imagecanvas = new JLabel();
+	    
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		
 		initComponents();
@@ -33,8 +37,7 @@ public class ImageViewer extends JFrame{
 
     public void initComponents() {
 	    this.setLayout(new BorderLayout());
-	    imagecanvas = new JLabel();
-	    imagecanvas.setBorder(new EmptyBorder(5,5,5,5));
+	    imagecanvas.setBorder(new EmptyBorder(0,0,0,0));
 	
 	    JPanel imagecenter = new JPanel(new GridBagLayout());
 	    imagecenter.add(imagecanvas);

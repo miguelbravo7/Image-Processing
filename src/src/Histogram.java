@@ -15,66 +15,77 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 import javax.swing.ToolTipManager;
 
 public class Histogram implements Runnable {
+	Thread thread;
 	ArrayList<Pixel> image = new ArrayList<Pixel>();
-	ArrayList<Map<Integer, Integer>> colores, colores_acc;	
-	boolean flagacc;
-	int[][] valores, acumulados;
-	Integer tamano = 0, acc[];
+	ArrayList<Map<Integer, Integer>> colores, colores_acc;
+	ArrayList<Map<Integer, Double>> norm_colores, norm_colores_acc;	
+	int[][] valores;
+	Integer tamano = 0;
 	Integer med[];
+	Double dev[],ent[];
 	Integer min[], max[];
 	Integer color_bits;
 
-	public Histogram(ArrayList<Pixel> imagen, int color_bits, boolean acumulado) {
-		this.flagacc = acumulado;
+	public Histogram(ArrayList<Pixel> imagen, int color_bits) {
 		this.image = imagen;
 		this.color_bits = color_bits;
-		
+
 		colores = new ArrayList<Map<Integer, Integer>>(color_bits);
 		colores_acc = new ArrayList<Map<Integer, Integer>>(color_bits);
+		norm_colores = new ArrayList<Map<Integer, Double>>(color_bits);
+		norm_colores_acc = new ArrayList<Map<Integer, Double>>(color_bits);
 		
 		for (int i = 0; i < color_bits; i++) {
 			colores.add(i, new TreeMap<Integer, Integer>());
 			colores_acc.add(i, new TreeMap<Integer, Integer>());
+			norm_colores.add(i, new TreeMap<Integer, Double>());
+			norm_colores_acc.add(i, new TreeMap<Integer, Double>());
 		}
 		
-		acumulados = new int[256][color_bits];
-		valores = new int[256][color_bits];
+		valores = new int[color_bits][256];
 		
-		acc = new Integer[color_bits];
 		med = new Integer[color_bits];
+		dev = new Double[color_bits];
+		ent = new Double[color_bits];
 		min = new Integer[color_bits];
 		max = new Integer[color_bits];
-		Arrays.fill(acc, -1);
-		Arrays.fill(min, -1);
-
-		Thread thread = new Thread(this, "histogram");
-		thread.start();
 		
+		Arrays.fill(min, -1);
+		Arrays.fill(med, 0);
+
+		this.thread = new Thread(this, "histogram");
+		this.thread.start();
 		try {
-			thread.join();
+			this.thread.join();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 		
-		System.out.println(this);
+		
 	}
 
 	public String toString() {
 		String msg = new String();
 		if(color_bits == 3)
-			msg = "Media: r " + med[0] + ",g " + med[1] + ",b " + med[2] + ": " + (acc[0] + acc[1] +acc[2])/tamano
-				+"\nMin/Max:\n\t red ["+ min[0] +","+ max[0] +"]\n\t green ["+ min[1] +","+ max[1] +"]\n\t blue ["+ min[2] +","+ max[2] +"]\n";
+			msg = "Media:\n\t r " + med[0] + ",g " + med[1] + ",b " + med[2] + ": " + colores_acc.get(0).get(255) + "/" + tamano
+				+"\nMin/Max:\n\t red ["+ min[0] +","+ max[0] +"]\n\t green ["+ min[1] +","+ max[1] +"]\n\t blue ["+ min[2] +","+ max[2] +"]\n"
+				+"Desv. tipica:\n\t red "+ dev[0] +" green "+ dev[1] +" blue "+ dev[2] +"\n"
+				+"Entropia:\n\t red "+ ent[0] +" green "+ ent[1] +" blue "+ ent[2] +"\n";
 		else {
 			msg ="Media:\n";
 			for (int i = 0; i < color_bits; i++) {
-				 msg += "valor "+ i + " ->" +med[i];
-				 msg += " : " + (acc[0]*3)/tamano
+				 msg += "color "+ i + " ->" +med[i];
+				 msg += " : " + colores_acc.get(0).get(255)/tamano
 						+"\nMin/Max:\n";
-				 msg += "\t valor "+i+"["+ min[i] +","+ max[i] +"]\n";				
+				 msg += "\t valor "+i+"["+ min[i] +","+ max[i] +"]\n";
+				 msg += "Desv. tipica color "+ i + " ->" +dev[i]+"\n";	
+				 msg += "Entropia color "+ i + " ->" +ent[i]+"\n";			
 			}
 		}
 		return msg;
@@ -82,69 +93,152 @@ public class Histogram implements Runnable {
 
 	@Override
 	public void run() {
-		tamano = image.size();
+		this.tamano = image.size();
 
 		for (Pixel pixel : image) {
 			for (int j = 0; j < color_bits; j++) {	
-				valores[(int) pixel.get(j+1)][j]++;
+				this.valores[j][(int) pixel.get(j+1)]++;
 			}
 		}
-
-		//valores minimos maximos y paso de valores al hashmap
-		for (int i = 0; i < valores.length; i++) {
-			for (int j = 0; j < color_bits; j++) {
-				colores.get(j).put(i, valores[i][j]);
-				if (min[j] == -1 && valores[i][j] != 0) min[j] = i;
-				if (valores[i][j] != 0) max[j] = i;
-			}
-		}
-		
-		//valores acumulados y media
-		{
-			int value = 0;
-			for (int[] pixel : valores) {
-				for (int j = 0; j < color_bits; j++) {	
-					acc[j] += pixel[j] * value;
-					colores_acc.get(j).put(value, pixel[j] + colores_acc.get(j).getOrDefault(value-1 <0 ? 0 : value-1, 0));
-				}
-				++value;
-			}
-			for (int j = 0; j < med.length; j++) {	
-				med[j] = acc[j] / tamano;
-			}
-		}
+		maxminhm();
+		acumulado();
+		normValues();
+		media();
+		stdDev();
+		entropy();
 		
 		image.clear();
-		graphicHisogram();
 	}
 
-	public void graphicHisogram() {
-		JFrame frame = new JFrame("Test");
-		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		frame.setLayout(new BorderLayout());
+	//valores minimos maximos y paso de valores al hashmap
+	private void maxminhm() {
+		for (int i = 0; i < 256; i++) {
+			for (int j = 0; j < color_bits; j++) {
+				colores.get(j).put(i, valores[j][i]);
+				if (min[j] == -1 && valores[j][i] != 0) min[j] = i;
+				if (valores[j][i] != 0) max[j] = i;
+			}
+		}
+	}
+
+	//valores acumulados y media
+	private void acumulado() {
+		for (int i = 0; i < 256; i++) {
+			for (int j = 0; j < color_bits; j++) {	
+				colores_acc.get(j).put(i, valores[j][i] + colores_acc.get(j).getOrDefault(i-1 < 0 ? 0 : i-1, 0));
+			}
+		}
+	}
+	//Valores normalizados
+	private void normValues() {
+		for (int i = 0; i < 256; i++) {
+			for (int j = 0; j < color_bits; j++) {
+				norm_colores.get(j).put(i, valores[j][i]/(double) colores_acc.get(j).get(255));
+				norm_colores_acc.get(j).put(i, norm_colores.get(j).getOrDefault(i, (double) 0) + norm_colores_acc.get(j).getOrDefault(i-1 == 0 ? 0 : i-1, (double) 0));
+			}
+		}
+	}
+	//media
+	private void media() {
+		for (int i = 0; i < color_bits; i++) {
+			double acc = 0;
+			for(int j = 0; j < 256; j++) {
+				acc += j * norm_colores.get(i).getOrDefault(j, (double) 0);				
+			}
+			med[i] = (int) acc;
+		}		
+	}
+	//desviacion tipica
+	private void stdDev() {
+		for (int i= 0; i< color_bits; i++) {
+			int acc=0;
+			for (int j = 0; j < 255; j++) {
+				acc = colores.get(i).getOrDefault(j, 0) * (j - med[i])*(j - med[i]);
+			}		
+			dev[i] = Math.sqrt(acc / (double)colores_acc.get(0).get(255));
+		}
+	}
+	
+	//entropia
+	private void entropy() {
+		for (int i= 0; i< color_bits; i++) {
+			double acc = 0;
+			for (int j = 0; j < 255; j++) {
+				acc = norm_colores.get(i).getOrDefault(j, (double) 0) * Math.log10(norm_colores.get(i).getOrDefault(j, (double) 0))/Math.log10(2);
+			}		
+			ent[i] = -acc;
+		}
+	}
+
+	public void histogram(){
+        Container container = new Container();
+	
+		if (color_bits == 3) {						
+			container.add(new Graph(colores.get(0), "red", med[0]));
+			container.add(new Graph(colores.get(1), "green", med[1]));
+			container.add(new Graph(colores.get(2), "blue", med[2]));
+		}else
+			container.add(new Graph(colores.get(0), "grey", med[0]));
+		
+		graphicHistogram(container);			
+		
+	}
+	public void histogramAcc(){
 		Container container = new Container();
 		
-		if (flagacc) {
-			if (color_bits == 3) {						
-				container.add(new Graph(colores_acc.get(0), "red", med[0]));
-				container.add(new Graph(colores_acc.get(1), "green", med[1]));
-				container.add(new Graph(colores_acc.get(2), "blue", med[2]));
-			}else
-				container.add(new Graph(colores_acc.get(0), "grey", med[0]));
-		}
-		else {
-			if (color_bits == 3) {						
-				container.add(new Graph(colores.get(0), "red", med[0]));
-				container.add(new Graph(colores.get(1), "green", med[1]));
-				container.add(new Graph(colores.get(2), "blue", med[2]));
-			}else
-				container.add(new Graph(colores.get(0), "grey", med[0]));
-		}		
+		if (color_bits == 3) {						
+			container.add(new Graph(colores_acc.get(0), "red", med[0]));
+			container.add(new Graph(colores_acc.get(1), "green", med[1]));
+			container.add(new Graph(colores_acc.get(2), "blue", med[2]));
+		}else
+			container.add(new Graph(colores_acc.get(0), "grey", med[0]));
 		
-			
+		graphicHistogram(container);			
 		
-		container.setLayout(new GridLayout(color_bits, 1));
+	}
+	public void normHistogram(){
+		Container container = new Container();
+		
+		if (color_bits == 3) {						
+			container.add(new Graph(norm_colores.get(0), "red", med[0]));
+			container.add(new Graph(norm_colores.get(1), "green", med[1]));
+			container.add(new Graph(norm_colores.get(2), "blue", med[2]));
+		}else
+			container.add(new Graph(norm_colores.get(0), "grey", med[0]));
+		
+		graphicHistogram(container);	
+		
+	}
+	public void normHistogramAcc(){
+		Container container = new Container();
+		
+		if (color_bits == 3) {						
+			container.add(new Graph(norm_colores_acc.get(0), "red", med[0]));
+			container.add(new Graph(norm_colores_acc.get(1), "green", med[1]));
+			container.add(new Graph(norm_colores_acc.get(2), "blue", med[2]));
+		}else
+			container.add(new Graph(norm_colores_acc.get(0), "grey", med[0]));
+		
+		graphicHistogram(container);	
+		
+	}
+
+	public void graphicHistogram(Container container) {
+		JFrame frame = new JFrame("Histogram");
+		
+		JPanel texto = new JPanel();
+		texto.add(new JLabel("<html>" + this.toString().replaceAll("\n","<br/>").replaceAll("\t", "&ensp;") + "<html>", SwingConstants.LEFT));
+		texto.setBackground(new Color(213, 202, 189));
+		container.add(texto);
+
+		container.setLayout(new GridLayout(color_bits+1, 1));
+		
+		
+		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		frame.setLayout(new BorderLayout());	
+		
 		frame.add(container);
+		
 		frame.pack();
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
@@ -152,21 +246,23 @@ public class Histogram implements Runnable {
 
 	protected class Graph extends JPanel {
 		private static final long serialVersionUID = 1L;
-		protected static final int MIN_BAR_WIDTH = 2;
-		private Map<Integer, Integer> mapHistory;
+		protected static final int MIN_BAR_WIDTH = 1;
+		protected static final int MIN_BAR_HEIGHT = 100;
+		private Map<Integer, Number> mapHistory;
 		private Map<Rectangle2D, String> rectValue = new HashMap<Rectangle2D, String>();
 		private String color;
 		private Integer median;
 		
-		public Graph(Map<Integer, Integer> mapHistory, String color, Integer median) {
-			this.mapHistory = mapHistory;
+		@SuppressWarnings("unchecked")
+		public Graph(Map<Integer, ? > mapHistory, String color, Integer median) {
+			this.mapHistory = (Map<Integer, Number>) mapHistory;
 			this.color = color;
 			this.median = median;
 			int width = (mapHistory.size() * MIN_BAR_WIDTH) + 11;			
 			
 			setBackground(new Color(213, 202, 189));
-			setMinimumSize(new Dimension(width, 128));
-			setPreferredSize(new Dimension(width, 256));
+			setMinimumSize(new Dimension(width, MIN_BAR_HEIGHT));
+			setPreferredSize(new Dimension(width, MIN_BAR_HEIGHT*2));
 			
 			addMouseMotionListener(new MouseMotionListener() {			     
 		        @Override
@@ -192,21 +288,22 @@ public class Histogram implements Runnable {
 				int yOffset = 5;
 				int width = getWidth() - 1 - (xOffset * 2);
 				int height = getHeight() - 1 - (yOffset * 2);
-				int maxValue = 0;
+				double maxValue = 0;
 				int barWidth =  Math.max(MIN_BAR_WIDTH,  width / mapHistory.size());
 				
 				Graphics2D g2d = (Graphics2D) g.create();
 				g2d.setColor(Color.BLACK);
 				g2d.drawRect(xOffset, yOffset, width, height);
 				
-				for (Integer value : mapHistory.values()) 
-					maxValue = Math.max(maxValue, value);
+				for (Number value : mapHistory.values()) 
+					maxValue = Math.max(maxValue, value.doubleValue() % 1 != 0 ? value.doubleValue()*100 : value.doubleValue());
 				
 				int xPos = xOffset;
 				for (Integer key : mapHistory.keySet()) {
-					int value = mapHistory.get(key);
-					int barHeight = Math.round((value / (float) maxValue) * height);					
-					int yPos = height + yOffset - barHeight;	
+					double value = mapHistory.get(key).doubleValue();
+					value = value % 1 != 0 ? value*100 : value;
+					double barHeight = (value / (float) maxValue) * height;					
+					double yPos = height + yOffset - barHeight;	
 					
 					Rectangle2D bar;
 
@@ -221,8 +318,8 @@ public class Histogram implements Runnable {
 									color == "green" ? key : 0,
 									color == "blue" ? key : 0));
 					
-					bar = new Rectangle2D.Float(xPos, yPos-1, barWidth, barHeight+1);
-					rectValue.put(bar, String.valueOf(value));
+					bar = new Rectangle2D.Float(xPos, (int)yPos-1, barWidth, (int) barHeight+1);
+					rectValue.put(bar, String.valueOf((value % 1 != 0 ? value + "%" : (int)value)));
 					
 					g2d.fill(bar);
 					g2d.setColor(Color.DARK_GRAY);
