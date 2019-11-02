@@ -15,7 +15,6 @@ import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
 
 public class Menu {
 	private static final int WINDOW_SIZE = 800;
@@ -23,8 +22,8 @@ public class Menu {
 	JFrame frame = new JFrame("Editor");
 	JTabbedPane tabbedPane = new JTabbedPane();
 	File file;
-	BufferedImage image;
 	ArrayList<Integer> imagetype = new ArrayList<Integer>();
+	ArrayList<Histogram> imagehist = new ArrayList<Histogram>();
 	JLabel text = new JLabel("");
 
 	public Menu() {			
@@ -38,8 +37,10 @@ public class Menu {
 		tabbedPane.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
+
+				int tab_index = tabbedPane.getSelectedIndex();
 				
-				((JLabel)getComponentImg(tabbedPane.getSelectedIndex())).addMouseMotionListener(new MouseAdapter() {
+				((JLabel)getComponentImg(tab_index)).addMouseMotionListener(new MouseAdapter() {
 					@Override
 					public void mouseMoved(MouseEvent e) {
 						text.setText("Posicion x:" + e.getX() + "  y:" + e.getY() + "  " );
@@ -53,8 +54,10 @@ public class Menu {
 		@Override
 		public void keyPressed(KeyEvent key) {
 			if (key.getKeyCode() == KeyEvent.VK_DELETE) {
-				imagetype.remove(tabbedPane.getSelectedIndex());
-				tabbedPane.remove(tabbedPane.getSelectedIndex());
+				int tab_index = tabbedPane.getSelectedIndex();
+				imagetype.remove(tab_index);
+				tabbedPane.remove(tab_index);
+				imagehist.remove(tab_index);
 			}
 		}
 		});
@@ -75,64 +78,62 @@ public class Menu {
 	
 	public void addImage(BufferedImage image) {
 		tabbedPane.addTab("Image", new ImageViewer(image).getContentPane());
+		imagehist.add(new Histogram(ImgConvert.toPixelArrayList(image), 3));
 	}
 	
 	public void addPalImage(BufferedImage image) {
-		tabbedPane.addTab("PAL Monochrome", new ImageViewer(ImgMonochrome.renderPal(image)).getContentPane());
+		BufferedImage pimage = ImgMonochrome.renderPal(image);
+		tabbedPane.addTab("PAL Monochrome", new ImageViewer(pimage).getContentPane());
+		imagehist.add(new Histogram(ImgConvert.toPixelArrayList(pimage), 1));
 	}
 	
 	public void addNegativeImage(BufferedImage image) {
-		tabbedPane.addTab("Negative", new ImageViewer(ImgNegative.render(image)).getContentPane());
+		BufferedImage nimage = ImgNegative.render(image);
+		tabbedPane.addTab("Negative", new ImageViewer(nimage).getContentPane());
+		imagehist.add(new Histogram(ImgConvert.toPixelArrayList(nimage), 3));
+	}
+	
+	public void addEcualizedImage(BufferedImage image) {
+		BufferedImage eimage = ImgLinealTransform.ecualize(image, imagehist.get(tabbedPane.getSelectedIndex()));
+		tabbedPane.addTab("Ecualized", new ImageViewer(eimage).getContentPane());
+		imagehist.add(new Histogram(ImgConvert.toPixelArrayList(eimage), 3));
 	}
 	
 	public void addKMeansImage(BufferedImage image, int k) {
-		tabbedPane.addTab(k + "-means", new ImageViewer(Kmeans_Processor.renderkmeans(image, k)).getContentPane());
+		BufferedImage kimage = Kmeans_Processor.renderkmeans(image, k);
+		tabbedPane.addTab(k + "-means", new ImageViewer(kimage).getContentPane());
+		imagehist.add(new Histogram(ImgConvert.toPixelArrayList(kimage), 3));
 	}
 
 	public void makeHistogram(BufferedImage image) {
-		if(imagetype.get(tabbedPane.getSelectedIndex()) == BufferedImage.TYPE_INT_ARGB) {
-			new Histogram(ImgConvert.toPixelArrayList(image), 3).histogram();
-		}
-		if(imagetype.get(tabbedPane.getSelectedIndex()) == BufferedImage.TYPE_BYTE_GRAY)
-			new Histogram(ImgConvert.toPixelArrayList(image), 1).histogram();
+		int tab_index = tabbedPane.getSelectedIndex();
+		imagehist.get(tab_index).histogram();
 	}
 
 	public void makeAccumulatedHistogram(BufferedImage image) {
-		if(imagetype.get(tabbedPane.getSelectedIndex()) == BufferedImage.TYPE_INT_ARGB)
-			new Histogram(ImgConvert.toPixelArrayList(image), 3).histogramAcc();
-		if(imagetype.get(tabbedPane.getSelectedIndex()) == BufferedImage.TYPE_BYTE_GRAY)
-			new Histogram(ImgConvert.toPixelArrayList(image), 1).histogramAcc();
+		int tab_index = tabbedPane.getSelectedIndex();
+		imagehist.get(tab_index).histogramAcc();
 	}
 
 	public void makeNormHistogram(BufferedImage image) {
-		if(imagetype.get(tabbedPane.getSelectedIndex()) == BufferedImage.TYPE_INT_ARGB)
-			new Histogram(ImgConvert.toPixelArrayList(image), 3).normHistogram();
-		if(imagetype.get(tabbedPane.getSelectedIndex()) == BufferedImage.TYPE_BYTE_GRAY)
-			new Histogram(ImgConvert.toPixelArrayList(image), 1).normHistogram();
+		int tab_index = tabbedPane.getSelectedIndex();
+		imagehist.get(tab_index).normHistogram();
 	}
 
 	public void makeNormAccumulatedHistogram(BufferedImage image) {
-		if(imagetype.get(tabbedPane.getSelectedIndex()) == BufferedImage.TYPE_INT_ARGB)
-			new Histogram(ImgConvert.toPixelArrayList(image), 3).normHistogramAcc();
-		if(imagetype.get(tabbedPane.getSelectedIndex()) == BufferedImage.TYPE_BYTE_GRAY)
-			new Histogram(ImgConvert.toPixelArrayList(image), 1).normHistogramAcc();
+		int tab_index = tabbedPane.getSelectedIndex();
+		imagehist.get(tab_index).normHistogramAcc();
 	}
 	private static List<Component> getAllComponents(final Container c) {
-        Component[] comps = c.getComponents();
-        List<Component> compList = new ArrayList<Component>();
-        for (Component comp : comps) {
-          compList.add(comp);
-          if (comp instanceof Container) {
-            compList.addAll(getAllComponents((Container) comp));
-          }
-
-
-            if(comp instanceof JTextField){
-                 System.out.println(comp);
-            }
-
-        }
-        return compList;
+	    Component[] comps = c.getComponents();
+	    List<Component> compList = new ArrayList<Component>();
+	    for (Component comp : comps) {
+			compList.add(comp);
+			if (comp instanceof Container) {
+				compList.addAll(getAllComponents((Container) comp));
+			}
+	    }
+	    return compList;
     }
 	
 	public Component getComponentImg(int index) {
@@ -140,10 +141,11 @@ public class Menu {
 		
 		return comp.get(index*3+7);
 	}
+	
 	public void openImage(String filepath) {
 		// Creacion de archivos de lectura y escrtura		
 		try {
-			image = ImageIO.read(file = new File(filepath));
+			BufferedImage image = ImageIO.read(file = new File(filepath));
 			addImage(image);
 		} catch (IOException e) {
 			System.out.println("Error: " + e);

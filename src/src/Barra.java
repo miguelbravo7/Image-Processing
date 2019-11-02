@@ -100,6 +100,9 @@ public class Barra extends JMenuBar implements ActionListener,ItemListener{
 		JMenuItem neg =new JMenuItem("Negativo");
 		neg.addActionListener(new ActFilterImageNeg());
 		submenu.add(neg); 		
+		JMenuItem ec =new JMenuItem("Ecualizacion");
+		ec.addActionListener(new ActFilterImageEc());
+		submenu.add(ec); 		
 		JMenuItem kmeans =new JMenuItem("K-means");
 		kmeans.addActionListener(new ActFilterImageKmeans());
 		submenu.add(kmeans);
@@ -168,6 +171,16 @@ public class Barra extends JMenuBar implements ActionListener,ItemListener{
 		public void actionPerformed(ActionEvent evt) {
 		    program.addPalImage(currentImage());
 		    program.imagetype.add(BufferedImage.TYPE_BYTE_GRAY);
+		}
+	}
+
+	public class ActFilterImageEc implements ActionListener {
+		public void actionPerformed(ActionEvent evt) {
+		    program.addEcualizedImage(currentImage());
+		    if(program.imagetype.get(program.tabbedPane.getSelectedIndex()) == BufferedImage.TYPE_BYTE_GRAY)
+		    	program.imagetype.add(BufferedImage.TYPE_BYTE_GRAY);
+		    else
+		    	program.imagetype.add(BufferedImage.TYPE_INT_ARGB);
 		}
 	}
 

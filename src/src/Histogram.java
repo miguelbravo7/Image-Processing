@@ -134,7 +134,7 @@ public class Histogram implements Runnable {
 		for (int i = 0; i < 256; i++) {
 			for (int j = 0; j < color_bits; j++) {
 				norm_colores.get(j).put(i, valores[j][i]/(double) colores_acc.get(j).get(255));
-				norm_colores_acc.get(j).put(i, norm_colores.get(j).getOrDefault(i, (double) 0) + norm_colores_acc.get(j).getOrDefault(i-1 == 0 ? 0 : i-1, (double) 0));
+				norm_colores_acc.get(j).put(i, norm_colores.get(j).getOrDefault(i, (double) 0) + norm_colores_acc.get(j).getOrDefault(i-1 < 0 ? 0 : i-1, (double) 0));
 			}
 		}
 	}
@@ -151,11 +151,11 @@ public class Histogram implements Runnable {
 	//desviacion tipica
 	private void stdDev() {
 		for (int i= 0; i< color_bits; i++) {
-			int acc=0;
+			double acc=0;
 			for (int j = 0; j < 255; j++) {
-				acc = colores.get(i).getOrDefault(j, 0) * (j - med[i])*(j - med[i]);
+				acc = norm_colores.get(i).getOrDefault(j, (double) 0) * (j - med[i])*(j - med[i]);
 			}		
-			dev[i] = Math.sqrt(acc / (double)colores_acc.get(0).get(255));
+			dev[i] = Math.sqrt(acc);
 		}
 	}
 	
