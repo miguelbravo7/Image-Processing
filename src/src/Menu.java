@@ -1,6 +1,7 @@
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Graphics2D;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -12,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.imageio.ImageIO;
+import javax.swing.Icon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTabbedPane;
@@ -39,11 +41,26 @@ public class Menu {
 			public void mouseClicked(MouseEvent e) {
 
 				int tab_index = tabbedPane.getSelectedIndex();
+				JLabel label = (JLabel)getComponentImg(tab_index);
+				Icon icon= label.getIcon();
+				int w = icon.getIconWidth();
+				int h = icon.getIconHeight();
+				BufferedImage img = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+				Graphics2D g2d = (Graphics2D) img.getGraphics();
+				icon.paintIcon(null, g2d, 0, 0);
+				g2d.dispose();
 				
-				((JLabel)getComponentImg(tab_index)).addMouseMotionListener(new MouseAdapter() {
+				label.addMouseMotionListener(new MouseAdapter() {
 					@Override
 					public void mouseMoved(MouseEvent e) {
-						text.setText("Posicion x:" + e.getX() + "  y:" + e.getY() + "  " );
+						int pixel = img.getRGB(e.getX(), e.getY());
+						
+						int alpha = (pixel >> 24) & 0xff;
+						int red = (pixel >> 16) & 0xff;
+						int green = (pixel >> 8) & 0xff;
+						int blue = (pixel) & 0xff;
+						
+						text.setText("Posicion (x:" + e.getX() + "  y:" + e.getY() + ")  Colores r: " + red + " g: " + green + " b: " + blue);
 					}
 				});
 				
