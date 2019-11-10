@@ -4,7 +4,7 @@ import java.util.List;
 public class ImgGammaCorrection {
 
 	static public BufferedImage gammaCorrection(BufferedImage image, int gamma) {
-		BufferedImage img = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
+		BufferedImage img = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
 
 		// Instanciacion de los puntos a partir de los valores de la imagen
 		List<Pixel> pixels = ImgConvert.toPixelArrayList(image);

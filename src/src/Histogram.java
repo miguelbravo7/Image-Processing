@@ -75,8 +75,8 @@ public class Histogram implements Runnable {
 		if(color_bits == 3)
 			msg = "Media:\n\t r " + med[0] + ",g " + med[1] + ",b " + med[2] + ": " + colores_acc.get(0).get(255) + "/" + tamano
 				+"\nMin/Max:\n\t red ["+ min[0] +","+ max[0] +"]\n\t green ["+ min[1] +","+ max[1] +"]\n\t blue ["+ min[2] +","+ max[2] +"]\n"
-				+"Desv. tipica:\n\t red "+ dev[0] +" green "+ dev[1] +" blue "+ dev[2] +"\n"
-				+"Entropia:\n\t red "+ ent[0] +" green "+ ent[1] +" blue "+ ent[2] +"\n";
+				+"Desv. tipica:\n\t red "+ String.format("%.4f",dev[0]) +" green "+ String.format("%.4f",dev[1]) +" blue "+ String.format("%.4f",dev[2]) +"\n"
+				+"Entropia:\n\t red "+ String.format("%.4f",ent[0]) +" green "+ String.format("%.4f",ent[1]) +" blue "+ String.format("%.4f",ent[2]) +"\n";
 		else {
 			msg ="Media:\n";
 			for (int i = 0; i < color_bits; i++) {
@@ -153,7 +153,10 @@ public class Histogram implements Runnable {
 		for (int i= 0; i< color_bits; i++) {
 			double acc=0;
 			for (int j = 0; j < 255; j++) {
-				acc = norm_colores.get(i).getOrDefault(j, (double) 0) * (j - med[i])*(j - med[i]);
+				double val = norm_colores.get(i).getOrDefault(j, (double) 0) * (j - med[i])*(j - med[i]);
+				if(Double.isFinite(val) && !Double.isNaN(val)) {
+					acc += val;
+				}
 			}		
 			dev[i] = Math.sqrt(acc);
 		}
@@ -164,7 +167,10 @@ public class Histogram implements Runnable {
 		for (int i= 0; i< color_bits; i++) {
 			double acc = 0;
 			for (int j = 0; j < 255; j++) {
-				acc = norm_colores.get(i).getOrDefault(j, (double) 0) * Math.log10(norm_colores.get(i).getOrDefault(j, (double) 0))/Math.log10(2);
+				double val = norm_colores.get(i).getOrDefault(j, (double) 0) * Math.log10(norm_colores.get(i).getOrDefault(j, (double) 0))/Math.log10(2);
+				if(Double.isFinite(val) && !Double.isNaN(val)) {
+					acc += val;
+				}
 			}		
 			ent[i] = -acc;
 		}

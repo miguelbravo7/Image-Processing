@@ -6,7 +6,7 @@ import java.util.List;
 public class ImgLinealTransform {
 
 	static public BufferedImage LinealTransform(BufferedImage image, ArrayList<Point> points) {
-		BufferedImage img = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
+		BufferedImage img = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
 
 		// Instanciacion de los puntos a partir de los valores de la imagen
 		List<Pixel> pixels = ImgConvert.toPixelArrayList(image);
@@ -32,7 +32,7 @@ public class ImgLinealTransform {
 	}
 
 	static public BufferedImage ecualize(BufferedImage image, Histogram img_hist) {
-		BufferedImage img = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
+		BufferedImage img = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
 
 		// Instanciacion de los puntos a partir de los valores de la imagen
 		List<Pixel> pixels = ImgConvert.toPixelArrayList(image);
