@@ -1,7 +1,6 @@
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
-import java.awt.Graphics2D;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -13,7 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.imageio.ImageIO;
-import javax.swing.Icon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTabbedPane;
@@ -24,8 +22,8 @@ public class Menu {
 	JFrame frame = new JFrame("Editor");
 	JTabbedPane tabbedPane = new JTabbedPane();
 	File file;
-	ArrayList<Integer> imagetype = new ArrayList<Integer>();
 	ArrayList<Histogram> imagehist = new ArrayList<Histogram>();
+	ArrayList<BufferedImage> imagelist = new ArrayList<BufferedImage>();
 	JLabel text = new JLabel("");
 
 	public Menu() {			
@@ -35,13 +33,7 @@ public class Menu {
 
 				int tab_index = tabbedPane.getSelectedIndex();
 				JLabel label = (JLabel)getComponentImg(tab_index);
-				Icon icon= label.getIcon();
-				int w = icon.getIconWidth();
-				int h = icon.getIconHeight();
-				BufferedImage img = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
-				Graphics2D g2d = (Graphics2D) img.getGraphics();
-				icon.paintIcon(null, g2d, 0, 0);
-				g2d.dispose();
+				BufferedImage img = imagelist.get(tab_index);
 				
 				label.addMouseMotionListener(new MouseAdapter() {
 					@Override
@@ -70,10 +62,7 @@ public class Menu {
 			@Override
 			public void keyPressed(KeyEvent key) {
 				if (key.getKeyCode() == KeyEvent.VK_DELETE) {
-					int tab_index = tabbedPane.getSelectedIndex();
-					imagetype.remove(tab_index);
-					tabbedPane.remove(tab_index);
-					imagehist.remove(tab_index);
+					deleteImage(tabbedPane.getSelectedIndex());					
 				}
 			}
 		});
@@ -93,32 +82,35 @@ public class Menu {
 	}
 	
 	public void addImage(BufferedImage image) {
-		tabbedPane.addTab("Image", new ImageViewer(image).getContentPane());
-		imagehist.add(new Histogram(ImgConvert.toPixelArrayList(image), 3));
+		addToPane(image, "Ecualized");
+	}
+	
+	public void deleteImage(int tab_index) {
+		tabbedPane.remove(tab_index);
+		imagehist.remove(tab_index);
+		imagelist.remove(tab_index);
 	}
 	
 	public void addPalImage(BufferedImage image) {
-		BufferedImage pimage = ImgMonochrome.renderPal(image);
-		tabbedPane.addTab("PAL Monochrome", new ImageViewer(pimage).getContentPane());
-		imagehist.add(new Histogram(ImgConvert.toPixelArrayList(pimage), 1));
+		addToPane(ImgMonochrome.renderPal(image), "PAL");
 	}
 	
 	public void addNegativeImage(BufferedImage image) {
-		BufferedImage nimage = ImgNegative.render(image);
-		tabbedPane.addTab("Negative", new ImageViewer(nimage).getContentPane());
-		imagehist.add(new Histogram(ImgConvert.toPixelArrayList(nimage), 3));
+		addToPane(ImgNegative.render(image), "Ecualized");
 	}
 	
 	public void addEcualizedImage(BufferedImage image) {
-		BufferedImage eimage = ImgLinealTransform.ecualize(image, imagehist.get(tabbedPane.getSelectedIndex()));
-		tabbedPane.addTab("Ecualized", new ImageViewer(eimage).getContentPane());
-		imagehist.add(new Histogram(ImgConvert.toPixelArrayList(eimage), 3));
+		addToPane(ImgLinealTransform.ecualize(image, imagehist.get(tabbedPane.getSelectedIndex())), "Ecualized");
 	}
 	
 	public void addKMeansImage(BufferedImage image, int k) {
-		BufferedImage kimage = Kmeans_Processor.renderkmeans(image, k);
-		tabbedPane.addTab(k + "-means", new ImageViewer(kimage).getContentPane());
-		imagehist.add(new Histogram(ImgConvert.toPixelArrayList(kimage), 3));
+		addToPane(Kmeans_Processor.renderkmeans(image, k), k + "-means");
+	}
+	
+	private void addToPane(	BufferedImage image, String text) {
+		tabbedPane.addTab(text, new ImageViewer(image).getContentPane());
+		imagehist.add(new Histogram(image));
+		imagelist.add(image);
 	}
 
 	public void makeHistogram(BufferedImage image) {

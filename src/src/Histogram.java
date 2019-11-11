@@ -8,6 +8,7 @@ import java.awt.GridLayout;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -23,7 +24,7 @@ import javax.swing.ToolTipManager;
 public class Histogram implements Runnable {
 	Thread thread;
 	ArrayList<Pixel> image = new ArrayList<Pixel>();
-	ArrayList<Map<Integer, Integer>> colores, colores_acc;
+	ArrayList<Map<Integer, Double>> colores, colores_acc;
 	ArrayList<Map<Integer, Double>> norm_colores, norm_colores_acc;	
 	int[][] valores;
 	Integer tamano = 0;
@@ -32,18 +33,18 @@ public class Histogram implements Runnable {
 	Integer min[], max[];
 	Integer color_bits;
 
-	public Histogram(ArrayList<Pixel> imagen, int color_bits) {
-		this.image = imagen;
-		this.color_bits = color_bits;
+	public Histogram(BufferedImage imagen) {
+		this.image = ImgConvert.toPixelArrayList(imagen);
+		this.color_bits = imagen.getType() == BufferedImage.TYPE_BYTE_GRAY ? 1 : 3;
 
-		colores = new ArrayList<Map<Integer, Integer>>(color_bits);
-		colores_acc = new ArrayList<Map<Integer, Integer>>(color_bits);
+		colores = new ArrayList<Map<Integer, Double>>(color_bits);
+		colores_acc = new ArrayList<Map<Integer, Double>>(color_bits);
 		norm_colores = new ArrayList<Map<Integer, Double>>(color_bits);
 		norm_colores_acc = new ArrayList<Map<Integer, Double>>(color_bits);
 		
 		for (int i = 0; i < color_bits; i++) {
-			colores.add(i, new TreeMap<Integer, Integer>());
-			colores_acc.add(i, new TreeMap<Integer, Integer>());
+			colores.add(i, new TreeMap<Integer, Double>());
+			colores_acc.add(i, new TreeMap<Integer, Double>());
 			norm_colores.add(i, new TreeMap<Integer, Double>());
 			norm_colores_acc.add(i, new TreeMap<Integer, Double>());
 		}
@@ -78,15 +79,10 @@ public class Histogram implements Runnable {
 				+"Desv. tipica:\n\t red "+ String.format("%.4f",dev[0]) +" green "+ String.format("%.4f",dev[1]) +" blue "+ String.format("%.4f",dev[2]) +"\n"
 				+"Entropia:\n\t red "+ String.format("%.4f",ent[0]) +" green "+ String.format("%.4f",ent[1]) +" blue "+ String.format("%.4f",ent[2]) +"\n";
 		else {
-			msg ="Media:\n";
-			for (int i = 0; i < color_bits; i++) {
-				 msg += "color "+ i + " ->" +med[i];
-				 msg += " : " + colores_acc.get(0).get(255)/tamano
-						+"\nMin/Max:\n";
-				 msg += "\t valor "+i+"["+ min[i] +","+ max[i] +"]\n";
-				 msg += "Desv. tipica color "+ i + " ->" +dev[i]+"\n";	
-				 msg += "Entropia color "+ i + " ->" +ent[i]+"\n";			
-			}
+				msg =  "Media: ->" + med[0];
+				msg += "\n Intervalo min-max [" + min[0] + "," + max[0] + "]\n";
+				msg += "Desv. tipica ->" + String.format("%.4f",dev[0]) + "\n";	
+				msg += "Entropia ->" + String.format("%.4f",ent[0]) + "\n";
 		}
 		return msg;
 	}
@@ -114,7 +110,7 @@ public class Histogram implements Runnable {
 	private void maxminhm() {
 		for (int i = 0; i < 256; i++) {
 			for (int j = 0; j < color_bits; j++) {
-				colores.get(j).put(i, valores[j][i]);
+				colores.get(j).put(i, (double) valores[j][i]);
 				if (min[j] == -1 && valores[j][i] != 0) min[j] = i;
 				if (valores[j][i] != 0) max[j] = i;
 			}
@@ -125,7 +121,7 @@ public class Histogram implements Runnable {
 	private void acumulado() {
 		for (int i = 0; i < 256; i++) {
 			for (int j = 0; j < color_bits; j++) {	
-				colores_acc.get(j).put(i, valores[j][i] + colores_acc.get(j).getOrDefault(i-1 < 0 ? 0 : i-1, 0));
+				colores_acc.get(j).put(i, valores[j][i] + colores_acc.get(j).getOrDefault(i-1 < 0 ? 0 : i-1, (double) 0));
 			}
 		}
 	}
@@ -177,59 +173,34 @@ public class Histogram implements Runnable {
 	}
 
 	public void histogram(){
-        Container container = new Container();
-	
-		if (color_bits == 3) {						
-			container.add(new Graph(colores.get(0), "red", med[0]));
-			container.add(new Graph(colores.get(1), "green", med[1]));
-			container.add(new Graph(colores.get(2), "blue", med[2]));
-		}else
-			container.add(new Graph(colores.get(0), "grey", med[0]));
-		
-		graphicHistogram(container);			
-		
+        initializeGraph(colores);
 	}
 	public void histogramAcc(){
-		Container container = new Container();
-		
-		if (color_bits == 3) {						
-			container.add(new Graph(colores_acc.get(0), "red", med[0]));
-			container.add(new Graph(colores_acc.get(1), "green", med[1]));
-			container.add(new Graph(colores_acc.get(2), "blue", med[2]));
-		}else
-			container.add(new Graph(colores_acc.get(0), "grey", med[0]));
-		
-		graphicHistogram(container);			
-		
+		initializeGraph(colores_acc);
 	}
+	
 	public void normHistogram(){
-		Container container = new Container();
-		
-		if (color_bits == 3) {						
-			container.add(new Graph(norm_colores.get(0), "red", med[0]));
-			container.add(new Graph(norm_colores.get(1), "green", med[1]));
-			container.add(new Graph(norm_colores.get(2), "blue", med[2]));
-		}else
-			container.add(new Graph(norm_colores.get(0), "grey", med[0]));
-		
-		graphicHistogram(container);	
-		
+		initializeGraph(norm_colores);			
 	}
+	
 	public void normHistogramAcc(){
+		initializeGraph(norm_colores_acc);		
+	}
+	
+	private void initializeGraph(ArrayList<Map<Integer, Double>> hm_array) {
 		Container container = new Container();
 		
 		if (color_bits == 3) {						
-			container.add(new Graph(norm_colores_acc.get(0), "red", med[0]));
-			container.add(new Graph(norm_colores_acc.get(1), "green", med[1]));
-			container.add(new Graph(norm_colores_acc.get(2), "blue", med[2]));
+			container.add(new Graph(hm_array.get(0), "red", med[0]));
+			container.add(new Graph(hm_array.get(1), "green", med[1]));
+			container.add(new Graph(hm_array.get(2), "blue", med[2]));
 		}else
-			container.add(new Graph(norm_colores_acc.get(0), "grey", med[0]));
+			container.add(new Graph(hm_array.get(0), "grey", med[0]));
 		
-		graphicHistogram(container);	
-		
+		graphicHistogram(container);
 	}
 
-	public void graphicHistogram(Container container) {
+	private void graphicHistogram(Container container) {
 		JFrame frame = new JFrame("Histogram");
 		
 		JPanel texto = new JPanel();

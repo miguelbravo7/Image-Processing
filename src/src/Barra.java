@@ -1,5 +1,3 @@
-import java.awt.Component;
-import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -103,7 +101,6 @@ public class Barra extends JMenuBar {
 		    if(returnVal == JFileChooser.APPROVE_OPTION) {
 		       System.out.println("You chose to open this file: " + (filepath = chooser.getSelectedFile().getAbsolutePath()));
 		       program.openImage(filepath);
-		       program.imagetype.add(BufferedImage.TYPE_INT_ARGB);	
 		    }
 		}
 	}
@@ -126,27 +123,18 @@ public class Barra extends JMenuBar {
 	public class ActFilterImageNeg implements ActionListener {
 		public void actionPerformed(ActionEvent evt) {
 		    program.addNegativeImage(currentImage());
-		    if(program.imagetype.get(program.tabbedPane.getSelectedIndex()) == BufferedImage.TYPE_BYTE_GRAY)
-		    	program.imagetype.add(BufferedImage.TYPE_BYTE_GRAY);
-		    else
-		    	program.imagetype.add(BufferedImage.TYPE_INT_ARGB);
 		}
 	}
 
 	public class ActFilterImagePal implements ActionListener {
 		public void actionPerformed(ActionEvent evt) {
 		    program.addPalImage(currentImage());
-		    program.imagetype.add(BufferedImage.TYPE_BYTE_GRAY);
 		}
 	}
 
 	public class ActFilterImageEc implements ActionListener {
 		public void actionPerformed(ActionEvent evt) {
 		    program.addEcualizedImage(currentImage());
-		    if(program.imagetype.get(program.tabbedPane.getSelectedIndex()) == BufferedImage.TYPE_BYTE_GRAY)
-		    	program.imagetype.add(BufferedImage.TYPE_BYTE_GRAY);
-		    else
-		    	program.imagetype.add(BufferedImage.TYPE_INT_ARGB);
 		}
 	}
 
@@ -154,10 +142,6 @@ public class Barra extends JMenuBar {
 		public void actionPerformed(ActionEvent evt) {
 			int means = 4;
 		    program.addKMeansImage(currentImage(), means);
-		    if(program.imagetype.get(program.tabbedPane.getSelectedIndex()) == BufferedImage.TYPE_BYTE_GRAY)
-		    	program.imagetype.add(BufferedImage.TYPE_BYTE_GRAY);
-		    else
-		    	program.imagetype.add(BufferedImage.TYPE_INT_ARGB);
 		}
 	}
 
@@ -230,14 +214,7 @@ public class Barra extends JMenuBar {
 		}
 	}
 	
-	private BufferedImage getImageFromComponent(Component component) {
-	    BufferedImage awtImage = new BufferedImage(component.getWidth(), component.getHeight(), BufferedImage.TYPE_INT_RGB);
-	    Graphics g = awtImage.getGraphics();
-	    component.printAll(g);
-		return awtImage;
-	}
-	
 	private BufferedImage currentImage() {
-		return getImageFromComponent(program.getComponentImg(program.tabbedPane.getSelectedIndex()));
+		return program.imagelist.get(program.tabbedPane.getSelectedIndex());
 	}
 }
