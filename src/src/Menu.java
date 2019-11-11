@@ -29,13 +29,6 @@ public class Menu {
 	JLabel text = new JLabel("");
 
 	public Menu() {			
-		//acciones de la pestaña
-		tabbedPane.addMouseMotionListener(new MouseAdapter() {
-			@Override
-			public void mouseMoved(MouseEvent e) {
-				
-			}
-		});
 		tabbedPane.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -55,7 +48,6 @@ public class Menu {
 					public void mouseMoved(MouseEvent e) {
 						int pixel = img.getRGB(e.getX(), e.getY());
 						
-						int alpha = (pixel >> 24) & 0xff;
 						int red = (pixel >> 16) & 0xff;
 						int green = (pixel >> 8) & 0xff;
 						int blue = (pixel) & 0xff;
@@ -63,20 +55,27 @@ public class Menu {
 						text.setText("Posicion (x:" + e.getX() + "  y:" + e.getY() + ")  Colores r: " + red + " g: " + green + " b: " + blue);
 					}
 				});
-				
-			}
-			
+				label.addMouseListener(new MouseAdapter() {
+					 public void mousePressed(MouseEvent e) {
+						System.out.println("Mouse pressed; start: x: " + e.getX() + "  y: " + e.getY());
+				    }
+
+				    public void mouseReleased(MouseEvent e) {
+				    	System.out.println("Mouse released; end: x: " + e.getX() + "  y: " + e.getY());
+				    }
+				});				
+			}			
 		});
 		tabbedPane.addKeyListener(new KeyAdapter() {
-		@Override
-		public void keyPressed(KeyEvent key) {
-			if (key.getKeyCode() == KeyEvent.VK_DELETE) {
-				int tab_index = tabbedPane.getSelectedIndex();
-				imagetype.remove(tab_index);
-				tabbedPane.remove(tab_index);
-				imagehist.remove(tab_index);
+			@Override
+			public void keyPressed(KeyEvent key) {
+				if (key.getKeyCode() == KeyEvent.VK_DELETE) {
+					int tab_index = tabbedPane.getSelectedIndex();
+					imagetype.remove(tab_index);
+					tabbedPane.remove(tab_index);
+					imagehist.remove(tab_index);
+				}
 			}
-		}
 		});
 		//Interfaz grafica
 		frame.setLayout(new BorderLayout());
