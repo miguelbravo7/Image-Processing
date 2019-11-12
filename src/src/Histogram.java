@@ -31,11 +31,12 @@ public class Histogram implements Runnable {
 	Integer med[];
 	Double dev[],ent[];
 	Integer min[], max[];
-	Integer color_bits;
+	Integer color_bits, displayed_graphs;
 
 	public Histogram(BufferedImage imagen) {
 		this.image = ImgConvert.toPixelArrayList(imagen);
-		this.color_bits = imagen.getType() == BufferedImage.TYPE_BYTE_GRAY ? 1 : 3;
+		this.color_bits = 3;
+		this.displayed_graphs = imagen.getType() == BufferedImage.TYPE_BYTE_GRAY ? 1 : 3;
 
 		colores = new ArrayList<Map<Integer, Double>>(color_bits);
 		colores_acc = new ArrayList<Map<Integer, Double>>(color_bits);
@@ -190,7 +191,7 @@ public class Histogram implements Runnable {
 	private void initializeGraph(ArrayList<Map<Integer, Double>> hm_array) {
 		Container container = new Container();
 		
-		if (color_bits == 3) {						
+		if (displayed_graphs == 3) {						
 			container.add(new Graph(hm_array.get(0), "red", med[0]));
 			container.add(new Graph(hm_array.get(1), "green", med[1]));
 			container.add(new Graph(hm_array.get(2), "blue", med[2]));

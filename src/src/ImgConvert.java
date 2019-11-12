@@ -27,6 +27,7 @@ public class ImgConvert {
 	static BufferedImage toBuffImg(ArrayList<Pixel> pixel_list, int width, int height) {
 
 		BufferedImage img =  new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+		
 		int linea = 0;
 		for (int i = 0; i < height; i++) {
 			for (int j = 0; j < width; j++) {

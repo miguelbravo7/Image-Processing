@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.imageio.ImageIO;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTabbedPane;
@@ -25,44 +26,55 @@ public class Menu {
 	ArrayList<Histogram> imagehist = new ArrayList<Histogram>();
 	ArrayList<BufferedImage> imagelist = new ArrayList<BufferedImage>();
 	JLabel text = new JLabel("");
+	boolean subimage_flag;
+	int acc_x, acc_y;
 
 	public Menu() {			
 		tabbedPane.addMouseListener(new MouseAdapter() {
 			@Override
-			public void mouseClicked(MouseEvent e) {
+			public void mouseEntered(MouseEvent e) {
 
 				int tab_index = tabbedPane.getSelectedIndex();
-				JLabel label = (JLabel)getComponentImg(tab_index);
-				BufferedImage img = imagelist.get(tab_index);
-				
-				label.addMouseMotionListener(new MouseAdapter() {
-					@Override
-					public void mouseMoved(MouseEvent e) {
-						int pixel = img.getRGB(e.getX(), e.getY());
-						
-						int red = (pixel >> 16) & 0xff;
-						int green = (pixel >> 8) & 0xff;
-						int blue = (pixel) & 0xff;
-						
-						text.setText("Posicion (x:" + e.getX() + "  y:" + e.getY() + ")  Colores r: " + red + " g: " + green + " b: " + blue);
-					}
-				});
-				label.addMouseListener(new MouseAdapter() {
-					 public void mousePressed(MouseEvent e) {
-						System.out.println("Mouse pressed; start: x: " + e.getX() + "  y: " + e.getY());
-				    }
-
-				    public void mouseReleased(MouseEvent e) {
-				    	System.out.println("Mouse released; end: x: " + e.getX() + "  y: " + e.getY());
-				    }
-				});				
+				if(tab_index != -1) {
+					JLabel label = (JLabel)getComponentImg(tab_index);
+					BufferedImage img = imagelist.get(tab_index);
+					if (label.getMouseListeners().length == 0) {
+						label.addMouseMotionListener(new MouseAdapter() {
+							@Override
+							public void mouseMoved(MouseEvent e) {
+								int pixel = img.getRGB(e.getX(), e.getY());
+								
+								int red = (pixel >> 16) & 0xff;
+								int green = (pixel >> 8) & 0xff;
+								int blue = (pixel) & 0xff;
+								
+								text.setText("Posicion (x:" + e.getX() + "  y:" + e.getY() + ")  Colores r: " + red + " g: " + green + " b: " + blue);
+							}
+						});
+						label.addMouseListener(new MouseAdapter() {
+							public void mousePressed(MouseEvent e) {
+								if(subimage_flag) {
+									System.out.println("Mouse pressed; start: x: " + (acc_x = e.getX()) + "  y: " + (acc_y = e.getY()));							 
+								}
+							}
+							
+							public void mouseReleased(MouseEvent e) {
+								if(subimage_flag) {
+									System.out.println("Mouse released; end: x: " + e.getX() + "  y: " + e.getY());
+									addToPane(img.getSubimage(acc_x, acc_y, e.getX() - acc_x , e.getY() - acc_y), "Imagen recortada");
+									subimage_flag = false;							 
+								}
+							}
+						});									
+					}					
+				}
 			}			
 		});
 		tabbedPane.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent key) {
 				if (key.getKeyCode() == KeyEvent.VK_DELETE) {
-					deleteImage(tabbedPane.getSelectedIndex());					
+					deleteFromPane(tabbedPane.getSelectedIndex());					
 				}
 			}
 		});
@@ -81,57 +93,30 @@ public class Menu {
 
 	}
 	
-	public void addImage(BufferedImage image) {
-		addToPane(image, "Ecualized");
-	}
-	
-	public void deleteImage(int tab_index) {
+	public void deleteFromPane(int tab_index) {
 		tabbedPane.remove(tab_index);
 		imagehist.remove(tab_index);
 		imagelist.remove(tab_index);
 	}
 	
-	public void addPalImage(BufferedImage image) {
-		addToPane(ImgMonochrome.renderPal(image), "PAL");
-	}
-	
-	public void addNegativeImage(BufferedImage image) {
-		addToPane(ImgNegative.render(image), "Ecualized");
-	}
-	
-	public void addEcualizedImage(BufferedImage image) {
-		addToPane(ImgLinealTransform.ecualize(image, imagehist.get(tabbedPane.getSelectedIndex())), "Ecualized");
-	}
-	
-	public void addKMeansImage(BufferedImage image, int k) {
-		addToPane(Kmeans_Processor.renderkmeans(image, k), k + "-means");
-	}
-	
-	private void addToPane(	BufferedImage image, String text) {
+	public void addToPane(BufferedImage image, String text) {
 		tabbedPane.addTab(text, new ImageViewer(image).getContentPane());
 		imagehist.add(new Histogram(image));
 		imagelist.add(image);
 	}
-
-	public void makeHistogram(BufferedImage image) {
-		int tab_index = tabbedPane.getSelectedIndex();
-		imagehist.get(tab_index).histogram();
+	
+	public Histogram currentHist() {
+		return imagehist.get(tabbedPane.getSelectedIndex());
 	}
-
-	public void makeAccumulatedHistogram(BufferedImage image) {
-		int tab_index = tabbedPane.getSelectedIndex();
-		imagehist.get(tab_index).histogramAcc();
+	
+	public BufferedImage currentImage() {
+		return imagelist.get(tabbedPane.getSelectedIndex());
 	}
-
-	public void makeNormHistogram(BufferedImage image) {
-		int tab_index = tabbedPane.getSelectedIndex();
-		imagehist.get(tab_index).normHistogram();
+	
+	public BufferedImage setcurrentImage(BufferedImage img) {
+		return imagelist.set(tabbedPane.getSelectedIndex(), img);
 	}
-
-	public void makeNormAccumulatedHistogram(BufferedImage image) {
-		int tab_index = tabbedPane.getSelectedIndex();
-		imagehist.get(tab_index).normHistogramAcc();
-	}
+	
 	private static List<Component> getAllComponents(final Container c) {
 	    Component[] comps = c.getComponents();
 	    List<Component> compList = new ArrayList<Component>();
@@ -146,15 +131,20 @@ public class Menu {
 	
 	public Component getComponentImg(int index) {
 		List<Component> comp = getAllComponents(tabbedPane.getFocusCycleRootAncestor());
-		
-		return comp.get(index*3+7);
+		List<JLabel> labels = new ArrayList<JLabel>();
+		for(Component c : comp) {
+			if (c instanceof JLabel) {
+				labels.add((JLabel) c);				
+			}
+		}
+		return labels.get(index);
 	}
 	
 	public void openImage(String filepath) {
 		// Creacion de archivos de lectura y escrtura		
 		try {
 			BufferedImage image = ImageIO.read(file = new File(filepath));
-			addImage(image);
+			addToPane(image, "Imagen");
 		} catch (IOException e) {
 			System.out.println("Error: " + e);
 		}
@@ -169,4 +159,9 @@ public class Menu {
 			e.printStackTrace();
 		}
 	}
+	
+	public void doRedraw(){
+        ((JComponent) getComponentImg(tabbedPane.getSelectedIndex())).getTopLevelAncestor().revalidate();
+        ((JComponent) getComponentImg(tabbedPane.getSelectedIndex())).getTopLevelAncestor().repaint();
+    }
 }

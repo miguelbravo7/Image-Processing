@@ -1,22 +1,24 @@
 import java.awt.image.BufferedImage;
-import java.util.List;
 
 public class ImgNegative {
 
 	static public BufferedImage render(BufferedImage image) {
-		BufferedImage img = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
-
-		// Instanciacion de los puntos a partir de los valores de la imagen
-		List<Pixel> pixels = ImgConvert.toPixelArrayList(image);
+		BufferedImage img = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
 		
-		int linea = 0;
 		for (int i = 0; i < image.getHeight(); i++) {
 			for (int j = 0; j < image.getWidth(); j++) {
 
-				int pixel = (pixels.get(linea).alpha() << 24) 
-						| (255 - pixels.get(linea).red() << 16) 
-						| (255 - pixels.get(linea).green() << 8)
-						| 255 - pixels.get(linea++).blue() ; // pixel
+				int pixel = image.getRGB(j, i);
+
+				int alpha = (pixel >> 24) & 0xff;
+				int red = (pixel >> 16) & 0xff;
+				int green = (pixel >> 8) & 0xff;
+				int blue = (pixel) & 0xff;
+
+				pixel = (alpha << 24) 
+						| (255 - red << 16) 
+						| (255 - green << 8)
+						| 255 - blue; // pixel
 
 				img.setRGB(j, i, pixel);
 			}
