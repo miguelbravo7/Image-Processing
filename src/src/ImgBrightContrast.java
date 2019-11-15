@@ -18,11 +18,15 @@ public class ImgBrightContrast {
 				red = (int) (red *(new_contrast / img_hist.dev[0]) + new_brightness - img_hist.med[0] *(new_contrast / img_hist.dev[0]));
 				green = (int) (green *(new_contrast / img_hist.dev[1]) + new_brightness - img_hist.med[1] *(new_contrast / img_hist.dev[1]));
 				blue = (int) (blue *(new_contrast / img_hist.dev[2]) + new_brightness - img_hist.med[2] *(new_contrast / img_hist.dev[2]));
+				
+				red = Math.min(red, 255);
+				green = Math.min(green, 255);
+				blue = Math.min(blue, 255);
 
 				pixel = (alpha << 24) 
-						| (red << 16) 
-						| (green << 8)
-						| blue ; // pixel
+						| ( Math.max(red, 0) << 16) 
+						| ( Math.max(green, 0) << 8)
+						|  Math.max(blue, 0) ; // pixel
 
 				img.setRGB(j, i, pixel);
 			}
