@@ -7,11 +7,17 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.stream.IntStream;
 
 import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -141,13 +147,43 @@ public class Menu {
 	}
 	
 	public void openImage(String filepath) {
-		// Creacion de archivos de lectura y escrtura		
+		BufferedImage image = open_image_tiff_compatible(new File(filepath));
+		addToPane(image, "Imagen");
+	}
+	
+	private BufferedImage open_image_tiff_compatible(File file) {
+		BufferedImage tiff = null;
 		try {
-			BufferedImage image = ImageIO.read(file = new File(filepath));
-			addToPane(image, "Imagen");
+			try (InputStream is = new FileInputStream(file)) {
+				try (ImageInputStream imageInputStream = ImageIO.createImageInputStream(is)) {
+					Iterator<ImageReader> iterator = ImageIO.getImageReaders(imageInputStream);
+					if (iterator == null || !iterator.hasNext()) {
+						throw new RuntimeException("Image file format not supported by jai ImageIO: " + file.getAbsolutePath());
+					}
+					
+					
+					// We are just looking for the first reader compatible:
+					ImageReader reader = iterator.next();
+					reader.setInput(imageInputStream);
+					
+					int numPage = reader.getNumImages(true);
+					
+					// it uses to put new png files, close to original example n0_.tiff will be in /png/n0_0.png					
+					int val = IntStream.range(0, numPage).filter(v -> {
+						try {
+							return reader.read(v) != null;
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+						return false;
+					}).findFirst().orElse(-1);
+					tiff = reader.read(val);
+				}
+			}
 		} catch (IOException e) {
-			System.out.println("Error: " + e);
+			e.printStackTrace();
 		}
+		return tiff;
 	}
 	
 	public void saveImage(BufferedImage image, String filepath) {

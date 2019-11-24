@@ -29,7 +29,8 @@ public class Barra extends JMenuBar {
 	private static final long serialVersionUID = 1L;
 	Menu program;
 	JFrame frame;
-	JSlider brillo, contraste, umbral;
+	JTextField brillo, contraste;
+	JSlider umbral;
 	JTextArea textarea;
 	final int BRI_MIN = 0;
 	final int BRI_MAX = 255;
@@ -170,30 +171,10 @@ public class Barra extends JMenuBar {
 
 	public class ActChangeBC implements ActionListener {
 		public void actionPerformed(ActionEvent evt) {
-			brillo = new JSlider(JSlider.HORIZONTAL, BRI_MIN, BRI_MAX, program.currentHist().med[0]);
-			brillo.setName("Brillo");
+			brillo = new JTextField(program.currentHist().med[0].toString());
 
-			// Turn on labels at major tick marks.
-			brillo.setMajorTickSpacing(50);
-			brillo.setMinorTickSpacing(1);
-			brillo.setPaintTicks(true);
-			brillo.setPaintLabels(true);
-			brillo.addChangeListener(new ChangeListener() {
-				public void stateChanged(ChangeEvent e) {
-				}
-			});
+			contraste = new JTextField(program.currentHist().dev[0].toString());
 
-			contraste = new JSlider(JSlider.HORIZONTAL, CONT_MIN, CONT_MAX, (program.currentHist().dev[0]).intValue());
-			contraste.setName("contraste");
-
-			contraste.setMajorTickSpacing(50);
-			contraste.setMinorTickSpacing(1);
-			contraste.setPaintTicks(true);
-			contraste.setPaintLabels(true);
-			contraste.addChangeListener(new ChangeListener() {
-				public void stateChanged(ChangeEvent e) {
-				}
-			});
 
 			JFrame popup = new JFrame("Cambio brillo-contraste");
 			popup.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -212,8 +193,12 @@ public class Barra extends JMenuBar {
 
 			okbutton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					program.addToPane(ImgBrightContrast.adjustImg(program.currentImage(), program.currentHist(),
-							brillo.getValue(), contraste.getValue()), "Conversion");
+					program.addToPane(ImgBrightContrast.adjustImg(
+							program.currentImage(),
+							program.currentHist(),
+							Integer.valueOf(brillo.getText()),
+							Integer.valueOf(contraste.getText())),
+							"Conversion");
 					popup.dispose();
 				}
 			});

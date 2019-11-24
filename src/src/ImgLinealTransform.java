@@ -6,8 +6,8 @@ public class ImgLinealTransform {
 
 	static public BufferedImage LinealTransform(BufferedImage image, ArrayList<Point> points) {
 		BufferedImage img = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
-		points.add(0, new Point(0, 0));
-		points.add(new Point(255, 255));
+		if(!(points.get(0).x != 0))points.add(0, new Point(0, 0));
+		if(!(points.get(points.size()).x != 255))points.add(new Point(255, 255));
 
 		for (int i = 0; i < image.getHeight(); i++) {
 			for (int j = 0; j < image.getWidth(); j++) {

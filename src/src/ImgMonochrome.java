@@ -15,7 +15,7 @@ public class ImgMonochrome {
 				int green = (pixel >> 8) & 0xff;
 				int blue = (pixel) & 0xff;
 
-				int grey_value = (int) (red*0.222 + green*0.707 + blue*0.071);
+				int grey_value = Math.round(red*0.222f + green*0.707f + blue*0.071f);
 				
 				pixel = (alpha << 24) 
 						| (grey_value << 16) 

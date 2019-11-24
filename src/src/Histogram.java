@@ -33,10 +33,9 @@ public class Histogram implements Runnable {
 	Integer min[], max[];
 	Integer color_bits, displayed_graphs;
 
-	public Histogram(BufferedImage imagen) {
-		this.image = ImgConvert.toPixelArrayList(imagen);
+	public Histogram(BufferedImage image) {
 		this.color_bits = 3;
-		this.displayed_graphs = imagen.getType() == BufferedImage.TYPE_BYTE_GRAY ? 1 : 3;
+		this.displayed_graphs = image.getType() == BufferedImage.TYPE_BYTE_GRAY ? 1 : 3;
 
 		colores = new ArrayList<Map<Integer, Double>>(color_bits);
 		colores_acc = new ArrayList<Map<Integer, Double>>(color_bits);
@@ -60,6 +59,14 @@ public class Histogram implements Runnable {
 		
 		Arrays.fill(min, -1);
 		Arrays.fill(med, 0);
+		
+		for (int i = 0; i < image.getHeight(); i++) {
+			for (int j = 0; j < image.getWidth(); j++) {
+				for (int w = 0; w < color_bits; w++) {	
+					this.valores[color_bits - w -1][(image.getRGB(j, i) >> (8 * w)) & 0xff]++;
+				}
+			}
+		}
 
 		this.thread = new Thread(this, "histogram");
 		this.thread.start();
@@ -74,29 +81,22 @@ public class Histogram implements Runnable {
 
 	public String toString() {
 		String msg = new String();
-		if(color_bits == 3)
-			msg = "Media:\n\t r " + med[0] + ",g " + med[1] + ",b " + med[2] + ": " + colores_acc.get(0).get(255) + "/" + tamano
+		if(displayed_graphs == 3)
+			msg = "Media:\n\t r " + med[0] + ",g " + med[1] + ",b " + med[2]
 				+"\nMin/Max:\n\t red ["+ min[0] +","+ max[0] +"]\n\t green ["+ min[1] +","+ max[1] +"]\n\t blue ["+ min[2] +","+ max[2] +"]\n"
 				+"Desv. tipica:\n\t red "+ String.format("%.4f",dev[0]) +" green "+ String.format("%.4f",dev[1]) +" blue "+ String.format("%.4f",dev[2]) +"\n"
 				+"Entropia:\n\t red "+ String.format("%.4f",ent[0]) +" green "+ String.format("%.4f",ent[1]) +" blue "+ String.format("%.4f",ent[2]) +"\n";
 		else {
-				msg =  "Media: ->" + med[0];
-				msg += "\n Intervalo min-max [" + min[0] + "," + max[0] + "]\n";
-				msg += "Desv. tipica ->" + String.format("%.4f",dev[0]) + "\n";	
-				msg += "Entropia ->" + String.format("%.4f",ent[0]) + "\n";
+				msg =  "Media: " + med[0];
+				msg += "\n Min/Max: [" + min[0] + "," + max[0] + "]\n";
+				msg += "Desv. tipica: " + String.format("%.4f",dev[0]) + "\n";	
+				msg += "Entropia: " + String.format("%.4f",ent[0]) + "\n";
 		}
 		return msg;
 	}
 
 	@Override
 	public void run() {
-		this.tamano = image.size();
-
-		for (Pixel pixel : image) {
-			for (int j = 0; j < color_bits; j++) {	
-				this.valores[j][(int) pixel.get(j+1)]++;
-			}
-		}
 		maxminhm();
 		acumulado();
 		normValues();
@@ -112,7 +112,8 @@ public class Histogram implements Runnable {
 		for (int i = 0; i < 256; i++) {
 			for (int j = 0; j < color_bits; j++) {
 				colores.get(j).put(i, (double) valores[j][i]);
-				if (min[j] == -1 && valores[j][i] != 0) min[j] = i;
+				
+				if (min[j] == -1 && valores[j][i] > 0) min[j] = i;
 				if (valores[j][i] != 0) max[j] = i;
 			}
 		}
@@ -209,7 +210,7 @@ public class Histogram implements Runnable {
 		texto.setBackground(new Color(213, 202, 189));
 		container.add(texto);
 
-		container.setLayout(new GridLayout(color_bits+1, 1));
+		container.setLayout(new GridLayout(displayed_graphs+1, 1));
 		
 		
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
