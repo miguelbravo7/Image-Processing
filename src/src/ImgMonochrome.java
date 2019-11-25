@@ -3,7 +3,7 @@ import java.awt.image.BufferedImage;
 public class ImgMonochrome {
 	
 	static public BufferedImage renderPal(BufferedImage image) {
-		BufferedImage img = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
+		BufferedImage img = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
 
 		for (int i = 0; i < image.getHeight(); i++) {
 			for (int j = 0; j < image.getWidth(); j++) {

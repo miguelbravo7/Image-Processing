@@ -6,8 +6,12 @@ public class ImgLinealTransform {
 
 	static public BufferedImage LinealTransform(BufferedImage image, ArrayList<Point> points) {
 		BufferedImage img = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
-		if(!(points.get(0).x != 0))points.add(0, new Point(0, 0));
-		if(!(points.get(points.size()).x != 255))points.add(new Point(255, 255));
+		
+		
+		traducePoints(points);
+		for(Point p : points) {
+			System.out.println(p);
+		}
 
 		for (int i = 0; i < image.getHeight(); i++) {
 			for (int j = 0; j < image.getWidth(); j++) {
@@ -33,6 +37,51 @@ public class ImgLinealTransform {
 		}
 		System.out.println("Lineal transform done.");
 		return img;
+	}
+
+	private static void traducePoints(ArrayList<Point> points) {
+		if(points.get(0).x != 0) {		// y = ax + b 
+			double pendiente = (points.get(1).y - points.get(0).y) / (points.get(1).x - points.get(0).x);
+			int offset = points.get(0).x - points.get(0).y;
+			
+			// Looking for slope cutting points
+			if(pendiente == 0) {
+				points.add(0, new Point(0, offset));
+			}else if(pendiente > 0) {
+				int cut_point = (int) (-offset / pendiente);
+				
+				points.add(0, new Point(cut_point, 0));
+				if(cut_point > 0)
+					points.add(0, new Point(0, 0));				
+			}else {
+				int cut_point = (int) (255-offset / pendiente);
+				
+				points.add(0, new Point(cut_point, 255));
+				if(cut_point > 0)
+					points.add(0, new Point(0, 255));
+			}
+		}
+		int last_point = points.size()-1;
+		if(points.get(last_point).x != 255) {
+			double pendiente = (points.get(last_point).y - points.get(last_point-1).y) / (points.get(last_point).x - points.get(last_point-1).x);
+			int offset = points.get(last_point-1).x - points.get(last_point-1).y;
+			
+			if(pendiente == 0) {
+				points.add(new Point(255, offset));
+			}else if(pendiente > 0) {
+				int cut_point = (int) (255-offset / pendiente);
+				
+				points.add(new Point(cut_point, 255));
+				if(cut_point < 255)
+					points.add(new Point(255, 255));				
+			}else {
+				int cut_point = (int) (255-offset / pendiente);
+				
+				points.add(new Point(cut_point, 0));
+				if(cut_point < 255)
+					points.add(new Point(255, 0));
+			}
+		}
 	}
 
 	static public BufferedImage ecualize(BufferedImage image, Histogram img_hist) {
@@ -64,15 +113,15 @@ public class ImgLinealTransform {
 		return img;
 	}
 
-	static private int traduceValue(int point, ArrayList<Point> spec) {
-		int pendiente = 0, offset = 0;
-		for(int i = 0; i <= spec.size(); i++) {
-			if(spec.get(i).x > point) {
-				pendiente = (spec.get(i).y - spec.get(i-1).y) / (spec.get(i).x - spec.get(i-1).x);
-				offset = spec.get(i-1).y;
+	static private int traduceValue(int point, ArrayList<Point> points) {
+		double pendiente = 0, offset = 0;
+		for(int i = 0; i <= points.size(); i++) {
+			if(points.get(i).x > point) {
+				pendiente = (points.get(i).y - points.get(i-1).y) / (double)(points.get(i).x - points.get(i-1).x);
+				offset = points.get(i-1).x - points.get(i-1).y;
 				break;
 			}
 		}
-		return Math.min(pendiente*point + offset, 255);		
+		return (int) Math.max(Math.min(pendiente * point + offset, 255), 0);		
 	}
 }

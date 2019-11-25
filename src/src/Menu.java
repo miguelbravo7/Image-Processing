@@ -84,7 +84,7 @@ public class Menu {
 				}
 			}
 		});
-		//Interfaz grafica
+		// Interfaz grafica
 		frame.setLayout(new BorderLayout());
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setSize(WINDOW_SIZE, WINDOW_SIZE);
@@ -106,9 +106,10 @@ public class Menu {
 	}
 	
 	public void addToPane(BufferedImage image, String text) {
-		tabbedPane.addTab(text, new ImageViewer(image).getContentPane());
-		imagehist.add(new Histogram(image));
+		System.out.println(image.getType());
 		imagelist.add(image);
+		imagehist.add(new Histogram(image));
+		tabbedPane.addTab(text, new ImageViewer(image).getContentPane());
 	}
 	
 	public Histogram currentHist() {

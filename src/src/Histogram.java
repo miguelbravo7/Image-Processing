@@ -107,7 +107,7 @@ public class Histogram implements Runnable {
 		image.clear();
 	}
 
-	//valores minimos maximos y paso de valores al hashmap
+	// Valores minimos maximos y paso de valores al hashmap
 	private void maxminhm() {
 		for (int i = 0; i < 256; i++) {
 			for (int j = 0; j < color_bits; j++) {
@@ -119,24 +119,24 @@ public class Histogram implements Runnable {
 		}
 	}
 
-	//valores acumulados y media
+	// Valores acumulados y media
 	private void acumulado() {
 		for (int i = 0; i < 256; i++) {
 			for (int j = 0; j < color_bits; j++) {	
-				colores_acc.get(j).put(i, valores[j][i] + colores_acc.get(j).getOrDefault(i-1 < 0 ? 0 : i-1, (double) 0));
+				colores_acc.get(j).put(i, valores[j][i] + colores_acc.get(j).getOrDefault(i-1 < 0 ? 0 : i - 1, (double) 0));
 			}
 		}
 	}
-	//Valores normalizados
+	// Valores normalizados
 	private void normValues() {
 		for (int i = 0; i < 256; i++) {
 			for (int j = 0; j < color_bits; j++) {
 				norm_colores.get(j).put(i, valores[j][i]/(double) colores_acc.get(j).get(255));
-				norm_colores_acc.get(j).put(i, norm_colores.get(j).getOrDefault(i, (double) 0) + norm_colores_acc.get(j).getOrDefault(i-1 < 0 ? 0 : i-1, (double) 0));
+				norm_colores_acc.get(j).put(i, norm_colores.get(j).getOrDefault(i, (double) 0) + norm_colores_acc.get(j).getOrDefault(i-1 < 0 ? 0 : i - 1, (double) 0));
 			}
 		}
 	}
-	//media
+	// Media
 	private void media() {
 		for (int i = 0; i < color_bits; i++) {
 			double acc = 0;
@@ -146,12 +146,12 @@ public class Histogram implements Runnable {
 			med[i] = (int) acc;
 		}		
 	}
-	//desviacion tipica
+	// Desviacion tipica
 	private void stdDev() {
 		for (int i= 0; i< color_bits; i++) {
 			double acc=0;
 			for (int j = 0; j < 255; j++) {
-				double val = norm_colores.get(i).getOrDefault(j, (double) 0) * (j - med[i])*(j - med[i]);
+				double val = norm_colores.get(i).getOrDefault(j, (double) 0) * (j - med[i]) * (j - med[i]);
 				if(Double.isFinite(val) && !Double.isNaN(val)) {
 					acc += val;
 				}
@@ -160,12 +160,12 @@ public class Histogram implements Runnable {
 		}
 	}
 	
-	//entropia
+	// Entropia
 	private void entropy() {
 		for (int i= 0; i< color_bits; i++) {
 			double acc = 0;
 			for (int j = 0; j < 255; j++) {
-				double val = norm_colores.get(i).getOrDefault(j, (double) 0) * Math.log10(norm_colores.get(i).getOrDefault(j, (double) 0))/Math.log10(2);
+				double val = norm_colores.get(i).getOrDefault(j, (double) 0) * Math.log10(norm_colores.get(i).getOrDefault(j, (double) 0)) / Math.log10(2);
 				if(Double.isFinite(val) && !Double.isNaN(val)) {
 					acc += val;
 				}

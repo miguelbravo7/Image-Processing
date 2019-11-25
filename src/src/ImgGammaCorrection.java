@@ -2,7 +2,7 @@ import java.awt.image.BufferedImage;
 
 public class ImgGammaCorrection {
 
-	static public BufferedImage gammaCorrection(BufferedImage image, int gamma) {
+	static public BufferedImage gammaCorrection(BufferedImage image, double gamma) {
 		BufferedImage img = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
 
 		for (int i = 0; i < image.getHeight(); i++) {
@@ -15,9 +15,9 @@ public class ImgGammaCorrection {
 				int green = (pixel >> 8) & 0xff;
 				int blue = (pixel) & 0xff;
 
-				double red_value = Math.pow(red / 255, gamma);
-				double green_value = Math.pow(green / 255, gamma);
-				double blue_value = Math.pow(blue / 255, gamma);
+				double red_value = Math.pow(red / 255d, gamma);
+				double green_value = Math.pow(green / 255d, gamma);
+				double blue_value = Math.pow(blue / 255d, gamma);
 				
 				pixel = (alpha << 24) 
 						| ((int)(red_value*255) << 16) 

@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 //import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -158,7 +159,28 @@ public class Barra extends JMenuBar {
 
 	public class ActImageGammaCorrection implements ActionListener {
 		public void actionPerformed(ActionEvent evt) {
-			program.addToPane(ImgGammaCorrection.gammaCorrection(program.currentImage(), 1), "Gamma");
+			JTextField gamma = new JTextField(1);
+
+			JFrame popup = new JFrame("Correccion de gamma");
+			popup.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			popup.setLayout(new GridLayout(3, 1));
+
+			JPanel panel = new JPanel(new GridLayout(2, 1));
+			panel.add(new JLabel("Gamma"));
+			panel.add(gamma);
+			popup.add(panel);
+			
+			JButton okbutton = new JButton("Ok");
+
+			okbutton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					program.addToPane(ImgGammaCorrection.gammaCorrection(program.currentImage(), Double.valueOf(gamma.getText())), "Gamma");
+					popup.dispose();
+				}
+			});
+			popup.add(okbutton);
+			popup.pack();
+			popup.setVisible(true);
 		}
 	}
 
@@ -196,8 +218,8 @@ public class Barra extends JMenuBar {
 					program.addToPane(ImgBrightContrast.adjustImg(
 							program.currentImage(),
 							program.currentHist(),
-							Integer.valueOf(brillo.getText()),
-							Integer.valueOf(contraste.getText())),
+							Double.valueOf(brillo.getText()),
+							Double.valueOf(contraste.getText())),
 							"Conversion");
 					popup.dispose();
 				}
@@ -210,36 +232,75 @@ public class Barra extends JMenuBar {
 
 	public class ActImgDifference implements ActionListener {
 		public void actionPerformed(ActionEvent evt) {
-			program.addToPane(ImgDifference.difference(program.imagelist.get(0), program.imagelist.get(1)),
-					"Diferencia");
+			ArrayList<String> pestanas = new ArrayList<String>();
+			
+			for (int i = 0; i < program.tabbedPane.getTabCount(); i++) {
+				pestanas.add(program.tabbedPane.getTitleAt(i));
+			}
 
-			umbral = new JSlider(JSlider.HORIZONTAL, BRI_MIN, BRI_MAX, 175);
-			umbral.setName("Brillo");
+			JComboBox<Object> img1 = new JComboBox<Object>(pestanas.toArray());
 
-			// Turn on labels at major tick marks.
-			umbral.setMajorTickSpacing(50);
-			umbral.setMinorTickSpacing(1);
-			umbral.setPaintTicks(true);
-			umbral.setPaintLabels(true);
-			umbral.addChangeListener(new ChangeListener() {
-				public void stateChanged(ChangeEvent e) {
-					ImgDifference.changeUmbral(program.currentImage(), umbral.getValue());
-					program.doRedraw();
-				}
-			});
-
-			JFrame popup = new JFrame("Diferencia de imagen");
+			JComboBox<Object> img2 = new JComboBox<Object>(pestanas.toArray());
+			
+			JFrame popup = new JFrame("Diferencia de imagen.");
 			popup.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-			popup.setLayout(new GridLayout(1, 1));
+			popup.setLayout(new GridLayout(3, 1));
 
 			JPanel panel = new JPanel(new GridLayout(2, 1));
-			panel.add(new JLabel("Umbral"));
-			panel.add(umbral);
+			panel.add(new JLabel("Imagen 1"));
+			panel.add(img1);
 			popup.add(panel);
+			JPanel panel2 = new JPanel(new GridLayout(2, 1));
+			panel2.add(new JLabel("Imagen 2"));
+			panel2.add(img2);
+			popup.add(panel2);
 
+			JButton okbutton = new JButton("Ok");
+
+			okbutton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {					
+					popup.dispose();
+					
+					program.addToPane(ImgDifference.difference(
+							program.imagelist.get(img1.getSelectedIndex()),
+							program.imagelist.get(img2.getSelectedIndex())),
+							"Diferencia");
+					umbralPopup();
+				}
+			});
+			popup.add(okbutton);
 			popup.pack();
-			popup.setVisible(true);
+			popup.setVisible(true);			
 		}
+	}
+	
+	private void umbralPopup() {
+		umbral = new JSlider(JSlider.HORIZONTAL, BRI_MIN, BRI_MAX, 175);
+		umbral.setName("Brillo");
+		
+		// Turn on labels at major tick marks.
+		umbral.setMajorTickSpacing(50);
+		umbral.setMinorTickSpacing(1);
+		umbral.setPaintTicks(true);
+		umbral.setPaintLabels(true);
+		umbral.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				ImgDifference.changeUmbral(program.currentImage(), umbral.getValue());
+				program.doRedraw();
+			}
+		});
+		
+		JFrame popup_umbral = new JFrame("Diferencia de imagen");
+		popup_umbral.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		popup_umbral.setLayout(new GridLayout(1, 1));
+		
+		JPanel panel_umbral = new JPanel(new GridLayout(2, 1));
+		panel_umbral.add(new JLabel("Umbral"));
+		panel_umbral.add(umbral);
+		popup_umbral.add(panel_umbral);
+		
+		popup_umbral.pack();
+		popup_umbral.setVisible(true);		
 	}
 
 	public class ActLinealTransform implements ActionListener {
@@ -250,11 +311,11 @@ public class Barra extends JMenuBar {
 			JPanel panely = new JPanel();
 			panelx.setLayout(new BoxLayout(panelx, BoxLayout.Y_AXIS));
 			panely.setLayout(new BoxLayout(panely, BoxLayout.Y_AXIS));
-			panelx.add(new JTextField(6));
-			panely.add(new JTextField(6));
+			panelx.add(new JTextField("x:",6));
+			panely.add(new JTextField("y:",6));
 			popup.setLayout(new FlowLayout());
 
-			JButton addpoint = new JButton("Ok");
+			JButton addpoint = new JButton("Anadir punto");
 
 			addpoint.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
