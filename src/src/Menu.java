@@ -110,7 +110,7 @@ public class Menu {
 		System.out.println(image.getType());
 		imagelist.add(image);
 		imagehist.add(new Histogram(image));
-		tabbedPane.addTab(text, new ImageViewer(image).getContentPane());
+		tabbedPane.addTab(text + "_" + image_count++, new ImageViewer(image).getContentPane());
 	}
 	
 	public Histogram currentHist() {
@@ -150,7 +150,7 @@ public class Menu {
 	
 	public void openImage(String filepath) {
 		BufferedImage image = open_image_tiff_compatible(new File(filepath));
-		addToPane(image, "Imagen_" + image_count++);
+		addToPane(image, "Imagen");
 	}
 	
 	private BufferedImage open_image_tiff_compatible(File file) {

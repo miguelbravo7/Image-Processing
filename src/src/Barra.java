@@ -82,6 +82,9 @@ public class Barra extends JMenuBar {
 		JMenuItem change = new JMenuItem("Cambio brillo-contraste");
 		change.addActionListener(new ActChangeBC());
 		submenu.add(change);
+		JMenuItem spec = new JMenuItem("Especificacion de histograma");
+		spec.addActionListener(new ActImgHistSpec());
+		submenu.add(spec);
 		JMenuItem diff = new JMenuItem("Diferencia de imagen");
 		diff.addActionListener(new ActImgDifference());
 		submenu.add(diff);
@@ -279,6 +282,49 @@ public class Barra extends JMenuBar {
 			popup.setVisible(true);
 		}
 	}
+	
+	public class ActImgHistSpec implements ActionListener {
+		public void actionPerformed(ActionEvent evt) {
+			ArrayList<String> pestanas = new ArrayList<String>();
+			
+			for (int i = 0; i < program.tabbedPane.getTabCount(); i++) {
+				pestanas.add(program.tabbedPane.getTitleAt(i));
+			}
+
+			JComboBox<Object> img1 = new JComboBox<Object>(pestanas.toArray());
+
+			JComboBox<Object> img2 = new JComboBox<Object>(pestanas.toArray());
+			
+			JFrame popup = new JFrame("Especificacion de histograma.");
+			popup.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			popup.setLayout(new GridLayout(3, 1));
+
+			JPanel panel = new JPanel(new GridLayout(2, 1));
+			panel.add(new JLabel("Imagen"));
+			panel.add(img1);
+			popup.add(panel);
+			JPanel panel2 = new JPanel(new GridLayout(2, 1));
+			panel2.add(new JLabel("Histograma de referencia"));
+			panel2.add(img2);
+			popup.add(panel2);
+
+			JButton okbutton = new JButton("Ok");
+
+			okbutton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {					
+					popup.dispose();					
+					program.addToPane(ImgSpecHist.convertHist(
+							program.imagelist.get(img1.getSelectedIndex()),
+							program.imagehist.get(img1.getSelectedIndex()),
+							program.imagehist.get(img2.getSelectedIndex())),
+							"Spec. hist.");
+				}
+			});
+			popup.add(okbutton);
+			popup.pack();
+			popup.setVisible(true);			
+		}
+	}
 
 	public class ActImgDifference implements ActionListener {
 		public void actionPerformed(ActionEvent evt) {
@@ -315,7 +361,6 @@ public class Barra extends JMenuBar {
 							program.imagelist.get(img1.getSelectedIndex()),
 							program.imagelist.get(img2.getSelectedIndex())),
 							"Diferencia");
-					System.out.println(img1.getSelectedIndex() + " " + img2.getSelectedIndex());
 					umbralPopup();
 				}
 			});
