@@ -1,12 +1,15 @@
 
 public class Pixel {
-	private Float[] data;
+	private Float[] data = new Float[4];
 	/**
 	 * Constructor de la clase Pixel
 	 * @param strings
 	 */
-	public Pixel(Float[] data) {
-		this.data = data;
+	public Pixel(Float[] data2) {
+		this.data[0] = (float) Math.round(data2[0]);
+		this.data[1] = (float) Math.round(data2[1]);
+		this.data[2] = (float) Math.round(data2[2]);
+		this.data[3] = (float) Math.round(data2[3]);
 	}
 
 	/**

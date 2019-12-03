@@ -34,6 +34,7 @@ public class Menu {
 	JLabel text = new JLabel("");
 	boolean subimage_flag;
 	int acc_x, acc_y;
+	Integer image_count = 0;
 
 	public Menu() {			
 		tabbedPane.addMouseListener(new MouseAdapter() {
@@ -149,7 +150,7 @@ public class Menu {
 	
 	public void openImage(String filepath) {
 		BufferedImage image = open_image_tiff_compatible(new File(filepath));
-		addToPane(image, "Imagen");
+		addToPane(image, "Imagen_" + image_count++);
 	}
 	
 	private BufferedImage open_image_tiff_compatible(File file) {
@@ -184,7 +185,9 @@ public class Menu {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return tiff;
+	    BufferedImage convertedImg = new BufferedImage(tiff.getWidth(), tiff.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
+	    convertedImg.getGraphics().drawImage(tiff, 0, 0, null);
+		return convertedImg;
 	}
 	
 	public void saveImage(BufferedImage image, String filepath) {

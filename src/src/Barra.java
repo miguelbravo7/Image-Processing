@@ -76,6 +76,9 @@ public class Barra extends JMenuBar {
 		JMenuItem kmeans = new JMenuItem("K-means");
 		kmeans.addActionListener(new ActFilterImageKmeans());
 		submenu.add(kmeans);
+		JMenuItem depth = new JMenuItem("Digitalizacion");
+		depth.addActionListener(new ActFilterImageDepth());
+		submenu.add(depth);
 		JMenuItem change = new JMenuItem("Cambio brillo-contraste");
 		change.addActionListener(new ActChangeBC());
 		submenu.add(change);
@@ -186,8 +189,55 @@ public class Barra extends JMenuBar {
 
 	public class ActFilterImageKmeans implements ActionListener {
 		public void actionPerformed(ActionEvent evt) {
-			int means = 4;
-			program.addToPane(Kmeans_Processor.renderkmeans(program.currentImage(), means), means + "-means");
+			JTextField means = new JTextField(1);
+
+			JFrame popup = new JFrame("K-means");
+			popup.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			popup.setLayout(new GridLayout(3, 1));
+
+			JPanel panel = new JPanel(new GridLayout(2, 1));
+			panel.add(new JLabel("Number of means"));
+			panel.add(means);
+			popup.add(panel);
+			
+			JButton okbutton = new JButton("Ok");
+
+			okbutton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					program.addToPane(Kmeans_Processor.renderkmeans(program.currentImage(), Integer.valueOf(means.getText())), means.getText() + "-means");
+					popup.dispose();
+				}
+			});
+			popup.add(okbutton);
+			popup.pack();
+			popup.setVisible(true);
+		}
+	}
+
+	public class ActFilterImageDepth implements ActionListener {
+		public void actionPerformed(ActionEvent evt) {
+			JTextField depth = new JTextField(1);
+
+			JFrame popup = new JFrame("Digitalizacion");
+			popup.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			popup.setLayout(new GridLayout(3, 1));
+
+			JPanel panel = new JPanel(new GridLayout(2, 1));
+			panel.add(new JLabel("Numero de bits"));
+			panel.add(depth);
+			popup.add(panel);
+			
+			JButton okbutton = new JButton("Ok");
+
+			okbutton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					program.addToPane(ImgColorDepth.colorDepth(program.currentImage(), Integer.valueOf(depth.getText())), depth.getText() + " bit depth");
+					popup.dispose();
+				}
+			});
+			popup.add(okbutton);
+			popup.pack();
+			popup.setVisible(true);
 		}
 	}
 
@@ -265,6 +315,7 @@ public class Barra extends JMenuBar {
 							program.imagelist.get(img1.getSelectedIndex()),
 							program.imagelist.get(img2.getSelectedIndex())),
 							"Diferencia");
+					System.out.println(img1.getSelectedIndex() + " " + img2.getSelectedIndex());
 					umbralPopup();
 				}
 			});
@@ -275,7 +326,7 @@ public class Barra extends JMenuBar {
 	}
 	
 	private void umbralPopup() {
-		umbral = new JSlider(JSlider.HORIZONTAL, BRI_MIN, BRI_MAX, 175);
+		umbral = new JSlider(JSlider.HORIZONTAL, BRI_MIN, BRI_MAX, 255);
 		umbral.setName("Brillo");
 		
 		// Turn on labels at major tick marks.

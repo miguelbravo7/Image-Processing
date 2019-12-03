@@ -20,10 +20,10 @@ public class Kmeans_Processor {
 			pixel_list.add(resultado.getCentroide(pixels_ordered.get(i)));	
 		}
 
-//		System.out.println(" Width:" + image.getWidth()+" Height:"+image.getHeight() +"\nCENTROIDES:");
-//		for (Cluster p : resultado.getClusters()) {
-//			System.out.println(p.getCentroide());
-//		}
+		System.out.println(" Width:" + image.getWidth()+" Height:"+image.getHeight() +"\nCENTROIDES:");
+		for (Cluster p : resultado.getClusters()) {
+			System.out.println(p.getCentroide());
+		}
 		System.out.println(k +" K-means done.");
 		
 		return ImgConvert.toBuffImg(pixel_list, image.getWidth(), image.getHeight());
