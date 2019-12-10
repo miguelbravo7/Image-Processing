@@ -128,6 +128,17 @@ public class Barra extends JMenuBar {
 		espejo.add(f_rotations);
 		
 		op_geom.add(espejo);
+
+		JMenu scale = new JMenu("Cambio de escala");
+		JMenuItem neighbour = new JMenuItem("Vecino mas proximo");
+		neighbour.addActionListener(new ActGeomScaleNeighbour());
+		scale.add(neighbour);
+		JMenuItem bilinear = new JMenuItem("Bilinear");
+		bilinear.addActionListener(new ActGeomScaleBilinear());
+		scale.add(bilinear);
+		
+		op_geom.add(scale);
+		
 		filtros.add(op_geom);
 
 		this.add(filtros);
@@ -561,6 +572,82 @@ public class Barra extends JMenuBar {
 	public class ActGeomRotate270 implements ActionListener {
 		public void actionPerformed(ActionEvent evt) {
 			program.addToPane(ImgFixedRotation.rotate270(program.currentImage()), "270º");
+		}
+	}
+
+	public class ActGeomScaleNeighbour implements ActionListener {
+		public void actionPerformed(ActionEvent evt) {
+			JTextField width = new JTextField();
+
+			JTextField height = new JTextField();
+
+
+			JFrame popup = new JFrame("Cambio de escala");
+			popup.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			popup.setLayout(new GridLayout(3, 1));
+
+			JPanel panel = new JPanel(new GridLayout(2, 1));
+			panel.add(new JLabel("Ancho"));
+			panel.add(width);
+			popup.add(panel);
+			JPanel panel2 = new JPanel(new GridLayout(2, 1));
+			panel2.add(new JLabel("Alto"));
+			panel2.add(height);
+			popup.add(panel2);
+
+			JButton okbutton = new JButton("Ok");
+
+			okbutton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					program.addToPane(ImgScale.scaleNeighbour(
+							program.currentImage(),
+							Double.valueOf(width.getText()),
+							Double.valueOf(height.getText())),
+							"Neighbour");
+					popup.dispose();
+				}
+			});
+			popup.add(okbutton);
+			popup.pack();
+			popup.setVisible(true);
+		}
+	}
+
+	public class ActGeomScaleBilinear implements ActionListener {
+		public void actionPerformed(ActionEvent evt) {
+			JTextField width = new JTextField();
+
+			JTextField height = new JTextField();
+
+
+			JFrame popup = new JFrame("Cambio de escala");
+			popup.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			popup.setLayout(new GridLayout(3, 1));
+
+			JPanel panel = new JPanel(new GridLayout(2, 1));
+			panel.add(new JLabel("Ancho"));
+			panel.add(width);
+			popup.add(panel);
+			JPanel panel2 = new JPanel(new GridLayout(2, 1));
+			panel2.add(new JLabel("Alto"));
+			panel2.add(height);
+			popup.add(panel2);
+
+			JButton okbutton = new JButton("Ok");
+
+			okbutton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					program.addToPane(ImgScale.scaleBilinear(
+							program.currentImage(),
+							Double.valueOf(width.getText()),
+							Double.valueOf(height.getText())),
+							"Bilinear");
+					popup.dispose();
+				}
+			});
+			popup.add(okbutton);
+			popup.pack();
+			popup.setVisible(true);
 		}
 	}
 	
