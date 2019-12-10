@@ -1,13 +1,15 @@
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class ImgLinealTransform {
 
 	static public BufferedImage LinealTransform(BufferedImage image, ArrayList<Point> points) {
 		BufferedImage img = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
 		
-		
+		Collections.sort(points, new PointCompare());
 		traducePoints(points);
 		for(Point p : points) {
 			System.out.println(p);
@@ -83,6 +85,21 @@ public class ImgLinealTransform {
 			}
 		}
 	}
+	
+
+    static class PointCompare implements Comparator<Point> {
+        public int compare(final Point a, final Point b) {
+            if (a.x < b.x) {
+                return -1;
+            }
+            else if (a.x > b.x) {
+                return 1;
+            }
+            else {
+                return 0;
+            }
+        }
+    }
 
 	static public BufferedImage ecualize(BufferedImage image, Histogram img_hist) {
 		BufferedImage img = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());

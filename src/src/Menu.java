@@ -46,16 +46,18 @@ public class Menu {
 					JLabel label = (JLabel)getComponentImg(tab_index);
 					BufferedImage img = imagelist.get(tab_index);
 					if (label.getMouseListeners().length == 0) {
+						String img_size_text = "Tamaño " + img.getWidth() + "x" + img.getHeight();
 						label.addMouseMotionListener(new MouseAdapter() {
 							@Override
 							public void mouseMoved(MouseEvent e) {
 								int pixel = img.getRGB(e.getX(), e.getY());
-								
+
+								int alpha = (pixel >> 24) & 0xff;
 								int red = (pixel >> 16) & 0xff;
 								int green = (pixel >> 8) & 0xff;
 								int blue = (pixel) & 0xff;
 								
-								text.setText("Posicion (x:" + e.getX() + "  y:" + e.getY() + ")  Colores r: " + red + " g: " + green + " b: " + blue);
+								text.setText(img_size_text + "    Posicion (x:" + e.getX() + ", y:" + e.getY() + ")      Colores a: " + alpha + " r: " + red + " g: " + green + " b: " + blue);
 							}
 						});
 						label.addMouseListener(new MouseAdapter() {

@@ -58,45 +58,79 @@ public class Barra extends JMenuBar {
 		guardar.addActionListener(new ActSaveFile());
 		menu.add(guardar);
 
-		JMenu menu2 = new JMenu("Filtros");
-		JMenu submenu = new JMenu("Operaciones sobre punto");
+		JMenu filtros = new JMenu("Filtros");
+		JMenu op_punto = new JMenu("Operaciones sobre punto");
 
 		JMenuItem pal = new JMenuItem("PAL");
 		pal.addActionListener(new ActFilterImagePal());
-		submenu.add(pal);
+		op_punto.add(pal);
 		JMenuItem neg = new JMenuItem("Negativo");
 		neg.addActionListener(new ActFilterImageNeg());
-		submenu.add(neg);
+		op_punto.add(neg);
 		JMenuItem ec = new JMenuItem("Ecualizacion");
 		ec.addActionListener(new ActFilterImageEc());
-		submenu.add(ec);
+		op_punto.add(ec);
 		JMenuItem gamma = new JMenuItem("Correccion de gamma");
 		gamma.addActionListener(new ActImageGammaCorrection());
-		submenu.add(gamma);
+		op_punto.add(gamma);
 		JMenuItem kmeans = new JMenuItem("K-means");
 		kmeans.addActionListener(new ActFilterImageKmeans());
-		submenu.add(kmeans);
-		JMenuItem depth = new JMenuItem("Digitalizacion");
-		depth.addActionListener(new ActFilterImageDepth());
-		submenu.add(depth);
+		op_punto.add(kmeans);
+
+		JMenu digitalization = new JMenu("Operaciones sobre punto");
+		JMenuItem depth = new JMenuItem("Digitalizacion por shifteo");
+		depth.addActionListener(new ActFilterImageDepthShift());
+		digitalization.add(depth);
+		JMenuItem d_region = new JMenuItem("Digitalizacion por region");
+		d_region.addActionListener(new ActFilterImageDepthRegion());
+		digitalization.add(d_region);
+		op_punto.add(digitalization);
+		
 		JMenuItem change = new JMenuItem("Cambio brillo-contraste");
 		change.addActionListener(new ActChangeBC());
-		submenu.add(change);
+		op_punto.add(change);
 		JMenuItem spec = new JMenuItem("Especificacion de histograma");
 		spec.addActionListener(new ActImgHistSpec());
-		submenu.add(spec);
+		op_punto.add(spec);
 		JMenuItem diff = new JMenuItem("Diferencia de imagen");
 		diff.addActionListener(new ActImgDifference());
-		submenu.add(diff);
+		op_punto.add(diff);
 		JMenuItem region = new JMenuItem("Región de interés");
 		region.addActionListener(new ActToggleRegion());
-		submenu.add(region);
+		op_punto.add(region);
 		JMenuItem linear = new JMenuItem("Transformación lineal");
 		linear.addActionListener(new ActLinealTransform());
-		submenu.add(linear);
+		op_punto.add(linear);
+		
+		filtros.add(op_punto);
 
-		menu2.add(submenu);
-		this.add(menu2);
+		JMenu op_geom = new JMenu("Operaciones geometricas");
+		JMenu espejo = new JMenu("Operaciones de espejo");
+		JMenuItem vertical = new JMenuItem("Espejo vertical");
+		vertical.addActionListener(new ActGeomMirrorVertical());
+		espejo.add(vertical);
+		JMenuItem horizontal = new JMenuItem("Espejo horizontal");
+		horizontal.addActionListener(new ActGeomMirrorHorizontal());
+		espejo.add(horizontal);
+		JMenuItem transpuesta = new JMenuItem("Transpuesta");
+		transpuesta.addActionListener(new ActGeomTranspose());
+		espejo.add(transpuesta);
+		JMenu f_rotations = new JMenu("Rotaciones fixadas");
+		JMenuItem rotar90 = new JMenuItem("Rotar 90º");
+		rotar90.addActionListener(new ActGeomRotate90());
+		f_rotations.add(rotar90);
+		JMenuItem rotar180 = new JMenuItem("Rotar 180º");
+		rotar180.addActionListener(new ActGeomRotate180());
+		f_rotations.add(rotar180);
+		JMenuItem rotar270 = new JMenuItem("Rotar 270º");
+		rotar270.addActionListener(new ActGeomRotate270());
+		f_rotations.add(rotar270);
+		espejo.add(f_rotations);
+		
+		op_geom.add(espejo);
+		filtros.add(op_geom);
+
+		this.add(filtros);
 
 		JMenu menu3 = new JMenu("Grafos");
 		JMenuItem hist = new JMenuItem("Histograma");
@@ -217,7 +251,7 @@ public class Barra extends JMenuBar {
 		}
 	}
 
-	public class ActFilterImageDepth implements ActionListener {
+	public class ActFilterImageDepthShift implements ActionListener {
 		public void actionPerformed(ActionEvent evt) {
 			JTextField depth = new JTextField(1);
 
@@ -234,7 +268,7 @@ public class Barra extends JMenuBar {
 
 			okbutton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					program.addToPane(ImgColorDepth.colorDepth(program.currentImage(), Integer.valueOf(depth.getText())), depth.getText() + " bit depth");
+					program.addToPane(ImgColorDepth.colorDepthShift(program.currentImage(), Integer.valueOf(depth.getText())), depth.getText() + " bit depth");
 					popup.dispose();
 				}
 			});
@@ -244,6 +278,33 @@ public class Barra extends JMenuBar {
 		}
 	}
 
+	public class ActFilterImageDepthRegion implements ActionListener {
+		public void actionPerformed(ActionEvent evt) {
+			JTextField depth = new JTextField(1);
+
+			JFrame popup = new JFrame("Digitalizacion");
+			popup.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			popup.setLayout(new GridLayout(3, 1));
+
+			JPanel panel = new JPanel(new GridLayout(2, 1));
+			panel.add(new JLabel("Tamaño de la celda"));
+			panel.add(depth);
+			popup.add(panel);
+			
+			JButton okbutton = new JButton("Ok");
+
+			okbutton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					program.addToPane(ImgColorDepth.colorDepthRegion(program.currentImage(), Integer.valueOf(depth.getText())), depth.getText() + " bit depth");
+					popup.dispose();
+				}
+			});
+			popup.add(okbutton);
+			popup.pack();
+			popup.setVisible(true);
+		}
+	}
+	
 	public class ActChangeBC implements ActionListener {
 		public void actionPerformed(ActionEvent evt) {
 			brillo = new JTextField(program.currentHist().med[0].toString());
@@ -467,6 +528,42 @@ public class Barra extends JMenuBar {
 		}
 	}
 
+	public class ActGeomMirrorVertical implements ActionListener {
+		public void actionPerformed(ActionEvent evt) {
+			program.addToPane(ImgMirror.vertical(program.currentImage()), "Vertical");
+		}
+	}
+
+	public class ActGeomMirrorHorizontal implements ActionListener {
+		public void actionPerformed(ActionEvent evt) {
+			program.addToPane(ImgMirror.horizontal(program.currentImage()), "Horizontal");
+		}
+	}
+
+	public class ActGeomTranspose implements ActionListener {
+		public void actionPerformed(ActionEvent evt) {
+			program.addToPane(ImgTranspose.transpose(program.currentImage()), "Transpuesta");
+		}
+	}
+
+	public class ActGeomRotate90 implements ActionListener {
+		public void actionPerformed(ActionEvent evt) {
+			program.addToPane(ImgFixedRotation.rotate90(program.currentImage()), "90º");
+		}
+	}
+
+	public class ActGeomRotate180 implements ActionListener {
+		public void actionPerformed(ActionEvent evt) {
+			program.addToPane(ImgFixedRotation.rotate180(program.currentImage()), "180º");
+		}
+	}
+
+	public class ActGeomRotate270 implements ActionListener {
+		public void actionPerformed(ActionEvent evt) {
+			program.addToPane(ImgFixedRotation.rotate270(program.currentImage()), "270º");
+		}
+	}
+	
 	public class ActImageHist implements ActionListener {
 		public void actionPerformed(ActionEvent evt) {
 			program.currentHist().histogram();

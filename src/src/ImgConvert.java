@@ -5,7 +5,6 @@ public class ImgConvert {
 
 	static ArrayList<Pixel> toPixelArrayList(BufferedImage image){
 		// Instanciacion de los puntos a partir de los valores de la imagen
-		System.out.println(image.getWidth()*image.getHeight() +" =>" +image.getHeight() + " * " + image.getWidth());
 		ArrayList<Pixel> pixels = new ArrayList<Pixel>();
 
 		for (int i = 0; i < image.getHeight(); i++) {
@@ -22,6 +21,19 @@ public class ImgConvert {
 			}
 		}
 		return pixels;
+	}
+
+	static Integer[][] toIntArray(BufferedImage image){
+		// Instanciacion de los puntos a partir de los valores de la imagen
+		Integer[][] array = new Integer[image.getHeight()][image.getWidth()];
+
+		for (int i = 0; i < image.getHeight(); i++) {
+			for (int j = 0; j < image.getWidth(); j++) {
+
+				array[i][j] = image.getRGB(j, i);
+			}
+		}
+		return array;
 	}
 	
 	static BufferedImage toBuffImg(ArrayList<Pixel> pixel_list, int width, int height) {
