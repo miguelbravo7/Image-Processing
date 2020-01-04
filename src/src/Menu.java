@@ -109,7 +109,6 @@ public class Menu {
 	}
 	
 	public void addToPane(BufferedImage image, String text) {
-		System.out.println(image.getType());
 		imagelist.add(image);
 		imagehist.add(new Histogram(image));
 		tabbedPane.addTab(text + "_" + image_count++, new ImageViewer(image).getContentPane());

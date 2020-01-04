@@ -115,6 +115,9 @@ public class Barra extends JMenuBar {
 		JMenuItem transpuesta = new JMenuItem("Transpuesta");
 		transpuesta.addActionListener(new ActGeomTranspose());
 		espejo.add(transpuesta);
+		JMenuItem rotar = new JMenuItem("Rotar");
+		rotar.addActionListener(new ActGeomRotate());
+		espejo.add(rotar);
 		JMenu f_rotations = new JMenu("Rotaciones fixadas");
 		JMenuItem rotar90 = new JMenuItem("Rotar 90º");
 		rotar90.addActionListener(new ActGeomRotate90());
@@ -554,6 +557,33 @@ public class Barra extends JMenuBar {
 	public class ActGeomTranspose implements ActionListener {
 		public void actionPerformed(ActionEvent evt) {
 			program.addToPane(ImgTranspose.transpose(program.currentImage()), "Transpuesta");
+		}
+	}
+	
+	public class ActGeomRotate implements ActionListener {
+		public void actionPerformed(ActionEvent evt) {
+			JTextField means = new JTextField(0);
+
+			JFrame popup = new JFrame("Rotacion");
+			popup.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			popup.setLayout(new GridLayout(3, 1));
+
+			JPanel panel = new JPanel(new GridLayout(2, 1));
+			panel.add(new JLabel("Angulo"));
+			panel.add(means);
+			popup.add(panel);
+			
+			JButton okbutton = new JButton("Ok");
+
+			okbutton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					program.addToPane(ImgRotation.rotate(program.currentImage(), Double.valueOf(means.getText())), means.getText() + "º");
+					popup.dispose();
+				}
+			});
+			popup.add(okbutton);
+			popup.pack();
+			popup.setVisible(true);
 		}
 	}
 

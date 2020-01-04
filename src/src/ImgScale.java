@@ -36,35 +36,39 @@ public class ImgScale {
 				int Y_1 = (Y + 1 == image.getHeight() ? image.getHeight() - 1 : Y + 1);
 
 				int pixel1 = array[Y][X];
+				int pixel2 = array[Y][X_1];
+				int pixel3 = array[Y_1][X];
+				int pixel4 = array[Y_1][X_1];
 
 				int alpha = (pixel1 >> 24) & 0xff;
 				int red1 = (pixel1 >> 16) & 0xff;
 				int green1 = (pixel1 >> 8) & 0xff;
 				int blue1 = (pixel1) & 0xff;
 
-				int pixel2 = array[Y][X_1];
 
 				int red2 = (pixel2 >> 16) & 0xff;
 				int green2 = (pixel2 >> 8) & 0xff;
 				int blue2 = (pixel2) & 0xff;
 
-				int pixel3 = array[Y_1][X];
 
 				int red3 = (pixel3 >> 16) & 0xff;
 				int green3 = (pixel3 >> 8) & 0xff;
 				int blue3 = (pixel3) & 0xff;
 
-				int pixel4 = array[Y_1][X_1];
 
 				int red4 = (pixel4 >> 16) & 0xff;
 				int green4 = (pixel4 >> 8) & 0xff;
 				int blue4 = (pixel4) & 0xff;
 				
+				double p = (j / width) % 1;
+				double q = (i / height) % 1;
+				System.out.println(p);
+				
 
 				int pixel = (alpha << 24) 
-						| (bilinearInterpolation(red1, red2, red3, red4, width%1, height%1) << 16) 
-						| (bilinearInterpolation(green1, green2, green3, green4, width%1, height%1) << 8)
-						| (bilinearInterpolation(blue1, blue2, blue3, blue4, width%1, height%1));
+						| (bilinearInterpolation(red1, red2, red3, red4, p, q) << 16) 
+						| (bilinearInterpolation(green1, green2, green3, green4, p, q) << 8)
+						| (bilinearInterpolation(blue1, blue2, blue3, blue4, p, q));
 
 
 				img.setRGB(j, i, pixel);
