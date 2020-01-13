@@ -115,9 +115,6 @@ public class Barra extends JMenuBar {
 		JMenuItem transpuesta = new JMenuItem("Transpuesta");
 		transpuesta.addActionListener(new ActGeomTranspose());
 		espejo.add(transpuesta);
-		JMenuItem rotar = new JMenuItem("Rotar");
-		rotar.addActionListener(new ActGeomRotate());
-		espejo.add(rotar);
 		JMenu f_rotations = new JMenu("Rotaciones fixadas");
 		JMenuItem rotar90 = new JMenuItem("Rotar 90º");
 		rotar90.addActionListener(new ActGeomRotate90());
@@ -132,12 +129,22 @@ public class Barra extends JMenuBar {
 		
 		op_geom.add(espejo);
 
+		JMenu rotar = new JMenu("Rotar");
+		JMenuItem rneighbour = new JMenuItem("Vecino mas proximo");
+		rneighbour.addActionListener(new ActGeomRotate("Neighbour"));
+		rotar.add(rneighbour);
+		JMenuItem rbilinear = new JMenuItem("Bilinear");
+		rbilinear.addActionListener(new ActGeomRotate("Bilinear"));
+		rotar.add(rbilinear);
+		
+		op_geom.add(rotar);
+
 		JMenu scale = new JMenu("Cambio de escala");
 		JMenuItem neighbour = new JMenuItem("Vecino mas proximo");
-		neighbour.addActionListener(new ActGeomScaleNeighbour());
+		neighbour.addActionListener(new ActGeomScale("Neighbour"));
 		scale.add(neighbour);
 		JMenuItem bilinear = new JMenuItem("Bilinear");
-		bilinear.addActionListener(new ActGeomScaleBilinear());
+		bilinear.addActionListener(new ActGeomScale("Bilinear"));
 		scale.add(bilinear);
 		
 		op_geom.add(scale);
@@ -561,6 +568,10 @@ public class Barra extends JMenuBar {
 	}
 	
 	public class ActGeomRotate implements ActionListener {
+		String function;
+		public ActGeomRotate(String function) {
+			this.function = function;
+		}
 		public void actionPerformed(ActionEvent evt) {
 			JTextField means = new JTextField(0);
 
@@ -577,7 +588,7 @@ public class Barra extends JMenuBar {
 
 			okbutton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					program.addToPane(ImgRotation.rotate(program.currentImage(), Double.valueOf(means.getText())), means.getText() + "º");
+					program.addToPane(ImgRotation.rotate(program.currentImage(), Double.valueOf(means.getText()), function), means.getText() + "º_" + function);
 					popup.dispose();
 				}
 			});
@@ -605,45 +616,11 @@ public class Barra extends JMenuBar {
 		}
 	}
 
-	public class ActGeomScaleNeighbour implements ActionListener {
-		public void actionPerformed(ActionEvent evt) {
-			JTextField width = new JTextField();
-
-			JTextField height = new JTextField();
-
-
-			JFrame popup = new JFrame("Cambio de escala");
-			popup.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-			popup.setLayout(new GridLayout(3, 1));
-
-			JPanel panel = new JPanel(new GridLayout(2, 1));
-			panel.add(new JLabel("Ancho"));
-			panel.add(width);
-			popup.add(panel);
-			JPanel panel2 = new JPanel(new GridLayout(2, 1));
-			panel2.add(new JLabel("Alto"));
-			panel2.add(height);
-			popup.add(panel2);
-
-			JButton okbutton = new JButton("Ok");
-
-			okbutton.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					program.addToPane(ImgScale.scaleNeighbour(
-							program.currentImage(),
-							Double.valueOf(width.getText()),
-							Double.valueOf(height.getText())),
-							"Neighbour");
-					popup.dispose();
-				}
-			});
-			popup.add(okbutton);
-			popup.pack();
-			popup.setVisible(true);
+	public class ActGeomScale implements ActionListener {
+		String function;
+		public ActGeomScale(String function) {
+			this.function = function;
 		}
-	}
-
-	public class ActGeomScaleBilinear implements ActionListener {
 		public void actionPerformed(ActionEvent evt) {
 			JTextField width = new JTextField();
 
@@ -667,10 +644,11 @@ public class Barra extends JMenuBar {
 
 			okbutton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					program.addToPane(ImgScale.scaleBilinear(
+					program.addToPane(ImgScale.scale(
 							program.currentImage(),
 							Double.valueOf(width.getText()),
-							Double.valueOf(height.getText())),
+							Double.valueOf(height.getText()),
+							function),
 							"Bilinear");
 					popup.dispose();
 				}
