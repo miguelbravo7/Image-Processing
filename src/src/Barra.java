@@ -136,6 +136,12 @@ public class Barra extends JMenuBar {
 		JMenuItem rbilinear = new JMenuItem("Bilinear");
 		rbilinear.addActionListener(new ActGeomRotate("Bilinear"));
 		rotar.add(rbilinear);
+		JMenuItem rdneighbour = new JMenuItem("Vecino mas proximo Directa");
+		rdneighbour.addActionListener(new ActGeomRotateDirect("Neighbour"));
+		rotar.add(rdneighbour);
+		JMenuItem rdbilinear = new JMenuItem("Bilinear Directa");
+		rdbilinear.addActionListener(new ActGeomRotateDirect("Bilinear"));
+		rotar.add(rdbilinear);
 		
 		op_geom.add(rotar);
 
@@ -598,6 +604,37 @@ public class Barra extends JMenuBar {
 		}
 	}
 
+	public class ActGeomRotateDirect implements ActionListener {
+		String function;
+		public ActGeomRotateDirect(String function) {
+			this.function = function;
+		}
+		public void actionPerformed(ActionEvent evt) {
+			JTextField means = new JTextField(0);
+
+			JFrame popup = new JFrame("Rotacion");
+			popup.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			popup.setLayout(new GridLayout(3, 1));
+
+			JPanel panel = new JPanel(new GridLayout(2, 1));
+			panel.add(new JLabel("Angulo"));
+			panel.add(means);
+			popup.add(panel);
+			
+			JButton okbutton = new JButton("Ok");
+
+			okbutton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					program.addToPane(ImgRotation.rotateDirect(program.currentImage(), Double.valueOf(means.getText()), function), means.getText() + "º_" + function);
+					popup.dispose();
+				}
+			});
+			popup.add(okbutton);
+			popup.pack();
+			popup.setVisible(true);
+		}
+	}
+	
 	public class ActGeomRotate90 implements ActionListener {
 		public void actionPerformed(ActionEvent evt) {
 			program.addToPane(ImgFixedRotation.rotate90(program.currentImage()), "90º");

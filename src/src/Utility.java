@@ -92,8 +92,8 @@ public class Utility {
 	}
 		
 	public static class Pair<L,R> {
-	  public final L x;
-	  public final R y;
+	  public L x;
+	  public R y;
 
 	  public Pair(L left, R right) {
 	    assert left != null;
