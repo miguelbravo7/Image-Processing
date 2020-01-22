@@ -135,7 +135,7 @@ public class ImgLinealTransform {
 		for(int i = 0; i <= points.size(); i++) {
 			if(points.get(i).x > point) {
 				pendiente = (points.get(i).y - points.get(i-1).y) / (double)(points.get(i).x - points.get(i-1).x);
-				offset = points.get(i-1).x - points.get(i-1).y;
+				offset = points.get(i-1).y - points.get(i-1).x * pendiente;
 				break;
 			}
 		}

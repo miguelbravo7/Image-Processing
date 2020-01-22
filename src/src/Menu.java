@@ -1,6 +1,7 @@
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Point;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -32,7 +33,7 @@ public class Menu {
 	ArrayList<Histogram> imagehist = new ArrayList<Histogram>();
 	ArrayList<BufferedImage> imagelist = new ArrayList<BufferedImage>();
 	JLabel text = new JLabel("");
-	boolean subimage_flag;
+	boolean subimage_flag, cross_section_flag;
 	int acc_x, acc_y;
 	Integer image_count = 0;
 
@@ -62,7 +63,7 @@ public class Menu {
 						});
 						label.addMouseListener(new MouseAdapter() {
 							public void mousePressed(MouseEvent e) {
-								if(subimage_flag) {
+								if(subimage_flag || cross_section_flag) {
 									System.out.println("Mouse pressed; start: x: " + (acc_x = e.getX()) + "  y: " + (acc_y = e.getY()));							 
 								}
 							}
@@ -72,6 +73,11 @@ public class Menu {
 									System.out.println("Mouse released; end: x: " + e.getX() + "  y: " + e.getY());
 									addToPane(img.getSubimage(acc_x, acc_y, e.getX() - acc_x , e.getY() - acc_y), "Imagen recortada");
 									subimage_flag = false;							 
+								}
+								else if(cross_section_flag) {
+									System.out.println("Mouse released; end: x: " + e.getX() + "  y: " + e.getY());
+									ImgCrossSection.profile(currentImage(), new Point(acc_x, acc_y), new Point(e.getX(), e.getY()));
+									cross_section_flag = false;							 
 								}
 							}
 						});									
@@ -162,9 +168,7 @@ public class Menu {
 					Iterator<ImageReader> iterator = ImageIO.getImageReaders(imageInputStream);
 					if (iterator == null || !iterator.hasNext()) {
 						throw new RuntimeException("Image file format not supported by jai ImageIO: " + file.getAbsolutePath());
-					}
-					
-					
+					}					
 					// We are just looking for the first reader compatible:
 					ImageReader reader = iterator.next();
 					reader.setInput(imageInputStream);

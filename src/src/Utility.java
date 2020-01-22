@@ -1,3 +1,4 @@
+import java.awt.Color;
 import java.io.File;
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -90,6 +91,34 @@ public class Utility {
 		
 		return color[h][w];		
 	}
+	
+	public static float getHue(Color color) {
+		int red = color.getRed();
+		int green = color.getGreen();
+		int blue = color.getBlue();
+	    float min = Math.min(Math.min(red, green), blue);
+	    float max = Math.max(Math.max(red, green), blue);
+
+	    if (min == max) {
+	        return 0f;
+	    }
+
+	    float hue = 0f;
+	    if (max == red) {
+	        hue = (green - blue) / (max - min);
+
+	    } else if (max == green) {
+	        hue = 2f + (blue - red) / (max - min);
+
+	    } else {
+	        hue = 4f + (red - green) / (max - min);
+	    }
+
+	    hue = hue * 60;
+	    if (hue < 0) hue = hue + 360;
+
+	    return hue;
+	}
 		
 	public static class Pair<L,R> {
 	  public L x;
@@ -112,7 +141,8 @@ public class Utility {
 	  @Override
 	  public boolean equals(Object o) {
 	    if (!(o instanceof Pair)) return false;
-	    Pair pairo = (Pair) o;
+	    @SuppressWarnings("unchecked")
+		Pair<L, R> pairo = (Pair<L, R>) o;
 	    return this.x.equals(pairo.getLeft()) && this.y.equals(pairo.getRight());
 	  }
 

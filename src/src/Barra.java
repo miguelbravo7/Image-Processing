@@ -76,6 +76,9 @@ public class Barra extends JMenuBar {
 		JMenuItem kmeans = new JMenuItem("K-means");
 		kmeans.addActionListener(new ActFilterImageKmeans());
 		op_punto.add(kmeans);
+		JMenuItem cross_section = new JMenuItem("Perfil de imagen");
+		cross_section.addActionListener(new ActFilterImageCrossSection());
+		op_punto.add(cross_section);
 
 		JMenu digitalization = new JMenu("Operaciones sobre punto");
 		JMenuItem depth = new JMenuItem("Digitalizacion por shifteo");
@@ -275,6 +278,12 @@ public class Barra extends JMenuBar {
 			popup.add(okbutton);
 			popup.pack();
 			popup.setVisible(true);
+		}
+	}
+
+	public class ActFilterImageCrossSection implements ActionListener {
+		public void actionPerformed(ActionEvent evt) {
+			program.cross_section_flag = true;
 		}
 	}
 
