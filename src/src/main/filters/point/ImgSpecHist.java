@@ -1,6 +1,10 @@
+package main.filters.point;
+
 import java.awt.image.BufferedImage;
 import java.util.Map;
 import java.util.TreeMap;
+
+import main.graphs.Histogram;
 
 public class ImgSpecHist {
 
@@ -12,7 +16,7 @@ public class ImgSpecHist {
 
 		for (int i = 0; i < image.getHeight(); i++) {
 			for (int j = 0; j < image.getWidth(); j++) {
-				
+
 				int pixel = image.getRGB(j, i);
 
 				int alpha = (pixel >> 24) & 0xff;
@@ -23,11 +27,8 @@ public class ImgSpecHist {
 				int red_value = lut_r.get(red);
 				int green_value = lut_g.get(green);
 				int blue_value = lut_b.get(blue);
-				
-				pixel = (alpha << 24) 
-						| (red_value << 16) 
-						| (green_value << 8)
-						| blue_value; // pixel
+
+				pixel = (alpha << 24) | (red_value << 16) | (green_value << 8) | blue_value; // pixel
 
 				img.setRGB(j, i, pixel);
 			}
@@ -35,26 +36,29 @@ public class ImgSpecHist {
 		System.out.println("Histogram specification done.");
 		return img;
 	}
-	
-	static Map<Integer, Integer> makeLut(Map<Integer, Double> reference, Map<Integer, Double> original){
+
+	static Map<Integer, Integer> makeLut(Map<Integer, Double> reference, Map<Integer, Double> original) {
 		Map<Integer, Integer> res = new TreeMap<Integer, Integer>();
-		for(Integer algo : original.keySet()){
+		for (Integer algo : original.keySet()) {
 			int i = 0;
-			while(original.get(algo) > reference.get(i)) { i++; }
-			if (nearestValue(original.get(algo), reference.getOrDefault(i-1, 0d), reference.get(i)) == reference.get(i)) {
+			while (original.get(algo) > reference.get(i)) {
+				i++;
+			}
+			if (nearestValue(original.get(algo), reference.getOrDefault(i - 1, 0d), reference.get(i)) == reference
+					.get(i)) {
 				res.put(algo, i);
-			}else
-				res.put(algo, i-1);
+			} else
+				res.put(algo, i - 1);
 		}
-		return res;		
+		return res;
 	}
-	
-	static private double nearestValue(double point, double left, double right) {
+
+	private static double nearestValue(double point, double left, double right) {
 		double res;
-		if(Math.abs(point-left) < Math.abs(point-right)) {
+		if (Math.abs(point - left) < Math.abs(point - right)) {
 			res = left;
 		} else
 			res = right;
-		return res;		
+		return res;
 	}
 }

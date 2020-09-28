@@ -1,5 +1,9 @@
+package main.filters.point.kmeans;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import main.utils.Pixel;
 
 public class KMeansResultado {
 	private List<Cluster> clusters = new ArrayList<Cluster>();
@@ -16,9 +20,10 @@ public class KMeansResultado {
 
 	public Pixel getCentroide(Pixel punto) {
 		int cluster_index = -1;
-		
-		while(!clusters.get(++cluster_index).contains(punto));
-			
+
+		while (!clusters.get(++cluster_index).contains(punto))
+			;
+
 		return clusters.get(cluster_index).getCentroide();
 	}
 

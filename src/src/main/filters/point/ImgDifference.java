@@ -1,3 +1,4 @@
+package main.filters.point;
 import java.awt.image.BufferedImage;
 
 public class ImgDifference {

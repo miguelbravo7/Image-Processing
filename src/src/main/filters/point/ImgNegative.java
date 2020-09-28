@@ -1,13 +1,15 @@
+package main.filters.point;
+
 import java.awt.image.BufferedImage;
 
-public class ImgMonochrome {
-	
-	static public BufferedImage renderPal(BufferedImage image) {
+public class ImgNegative {
+
+	static public BufferedImage render(BufferedImage image) {
 		BufferedImage img = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
 
 		for (int i = 0; i < image.getHeight(); i++) {
 			for (int j = 0; j < image.getWidth(); j++) {
-				
+
 				int pixel = image.getRGB(j, i);
 
 				int alpha = (pixel >> 24) & 0xff;
@@ -15,17 +17,12 @@ public class ImgMonochrome {
 				int green = (pixel >> 8) & 0xff;
 				int blue = (pixel) & 0xff;
 
-				int grey_value = Math.round(red*0.222f + green*0.707f + blue*0.071f);
-				
-				pixel = (alpha << 24) 
-						| (grey_value << 16) 
-						| (grey_value << 8)
-						| grey_value ; // pixel
+				pixel = (alpha << 24) | (255 - red << 16) | (255 - green << 8) | 255 - blue; // pixel
 
 				img.setRGB(j, i, pixel);
 			}
 		}
-		System.out.println("ImgMonochrome PAL done.");
+		System.out.println("ImgNegative done.");
 		return img;
 	}
 }

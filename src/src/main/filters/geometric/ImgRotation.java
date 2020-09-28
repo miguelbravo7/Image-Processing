@@ -1,6 +1,11 @@
+package main.filters.geometric;
+
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.lang.reflect.InvocationTargetException;
+
+import main.utils.ImgConvert;
+import main.utils.Utility;
 
 public class ImgRotation {
 	static public BufferedImage rotate(BufferedImage image, Double degrees, String function) {

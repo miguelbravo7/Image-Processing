@@ -1,3 +1,9 @@
+package main;
+
+import main.filters.point.*;
+import main.graphs.*;
+import main.utils.*;
+
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
@@ -47,7 +53,7 @@ public class Menu {
 					JLabel label = (JLabel)getComponentImg(tab_index);
 					BufferedImage img = imagelist.get(tab_index);
 					if (label.getMouseListeners().length == 0) {
-						String img_size_text = "Tamaño " + img.getWidth() + "x" + img.getHeight();
+						String img_size_text = "Tamaï¿½o " + img.getWidth() + "x" + img.getHeight();
 						label.addMouseMotionListener(new MouseAdapter() {
 							@Override
 							public void mouseMoved(MouseEvent e) {

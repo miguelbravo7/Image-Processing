@@ -1,10 +1,14 @@
+package main.filters.point.kmeans;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
+import main.utils.Pixel;
+
 public class KMeans {
-	
+
 	public KMeansResultado calcular(List<Pixel> puntos, Integer k) {
 		List<Cluster> clusters = elegirCentroides(puntos, k);
 
@@ -21,6 +25,7 @@ public class KMeans {
 
 	/**
 	 * Metodo que inicialica los centroides en su posicion inicial
+	 * 
 	 * @param puntos
 	 * @param k(numero de clases)
 	 * @return centroides
@@ -44,7 +49,8 @@ public class KMeans {
 			minimos.add(min);
 		}
 
-		//Se generan los clusters dentro de la region en la que estan situados los puntos
+		// Se generan los clusters dentro de la region en la que estan situados los
+		// puntos
 		Random random = new Random();
 
 		for (int i = 0; i < k; i++) {
@@ -62,9 +68,10 @@ public class KMeans {
 
 		return centroides;
 	}
-	
+
 	/**
 	 * Metodo para comprobar si todos los clusters estan establecidos
+	 * 
 	 * @param clusters
 	 * @return boolean (posicion final en todos los clusters)
 	 */
@@ -79,6 +86,7 @@ public class KMeans {
 
 	/**
 	 * Metodo que vacia los puntos asignados anteriormente al cluster
+	 * 
 	 * @param clusters
 	 */
 	private void prepararClusters(List<Cluster> clusters) {
@@ -86,9 +94,10 @@ public class KMeans {
 			c.limpiarPuntos();
 		}
 	}
-	
+
 	/**
 	 * Metodo que para cada punto le asigna el cluster mas cercano
+	 * 
 	 * @param puntos
 	 * @param clusters
 	 */
@@ -108,7 +117,9 @@ public class KMeans {
 	}
 
 	/**
-	 * Metodo que evalua que posicion nueva se situara el cluster y se ha dejado de mover
+	 * Metodo que evalua que posicion nueva se situara el cluster y se ha dejado de
+	 * mover
+	 * 
 	 * @param clusters
 	 */
 	private void recalcularCentroides(List<Cluster> clusters) {
@@ -127,7 +138,8 @@ public class KMeans {
 				}
 			}
 
-			//Establecido el nuevo punto se compara con el anterior para ver si se ha movido
+			// Establecido el nuevo punto se compara con el anterior para ver si se ha
+			// movido
 			Pixel nuevoCentroide = new Pixel(d);
 
 			if (nuevoCentroide.equals(c.getCentroide())) {
@@ -140,6 +152,7 @@ public class KMeans {
 
 	/**
 	 * Metodo que calcula el error acumulado
+	 * 
 	 * @param clusters
 	 * @return double con err. acumulado
 	 */

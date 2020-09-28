@@ -1,5 +1,10 @@
+package main.filters.geometric;
+
 import java.awt.image.BufferedImage;
 import java.lang.reflect.InvocationTargetException;
+
+import main.utils.ImgConvert;
+import main.utils.Utility;
 
 public class ImgScale {
 

@@ -1,3 +1,5 @@
+package main.filters.geometric;
+
 import java.awt.image.BufferedImage;
 
 public class ImgTranspose {

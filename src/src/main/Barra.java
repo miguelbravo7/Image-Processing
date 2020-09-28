@@ -1,3 +1,12 @@
+package main;
+
+import main.filters.*;
+import main.filters.geometric.*;
+import main.filters.point.*;
+import main.filters.point.kmeans.Kmeans_Processor;
+import main.graphs.*;
+import main.utils.*;
+
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.FlowLayout;
@@ -11,7 +20,6 @@ import java.util.ArrayList;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-//import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -33,7 +41,7 @@ public class Barra extends JMenuBar {
 	JTextField brillo, contraste;
 	JSlider umbral;
 	JTextArea textarea;
-	final int BRI_MIN = 0;
+	final static int BRI_MIN = 0;
 	final int BRI_MAX = 255;
 	final int CONT_MIN = 0;
 	final int CONT_MAX = 255;
@@ -98,10 +106,10 @@ public class Barra extends JMenuBar {
 		JMenuItem diff = new JMenuItem("Diferencia de imagen");
 		diff.addActionListener(new ActImgDifference());
 		op_punto.add(diff);
-		JMenuItem region = new JMenuItem("Región de interés");
+		JMenuItem region = new JMenuItem("Regiï¿½n de interï¿½s");
 		region.addActionListener(new ActToggleRegion());
 		op_punto.add(region);
-		JMenuItem linear = new JMenuItem("Transformación lineal");
+		JMenuItem linear = new JMenuItem("Transformaciï¿½n lineal");
 		linear.addActionListener(new ActLinealTransform());
 		op_punto.add(linear);
 		
@@ -119,13 +127,13 @@ public class Barra extends JMenuBar {
 		transpuesta.addActionListener(new ActGeomTranspose());
 		espejo.add(transpuesta);
 		JMenu f_rotations = new JMenu("Rotaciones fixadas");
-		JMenuItem rotar90 = new JMenuItem("Rotar 90º");
+		JMenuItem rotar90 = new JMenuItem("Rotar 90ï¿½");
 		rotar90.addActionListener(new ActGeomRotate90());
 		f_rotations.add(rotar90);
-		JMenuItem rotar180 = new JMenuItem("Rotar 180º");
+		JMenuItem rotar180 = new JMenuItem("Rotar 180ï¿½");
 		rotar180.addActionListener(new ActGeomRotate180());
 		f_rotations.add(rotar180);
-		JMenuItem rotar270 = new JMenuItem("Rotar 270º");
+		JMenuItem rotar270 = new JMenuItem("Rotar 270ï¿½");
 		rotar270.addActionListener(new ActGeomRotate270());
 		f_rotations.add(rotar270);
 		espejo.add(f_rotations);
@@ -186,8 +194,9 @@ public class Barra extends JMenuBar {
 			chooser.setFileFilter(new FileNameExtensionFilter("JPG & PNG Images", "jpg", "png"));
 			int returnVal = chooser.showOpenDialog(frame);
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
+				filepath = chooser.getSelectedFile().getAbsolutePath();
 				System.out.println(
-						"You chose to open this file: " + (filepath = chooser.getSelectedFile().getAbsolutePath()));
+						"You chose to open this file: " + filepath);
 				program.openImage(filepath);
 			}
 		}
@@ -323,7 +332,7 @@ public class Barra extends JMenuBar {
 			popup.setLayout(new GridLayout(3, 1));
 
 			JPanel panel = new JPanel(new GridLayout(2, 1));
-			panel.add(new JLabel("Tamaño de la celda"));
+			panel.add(new JLabel("Tamaï¿½o de la celda"));
 			panel.add(depth);
 			popup.add(panel);
 			
@@ -603,7 +612,7 @@ public class Barra extends JMenuBar {
 
 			okbutton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					program.addToPane(ImgRotation.rotate(program.currentImage(), Double.valueOf(means.getText()), function), means.getText() + "º_" + function);
+					program.addToPane(ImgRotation.rotate(program.currentImage(), Double.valueOf(means.getText()), function), means.getText() + "ï¿½_" + function);
 					popup.dispose();
 				}
 			});
@@ -634,7 +643,7 @@ public class Barra extends JMenuBar {
 
 			okbutton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					program.addToPane(ImgRotation.rotateDirect(program.currentImage(), Double.valueOf(means.getText()), function), means.getText() + "º_" + function);
+					program.addToPane(ImgRotation.rotateDirect(program.currentImage(), Double.valueOf(means.getText()), function), means.getText() + "ï¿½_" + function);
 					popup.dispose();
 				}
 			});
@@ -646,19 +655,19 @@ public class Barra extends JMenuBar {
 	
 	public class ActGeomRotate90 implements ActionListener {
 		public void actionPerformed(ActionEvent evt) {
-			program.addToPane(ImgFixedRotation.rotate90(program.currentImage()), "90º");
+			program.addToPane(ImgFixedRotation.rotate90(program.currentImage()), "90ï¿½");
 		}
 	}
 
 	public class ActGeomRotate180 implements ActionListener {
 		public void actionPerformed(ActionEvent evt) {
-			program.addToPane(ImgFixedRotation.rotate180(program.currentImage()), "180º");
+			program.addToPane(ImgFixedRotation.rotate180(program.currentImage()), "180ï¿½");
 		}
 	}
 
 	public class ActGeomRotate270 implements ActionListener {
 		public void actionPerformed(ActionEvent evt) {
-			program.addToPane(ImgFixedRotation.rotate270(program.currentImage()), "270º");
+			program.addToPane(ImgFixedRotation.rotate270(program.currentImage()), "270ï¿½");
 		}
 	}
 

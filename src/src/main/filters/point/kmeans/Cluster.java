@@ -1,5 +1,9 @@
+package main.filters.point.kmeans;
+
 import java.util.HashSet;
 import java.util.Set;
+
+import main.utils.Pixel;
 
 public class Cluster {
 	private Set<Pixel> puntos = new HashSet<Pixel>();

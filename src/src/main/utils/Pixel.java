@@ -1,8 +1,11 @@
+package main.utils;
 
 public class Pixel {
 	private Float[] data = new Float[4];
+
 	/**
 	 * Constructor de la clase Pixel
+	 * 
 	 * @param strings
 	 */
 	public Pixel(Float[] data2) {
@@ -13,19 +16,16 @@ public class Pixel {
 	}
 
 	/**
-	 * 0 - alpha
-	 * 1 - red
-	 * 2 - green
-	 * 3 - blue
+	 * 0 - alpha 1 - red 2 - green 3 - blue
 	 */
 	public float get(int index) {
 		return data[index];
 	}
-	
+
 	public int alpha() {
 		return data[0].intValue();
 	}
-	
+
 	public int red() {
 		return data[1].intValue();
 	}
@@ -40,6 +40,7 @@ public class Pixel {
 
 	/**
 	 * Metododo para obtener la dimension
+	 * 
 	 * @return dimension en valor entero
 	 */
 	public int getGrado() {
@@ -56,11 +57,12 @@ public class Pixel {
 		}
 		return sb.toString();
 	}
-	
-	//Funciones de ayuda
+
+	// Funciones de ayuda
 
 	/**
 	 * Funcion de ayuda para obtener la distancia euclidiana
+	 * 
 	 * @param destino
 	 * @return flotante de precision doble
 	 */
@@ -74,8 +76,9 @@ public class Pixel {
 
 	/**
 	 * Metodo que compara las coordenadas del punto
+	 * 
 	 * @return booleano
-	 */	
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		Pixel other = (Pixel) obj;
