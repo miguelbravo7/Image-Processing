@@ -6,8 +6,8 @@ import java.util.logging.Logger;
 
 import main.utils.Utility;
 
-public class ImgGammaCorrection {
-	private static final Logger LOGGER = Logger.getLogger(ImgGammaCorrection.class.getName());
+public class GammaCorrection {
+	private static final Logger LOGGER = Logger.getLogger(GammaCorrection.class.getName());
 
 	public static BufferedImage gammaCorrection(BufferedImage image, double gamma) {
 		BufferedImage img = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());

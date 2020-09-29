@@ -6,8 +6,8 @@ import java.util.logging.Logger;
 
 import main.utils.Utility;
 
-public class ImgDifference {
-	private static final Logger LOGGER = Logger.getLogger(ImgDifference.class.getName());
+public class Difference {
+	private static final Logger LOGGER = Logger.getLogger(Difference.class.getName());
 
 	public static BufferedImage difference(BufferedImage image1, BufferedImage image2) {
 		BufferedImage img = new BufferedImage(image1.getWidth(), image1.getHeight(), image1.getType());

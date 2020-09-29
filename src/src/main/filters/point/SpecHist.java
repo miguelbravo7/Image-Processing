@@ -9,8 +9,8 @@ import java.util.logging.Logger;
 import main.graphs.Histogram;
 import main.utils.Utility;
 
-public class ImgSpecHist {
-	private static final Logger LOGGER = Logger.getLogger(ImgSpecHist.class.getName());
+public class SpecHist {
+	private static final Logger LOGGER = Logger.getLogger(SpecHist.class.getName());
 
 	public static BufferedImage convertHist(BufferedImage image, Histogram imgHist, Histogram refImgHist) {
 		BufferedImage img = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());

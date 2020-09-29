@@ -9,8 +9,8 @@ import java.util.logging.Logger;
 import main.utils.ImgConvert;
 import main.utils.Utility;
 
-public class ImgRotation {
-	private static final Logger LOGGER = Logger.getLogger(ImgRotation.class.getName());
+public class Rotation {
+	private static final Logger LOGGER = Logger.getLogger(Rotation.class.getName());
 
 	public static BufferedImage rotate(BufferedImage image, Double degrees, String function) {
 		Double deg = degrees % 360;

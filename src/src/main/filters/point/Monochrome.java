@@ -6,8 +6,8 @@ import java.util.logging.Logger;
 
 import main.utils.Utility;
 
-public class ImgMonochrome {
-	private static final Logger LOGGER = Logger.getLogger(ImgMonochrome.class.getName());
+public class Monochrome {
+	private static final Logger LOGGER = Logger.getLogger(Monochrome.class.getName());
 
 	public static BufferedImage renderPal(BufferedImage image) {
 		BufferedImage img = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());

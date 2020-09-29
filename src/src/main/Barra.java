@@ -221,19 +221,19 @@ public class Barra extends JMenuBar {
 
 	public class ActFilterImageNeg implements ActionListener {
 		public void actionPerformed(ActionEvent evt) {
-			program.addToPane(ImgNegative.render(program.currentImage()), "Negativa");
+			program.addToPane(Negative.render(program.currentImage()), "Negativa");
 		}
 	}
 
 	public class ActFilterImagePal implements ActionListener {
 		public void actionPerformed(ActionEvent evt) {
-			program.addToPane(ImgMonochrome.renderPal(program.currentImage()), "PAL");
+			program.addToPane(Monochrome.renderPal(program.currentImage()), "PAL");
 		}
 	}
 
 	public class ActFilterImageEc implements ActionListener {
 		public void actionPerformed(ActionEvent evt) {
-			program.addToPane(ImgLinealTransform.ecualize(program.currentImage(), program.currentHist()), "Ecualizada");
+			program.addToPane(LinealTransform.ecualize(program.currentImage(), program.currentHist()), "Ecualizada");
 		}
 	}
 
@@ -255,7 +255,7 @@ public class Barra extends JMenuBar {
 			okbutton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					program.addToPane(
-							ImgGammaCorrection.gammaCorrection(program.currentImage(), Double.valueOf(gamma.getText())),
+							GammaCorrection.gammaCorrection(program.currentImage(), Double.valueOf(gamma.getText())),
 							"Gamma");
 					popup.dispose();
 				}
@@ -319,7 +319,7 @@ public class Barra extends JMenuBar {
 			okbutton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					program.addToPane(
-							ImgColorDepth.colorDepthShift(program.currentImage(), Integer.valueOf(depth.getText())),
+							ColorDepth.colorDepthShift(program.currentImage(), Integer.valueOf(depth.getText())),
 							depth.getText() + " bit depth");
 					popup.dispose();
 				}
@@ -348,7 +348,7 @@ public class Barra extends JMenuBar {
 			okbutton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					program.addToPane(
-							ImgColorDepth.colorDepthRegion(program.currentImage(), Integer.valueOf(depth.getText())),
+							ColorDepth.colorDepthRegion(program.currentImage(), Integer.valueOf(depth.getText())),
 							depth.getText() + " bit depth");
 					popup.dispose();
 				}
@@ -383,7 +383,7 @@ public class Barra extends JMenuBar {
 			okbutton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					program.addToPane(
-							ImgBrightContrast.adjustImg(program.currentImage(), program.currentHist(),
+							BrightContrast.adjustImg(program.currentImage(), program.currentHist(),
 									Double.valueOf(brillo.getText()), Double.valueOf(contraste.getText())),
 							"Conversion");
 					popup.dispose();
@@ -425,7 +425,7 @@ public class Barra extends JMenuBar {
 			okbutton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					popup.dispose();
-					program.addToPane(ImgSpecHist.convertHist(program.imagelist.get(img1.getSelectedIndex()),
+					program.addToPane(SpecHist.convertHist(program.imagelist.get(img1.getSelectedIndex()),
 							program.imagehist.get(img1.getSelectedIndex()),
 							program.imagehist.get(img2.getSelectedIndex())), "Spec. hist.");
 				}
@@ -467,7 +467,7 @@ public class Barra extends JMenuBar {
 				public void actionPerformed(ActionEvent e) {
 					popup.dispose();
 
-					program.addToPane(ImgDifference.difference(program.imagelist.get(img1.getSelectedIndex()),
+					program.addToPane(Difference.difference(program.imagelist.get(img1.getSelectedIndex()),
 							program.imagelist.get(img2.getSelectedIndex())), "Diferencia");
 					umbralPopup();
 				}
@@ -488,7 +488,7 @@ public class Barra extends JMenuBar {
 			umbral.setPaintLabels(true);
 			umbral.addChangeListener(new ChangeListener() {
 				public void stateChanged(ChangeEvent e) {
-					ImgDifference.changeUmbral(program.currentImage(), umbral.getValue());
+					Difference.changeUmbral(program.currentImage(), umbral.getValue());
 					program.doRedraw();
 				}
 			});
@@ -541,7 +541,7 @@ public class Barra extends JMenuBar {
 
 			okbutton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					program.addToPane(ImgLinealTransform.LinealTransform(program.currentImage(),
+					program.addToPane(LinealTransform.LinealTransform(program.currentImage(),
 							iterateOverJTextFields(panelx, panely)), "Trans. lineal");
 					popup.dispose();
 				}
@@ -578,19 +578,19 @@ public class Barra extends JMenuBar {
 
 	public class ActGeomMirrorVertical implements ActionListener {
 		public void actionPerformed(ActionEvent evt) {
-			program.addToPane(ImgMirror.vertical(program.currentImage()), "Vertical");
+			program.addToPane(Mirror.vertical(program.currentImage()), "Vertical");
 		}
 	}
 
 	public class ActGeomMirrorHorizontal implements ActionListener {
 		public void actionPerformed(ActionEvent evt) {
-			program.addToPane(ImgMirror.horizontal(program.currentImage()), "Horizontal");
+			program.addToPane(Mirror.horizontal(program.currentImage()), "Horizontal");
 		}
 	}
 
 	public class ActGeomTranspose implements ActionListener {
 		public void actionPerformed(ActionEvent evt) {
-			program.addToPane(ImgTranspose.transpose(program.currentImage()), "Transpuesta");
+			program.addToPane(Transpose.transpose(program.currentImage()), "Transpuesta");
 		}
 	}
 
@@ -618,7 +618,7 @@ public class Barra extends JMenuBar {
 			okbutton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					program.addToPane(
-							ImgRotation.rotate(program.currentImage(), Double.valueOf(means.getText()), function),
+							Rotation.rotate(program.currentImage(), Double.valueOf(means.getText()), function),
 							means.getText() + "�_" + function);
 					popup.dispose();
 				}
@@ -653,7 +653,7 @@ public class Barra extends JMenuBar {
 			okbutton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					program.addToPane(
-							ImgRotation.rotateDirect(program.currentImage(), Double.valueOf(means.getText()), function),
+							Rotation.rotateDirect(program.currentImage(), Double.valueOf(means.getText()), function),
 							means.getText() + "�_" + function);
 					popup.dispose();
 				}
@@ -666,19 +666,19 @@ public class Barra extends JMenuBar {
 
 	public class ActGeomRotate90 implements ActionListener {
 		public void actionPerformed(ActionEvent evt) {
-			program.addToPane(ImgFixedRotation.rotate90(program.currentImage()), "90�");
+			program.addToPane(FixedRotation.rotate90(program.currentImage()), "90�");
 		}
 	}
 
 	public class ActGeomRotate180 implements ActionListener {
 		public void actionPerformed(ActionEvent evt) {
-			program.addToPane(ImgFixedRotation.rotate180(program.currentImage()), "180�");
+			program.addToPane(FixedRotation.rotate180(program.currentImage()), "180�");
 		}
 	}
 
 	public class ActGeomRotate270 implements ActionListener {
 		public void actionPerformed(ActionEvent evt) {
-			program.addToPane(ImgFixedRotation.rotate270(program.currentImage()), "270�");
+			program.addToPane(FixedRotation.rotate270(program.currentImage()), "270�");
 		}
 	}
 
@@ -711,7 +711,7 @@ public class Barra extends JMenuBar {
 
 			okbutton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					program.addToPane(ImgScale.scale(program.currentImage(), Double.valueOf(width.getText()),
+					program.addToPane(Scale.scale(program.currentImage(), Double.valueOf(width.getText()),
 							Double.valueOf(height.getText()), function), "Bilinear");
 					popup.dispose();
 				}

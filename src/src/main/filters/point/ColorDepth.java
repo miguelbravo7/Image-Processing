@@ -7,8 +7,8 @@ import java.util.logging.Logger;
 import main.utils.ImgConvert;
 import main.utils.Utility;
 
-public class ImgColorDepth {
-	private static final Logger LOGGER = Logger.getLogger(ImgColorDepth.class.getName());
+public class ColorDepth {
+	private static final Logger LOGGER = Logger.getLogger(ColorDepth.class.getName());
 
 	public static BufferedImage colorDepthShift(BufferedImage image, int depth) {
 		BufferedImage img = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());

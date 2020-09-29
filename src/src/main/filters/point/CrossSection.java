@@ -15,8 +15,8 @@ import javax.swing.JFrame;
 
 import main.graphs.Graph;
 
-public class ImgCrossSection {
-	private static final Logger LOGGER = Logger.getLogger(ImgCrossSection.class.getName());
+public class CrossSection {
+	private static final Logger LOGGER = Logger.getLogger(CrossSection.class.getName());
 
 	public static void profile(BufferedImage image, Point p1, Point p2) {
 		Map<Integer, Integer> monochrome = new TreeMap<Integer, Integer>();

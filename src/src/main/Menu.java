@@ -93,7 +93,7 @@ public class Menu {
 											"Imagen recortada");
 									subimageFlag = false;
 								} else if (crossSectionFlag) {
-									ImgCrossSection.profile(currentImage(), new Point(xAcc, yAcc),
+									CrossSection.profile(currentImage(), new Point(xAcc, yAcc),
 											new Point(e.getX(), e.getY()));
 									crossSectionFlag = false;
 								}

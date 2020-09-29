@@ -7,8 +7,8 @@ import java.util.logging.Logger;
 import main.graphs.Histogram;
 import main.utils.Utility;
 
-public class ImgBrightContrast {
-	private static final Logger LOGGER = Logger.getLogger(ImgBrightContrast.class.getName());
+public class BrightContrast {
+	private static final Logger LOGGER = Logger.getLogger(BrightContrast.class.getName());
 
 	public static BufferedImage adjustImg(BufferedImage image, Histogram imgHist, double newBrightness,
 			double newContrast) {

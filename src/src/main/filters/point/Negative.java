@@ -6,8 +6,8 @@ import java.util.logging.Logger;
 
 import main.utils.Utility;
 
-public class ImgNegative {
-	private static final Logger LOGGER = Logger.getLogger(ImgNegative.class.getName());
+public class Negative {
+	private static final Logger LOGGER = Logger.getLogger(Negative.class.getName());
 
 	public static BufferedImage render(BufferedImage image) {
 		BufferedImage img = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());

@@ -6,8 +6,8 @@ import java.util.logging.Logger;
 
 import main.utils.Utility;
 
-public class ImgTranspose {	
-	private static final Logger LOGGER = Logger.getLogger(ImgTranspose.class.getName());
+public class Transpose {	
+	private static final Logger LOGGER = Logger.getLogger(Transpose.class.getName());
 
 	public static BufferedImage transpose(BufferedImage image) {
 		BufferedImage img = new BufferedImage(image.getHeight(), image.getWidth(), image.getType());

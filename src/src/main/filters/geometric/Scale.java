@@ -8,8 +8,8 @@ import java.util.logging.Logger;
 import main.utils.ImgConvert;
 import main.utils.Utility;
 
-public class ImgScale {
-	private static final Logger LOGGER = Logger.getLogger(ImgScale.class.getName());
+public class Scale {
+	private static final Logger LOGGER = Logger.getLogger(Scale.class.getName());
 
 	public static BufferedImage scale(BufferedImage image, double width, double height, String function) {
 		int cappedWidth = (int) Math.floor(image.getWidth() * width);

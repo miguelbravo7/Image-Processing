@@ -6,8 +6,8 @@ import java.util.logging.Logger;
 
 import main.utils.Utility;
 
-public class ImgMirror {
-	private static final Logger LOGGER = Logger.getLogger(ImgMirror.class.getName());
+public class Mirror {
+	private static final Logger LOGGER = Logger.getLogger(Mirror.class.getName());
 
 	public static BufferedImage vertical(BufferedImage image) {
 		BufferedImage img = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());

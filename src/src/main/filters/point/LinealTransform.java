@@ -11,8 +11,8 @@ import java.util.logging.Logger;
 import main.graphs.Histogram;
 import main.utils.Utility;
 
-public class ImgLinealTransform {
-	private static final Logger LOGGER = Logger.getLogger(ImgLinealTransform.class.getName());
+public class LinealTransform {
+	private static final Logger LOGGER = Logger.getLogger(LinealTransform.class.getName());
 
 	public static BufferedImage LinealTransform(BufferedImage image, List<Point> points) {
 		BufferedImage img = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
