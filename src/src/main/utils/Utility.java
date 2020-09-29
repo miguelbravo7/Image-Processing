@@ -1,13 +1,19 @@
 package main.utils;
 
+import java.awt.image.BufferedImage;
 import java.awt.Color;
 import java.io.File;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiConsumer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.IntStream;
 
 public class Utility {
-	static Map<String, Method> methodMap = createMap();
+	private static final Logger LOGGER = Logger.getLogger( Utility.class.getName() );
+	public static final Map<String, Method> methodMap = createMap();
 
 	private static Map<String, Method> createMap() {
 		Map<String, Method> myMap = new HashMap<String, Method>();
@@ -27,26 +33,35 @@ public class Utility {
 
 		for (File f : filesList) {
 			if (f.isDirectory()) {
-				System.out.println(f.getName());
+				LOGGER.log(Level.FINE, f.getName());
 				getAllFiles(f, level + " | ");
 			}
 			if (f.isFile()) {
-				System.out.println(level + f.getName());
+				LOGGER.log(Level.FINE, "{0}{1}", new Object[]{level, f.getName()});
 			}
 		}
 	}
 
-	public static int bilinearInterpolation(Integer[][] color, double x_position, double y_position, int width,
-			int height) {
-		int X = (int) Math.floor(x_position);
-		int Y = (int) Math.floor(y_position);
-		int X_1 = (X + 1 == width ? width - 1 : X + 1);
-		int Y_1 = (Y + 1 == height ? height - 1 : Y + 1);
+	public static void imgApply(BufferedImage image, BiConsumer<Integer, Integer> function) {
+		// Seen unstable behaviour when implemented on toPixelArrayList
+		IntStream.range(0, image.getHeight()).parallel().forEach(i -> 
+			IntStream.range(0, image.getWidth()).parallel().forEach(j ->
+				function.accept(i, j)
+			)
+		);
+	}
 
-		int pixel1 = color[Y][X];
-		int pixel2 = color[Y][X_1];
-		int pixel3 = color[Y_1][X];
-		int pixel4 = color[Y_1][X_1];
+	public static int bilinearInterpolation(Integer[][] color, double xPosition, double yPosition, int width,
+			int height) {
+		int x = (int) Math.floor(xPosition);
+		int y = (int) Math.floor(yPosition);
+		int x1 = (x + 1 == width ? width - 1 : x + 1);
+		int y1 = (y + 1 == height ? height - 1 : y + 1);
+
+		int pixel1 = color[y][x];
+		int pixel2 = color[y][x1];
+		int pixel3 = color[y1][x];
+		int pixel4 = color[y1][x1];
 
 		int alpha = (pixel1 >> 24) & 0xff;
 		int red1 = (pixel1 >> 16) & 0xff;
@@ -65,29 +80,28 @@ public class Utility {
 		int green4 = (pixel4 >> 8) & 0xff;
 		int blue4 = (pixel4) & 0xff;
 
-		double p = x_position % 1;
-		double q = y_position % 1;
+		double p = xPosition % 1;
+		double q = yPosition % 1;
 
-		int pixel_color = (alpha << 24) | (interpolate(red1, red2, red3, red4, p, q) << 16)
+		return (alpha << 24) | (interpolate(red1, red2, red3, red4, p, q) << 16)
 				| (interpolate(green1, green2, green3, green4, p, q) << 8)
 				| (interpolate(blue1, blue2, blue3, blue4, p, q));
-
-		return pixel_color;
 	}
 
-	private static int interpolate(int A, int B, int C, int D, double p, double q) {
+	public static int interpolate(int a, int b, int c, int d, double p, double q) {
+		double r = a + p * (b - a);
+		double s = c + p * (d - c);
 
-		double R = A + p * (B - A);
-		double S = C + p * (D - C);
-
-		int color = (int) (R + q * (S - R));
-
-		return color;
+		return (int) (r + q * (s - r));
 	}
 
-	public static int nearestNeighbour(Integer[][] color, double x_position, double y_position, int width, int height) {
-		int w = Math.round(x_position) == width ? width - 1 : (int) Math.round(x_position);
-		int h = Math.round(y_position) == height ? height - 1 : (int) Math.round(y_position);
+	public static int nearestNeighbour(Integer[][] color, double xPosition, double yPosition, int width, int height) {
+		if(xPosition < 0 || yPosition < 0){
+			System.out.println(xPosition);
+			System.out.println(yPosition);
+		}
+		int w = Math.round(xPosition) == width ? width - 1 : (int) Math.round(xPosition);
+		int h = Math.round(yPosition) == height ? height - 1 : (int) Math.round(yPosition);
 
 		return color[h][w];
 	}
@@ -103,7 +117,7 @@ public class Utility {
 			return 0f;
 		}
 
-		float hue = 0f;
+		float hue;
 		if (max == red) {
 			hue = (green - blue) / (max - min);
 

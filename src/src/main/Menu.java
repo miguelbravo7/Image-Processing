@@ -20,6 +20,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.IntStream;
 
 import javax.imageio.ImageIO;
@@ -32,28 +34,31 @@ import javax.swing.JTabbedPane;
 
 public class Menu {
 	private static final int WINDOW_SIZE = 800;
-	final static String format = "jpg";
+	static String format = "jpg";
 	JFrame frame = new JFrame("Editor");
 	JTabbedPane tabbedPane = new JTabbedPane();
 	File file;
 	ArrayList<Histogram> imagehist = new ArrayList<Histogram>();
 	ArrayList<BufferedImage> imagelist = new ArrayList<BufferedImage>();
 	JLabel text = new JLabel("");
-	boolean subimage_flag, cross_section_flag;
-	int acc_x, acc_y;
-	Integer image_count = 0;
+	boolean subimageFlag;
+	boolean crossSectionFlag;
+	int xAcc;
+	int yAcc;
+	Integer imgCount = 0;
 
-	public Menu() {			
+	public Menu() {
+		final Logger LOGGER = Logger.getLogger(Menu.class.getName());
 		tabbedPane.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseEntered(MouseEvent e) {
 
-				int tab_index = tabbedPane.getSelectedIndex();
-				if(tab_index != -1) {
-					JLabel label = (JLabel)getComponentImg(tab_index);
-					BufferedImage img = imagelist.get(tab_index);
+				int tabIndex = tabbedPane.getSelectedIndex();
+				if (tabIndex != -1) {
+					JLabel label = (JLabel) getComponentImg(tabIndex);
+					BufferedImage img = imagelist.get(tabIndex);
 					if (label.getMouseListeners().length == 0) {
-						String img_size_text = "Tama�o " + img.getWidth() + "x" + img.getHeight();
+						String imgSizeText = "Tamano " + img.getWidth() + "x" + img.getHeight();
 						label.addMouseMotionListener(new MouseAdapter() {
 							@Override
 							public void mouseMoved(MouseEvent e) {
@@ -63,67 +68,77 @@ public class Menu {
 								int red = (pixel >> 16) & 0xff;
 								int green = (pixel >> 8) & 0xff;
 								int blue = (pixel) & 0xff;
-								
-								text.setText(img_size_text + "    Posicion (x:" + e.getX() + ", y:" + e.getY() + ")      Colores a: " + alpha + " r: " + red + " g: " + green + " b: " + blue);
+
+								text.setText(imgSizeText + "    Posicion (x:" + e.getX() + ", y:" + e.getY()
+										+ ")      Colores a: " + alpha + " r: " + red + " g: " + green + " b: " + blue);
 							}
 						});
 						label.addMouseListener(new MouseAdapter() {
+							@Override
 							public void mousePressed(MouseEvent e) {
-								if(subimage_flag || cross_section_flag) {
-									System.out.println("Mouse pressed; start: x: " + (acc_x = e.getX()) + "  y: " + (acc_y = e.getY()));							 
+								if (subimageFlag || crossSectionFlag) {
+									LOGGER.log(Level.FINE, "Mouse pressed; start: x: {0}  y: {1}",
+											new Object[] { xAcc, yAcc });
+									xAcc = e.getX();
+									yAcc = e.getY();
 								}
 							}
-							
+
+							@Override
 							public void mouseReleased(MouseEvent e) {
-								if(subimage_flag) {
-									System.out.println("Mouse released; end: x: " + e.getX() + "  y: " + e.getY());
-									addToPane(img.getSubimage(acc_x, acc_y, e.getX() - acc_x , e.getY() - acc_y), "Imagen recortada");
-									subimage_flag = false;							 
-								}
-								else if(cross_section_flag) {
-									System.out.println("Mouse released; end: x: " + e.getX() + "  y: " + e.getY());
-									ImgCrossSection.profile(currentImage(), new Point(acc_x, acc_y), new Point(e.getX(), e.getY()));
-									cross_section_flag = false;							 
+								LOGGER.log(Level.FINE, "Mouse released; end: x: {0} y: {1}",
+										new Object[] { e.getX(), e.getY() });
+								if (subimageFlag) {
+									addToPane(img.getSubimage(xAcc, yAcc, e.getX() - xAcc, e.getY() - yAcc),
+											"Imagen recortada");
+									subimageFlag = false;
+								} else if (crossSectionFlag) {
+									ImgCrossSection.profile(currentImage(), new Point(xAcc, yAcc),
+											new Point(e.getX(), e.getY()));
+									crossSectionFlag = false;
 								}
 							}
-						});									
-					}					
+						});
+					}
 				}
-			}			
+			}
 		});
 		tabbedPane.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent key) {
 				if (key.getKeyCode() == KeyEvent.VK_DELETE) {
-					deleteFromPane(tabbedPane.getSelectedIndex());					
+					deleteFromPane(tabbedPane.getSelectedIndex());
 				}
 			}
 		});
 		// Interfaz grafica
 		frame.setLayout(new BorderLayout());
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 		frame.setSize(WINDOW_SIZE, WINDOW_SIZE);
 		frame.setLocation(100, 100);
-		
-		frame.add(tabbedPane, BorderLayout.CENTER);					
-		frame.add(new Barra(this), BorderLayout.NORTH);		
+
+		frame.add(tabbedPane, BorderLayout.CENTER);
+		frame.add(new Barra(this), BorderLayout.NORTH);
 		frame.add(text, BorderLayout.SOUTH);
-		
-		
-		frame.setVisible(true);		
+
+		frame.setVisible(true);
 
 	}
-	
-	public void deleteFromPane(int tab_index) {
-		tabbedPane.remove(tab_index);
-		imagehist.remove(tab_index);
-		imagelist.remove(tab_index);
+
+	public void deleteFromPane(int tabIndex) {
+		tabbedPane.remove(tabIndex);
+		imagehist.remove(tabIndex);
+		imagelist.remove(tabIndex);
 	}
-	
+
 	public void addToPane(BufferedImage image, String text) {
 		imagelist.add(image);
-		imagehist.add(new Histogram(image));
-		tabbedPane.addTab(text + "_" + image_count++, new ImageViewer(image).getContentPane());
+		try {
+			imagehist.add(new Histogram(image));
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		tabbedPane.addTab(text + "_" + imgCount++, new ImageViewer(image).getContentPane());
 	}
 	
 	public Histogram currentHist() {
@@ -162,11 +177,11 @@ public class Menu {
 	}
 	
 	public void openImage(String filepath) {
-		BufferedImage image = open_image_tiff_compatible(new File(filepath));
+		BufferedImage image = openTiffCompatibleImg(new File(filepath));
 		addToPane(image, "Imagen");
 	}
 	
-	private BufferedImage open_image_tiff_compatible(File file) {
+	private BufferedImage openTiffCompatibleImg(File file) {
 		BufferedImage tiff = null;
 		try {
 			try (InputStream is = new FileInputStream(file)) {
@@ -196,6 +211,7 @@ public class Menu {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
 	    BufferedImage convertedImg = new BufferedImage(tiff.getWidth(), tiff.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
 	    convertedImg.getGraphics().drawImage(tiff, 0, 0, null);
 		return convertedImg;

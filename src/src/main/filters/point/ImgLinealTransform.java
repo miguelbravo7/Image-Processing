@@ -2,87 +2,88 @@ package main.filters.point;
 
 import java.awt.Point;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import main.graphs.Histogram;
+import main.utils.Utility;
 
 public class ImgLinealTransform {
+	private static final Logger LOGGER = Logger.getLogger(ImgLinealTransform.class.getName());
 
-	static public BufferedImage LinealTransform(BufferedImage image, ArrayList<Point> points) {
+	public static BufferedImage LinealTransform(BufferedImage image, List<Point> points) {
 		BufferedImage img = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
 
 		Collections.sort(points, new PointCompare());
 		traducePoints(points);
 		for (Point p : points) {
-			System.out.println(p);
+			LOGGER.log(Level.FINE, p.toString());
 		}
 
-		for (int i = 0; i < image.getHeight(); i++) {
-			for (int j = 0; j < image.getWidth(); j++) {
+		Utility.imgApply(image, (i, j) -> {
+			int pixel = image.getRGB(j, i);
 
-				int pixel = image.getRGB(j, i);
+			int alpha = (pixel >> 24) & 0xff;
+			int red = (pixel >> 16) & 0xff;
+			int green = (pixel >> 8) & 0xff;
+			int blue = (pixel) & 0xff;
 
-				int alpha = (pixel >> 24) & 0xff;
-				int red = (pixel >> 16) & 0xff;
-				int green = (pixel >> 8) & 0xff;
-				int blue = (pixel) & 0xff;
+			int redValue = traduceValue(red, points);
+			int greenValue = traduceValue(green, points);
+			int blueValue = traduceValue(blue, points);
 
-				int red_value = traduceValue(red, points);
-				int green_value = traduceValue(green, points);
-				int blue_value = traduceValue(blue, points);
+			pixel = (alpha << 24) | (redValue << 16) | (greenValue << 8) | blueValue; // pixel
 
-				pixel = (alpha << 24) | (red_value << 16) | (green_value << 8) | blue_value; // pixel
-
-				img.setRGB(j, i, pixel);
-			}
-		}
-		System.out.println("Lineal transform done.");
+			img.setRGB(j, i, pixel);
+		});
+		LOGGER.log(Level.FINE, "Lineal transform done.");
 		return img;
 	}
 
-	private static void traducePoints(ArrayList<Point> points) {
+	private static void traducePoints(List<Point> points) {
 		if (points.get(0).x != 0) { // y = ax + b
-			double pendiente = (points.get(1).y - points.get(0).y) / (points.get(1).x - points.get(0).x);
+			double pendiente = (points.get(1).y - points.get(0).y) / (double) (points.get(1).x - points.get(0).x);
 			int offset = points.get(0).x - points.get(0).y;
 
 			// Looking for slope cutting points
 			if (pendiente == 0) {
 				points.add(0, new Point(0, offset));
 			} else if (pendiente > 0) {
-				int cut_point = (int) (-offset / pendiente);
+				int cutPoint = (int) (-offset / pendiente);
 
-				points.add(0, new Point(cut_point, 0));
-				if (cut_point > 0)
+				points.add(0, new Point(cutPoint, 0));
+				if (cutPoint > 0)
 					points.add(0, new Point(0, 0));
 			} else {
-				int cut_point = (int) (255 - offset / pendiente);
+				int cutPoint = (int) (255 - offset / pendiente);
 
-				points.add(0, new Point(cut_point, 255));
-				if (cut_point > 0)
+				points.add(0, new Point(cutPoint, 255));
+				if (cutPoint > 0)
 					points.add(0, new Point(0, 255));
 			}
 		}
-		int last_point = points.size() - 1;
-		if (points.get(last_point).x != 255) {
-			double pendiente = (points.get(last_point).y - points.get(last_point - 1).y)
-					/ (points.get(last_point).x - points.get(last_point - 1).x);
-			int offset = points.get(last_point - 1).x - points.get(last_point - 1).y;
+		int lastPoint = points.size() - 1;
+		if (points.get(lastPoint).x != 255) {
+			double pendiente = (points.get(lastPoint).y - points.get(lastPoint - 1).y)
+					/ (double) (points.get(lastPoint).x - points.get(lastPoint - 1).x);
+			int offset = points.get(lastPoint - 1).x - points.get(lastPoint - 1).y;
 
 			if (pendiente == 0) {
 				points.add(new Point(255, offset));
 			} else if (pendiente > 0) {
-				int cut_point = (int) (255 - offset / pendiente);
+				int cutPoint = (int) (255 - offset / pendiente);
 
-				points.add(new Point(cut_point, 255));
-				if (cut_point < 255)
+				points.add(new Point(cutPoint, 255));
+				if (cutPoint < 255)
 					points.add(new Point(255, 255));
 			} else {
-				int cut_point = (int) (255 - offset / pendiente);
+				int cutPoint = (int) (255 - offset / pendiente);
 
-				points.add(new Point(cut_point, 0));
-				if (cut_point < 255)
+				points.add(new Point(cutPoint, 0));
+				if (cutPoint < 255)
 					points.add(new Point(255, 0));
 			}
 		}
@@ -100,37 +101,33 @@ public class ImgLinealTransform {
 		}
 	}
 
-	static public BufferedImage ecualize(BufferedImage image, Histogram img_hist) {
+	public static BufferedImage ecualize(BufferedImage image, Histogram imgHist) {
 		BufferedImage img = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
 
-		for (int i = 0; i < image.getHeight(); i++) {
-			for (int j = 0; j < image.getWidth(); j++) {
+		Utility.imgApply(image, (i, j) -> {
+			int pixel = image.getRGB(j, i);
 
-				int pixel = image.getRGB(j, i);
+			int alpha = (pixel >> 24) & 0xff;
+			int red = (pixel >> 16) & 0xff;
+			int green = (pixel >> 8) & 0xff;
+			int blue = (pixel) & 0xff;
 
-				int alpha = (pixel >> 24) & 0xff;
-				int red = (pixel >> 16) & 0xff;
-				int green = (pixel >> 8) & 0xff;
-				int blue = (pixel) & 0xff;
+			int redValue = (int) Math.floor(imgHist.normColorsAcc.get(0).getOrDefault(red, (double) 0) * 255);
+			int greenValue = (int) Math.floor(imgHist.normColorsAcc.get(1).getOrDefault(green, (double) 0) * 255);
+			int blueValue = (int) Math.floor(imgHist.normColorsAcc.get(2).getOrDefault(blue, (double) 0) * 255);
 
-				int red_value = (int) Math.floor(img_hist.norm_colores_acc.get(0).getOrDefault(red, (double) 0) * 255);
-				int green_value = (int) Math
-						.floor(img_hist.norm_colores_acc.get(1).getOrDefault(green, (double) 0) * 255);
-				int blue_value = (int) Math
-						.floor(img_hist.norm_colores_acc.get(2).getOrDefault(blue, (double) 0) * 255);
+			pixel = (alpha << 24) | (redValue << 16) | (greenValue << 8) | blueValue; // pixel
 
-				pixel = (alpha << 24) | (red_value << 16) | (green_value << 8) | blue_value; // pixel
-
-				img.setRGB(j, i, pixel);
-			}
-		}
-		System.out.println("Ecualization done.");
+			img.setRGB(j, i, pixel);
+		});
+		LOGGER.log(Level.FINE, "Ecualization done.");
 		return img;
 	}
 
-	static private int traduceValue(int point, ArrayList<Point> points) {
-		double pendiente = 0, offset = 0;
-		for (int i = 0; i <= points.size(); i++) {
+	private static int traduceValue(int point, List<Point> points) {
+		double pendiente = 0;
+		double offset = 0;
+		for (int i = 0; i < points.size(); i++) {
 			if (points.get(i).x > point) {
 				pendiente = (points.get(i).y - points.get(i - 1).y) / (double) (points.get(i).x - points.get(i - 1).x);
 				offset = points.get(i - 1).y - points.get(i - 1).x * pendiente;

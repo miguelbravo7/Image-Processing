@@ -22,7 +22,7 @@ public class ImageViewer extends JFrame{
 	    
     	this.imagecanvas = new JLabel();
 	    
-		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 		
 		initComponents();
 

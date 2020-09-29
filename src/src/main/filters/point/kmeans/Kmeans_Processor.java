@@ -2,35 +2,37 @@ package main.filters.point.kmeans;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import main.utils.ImgConvert;
 import main.utils.Pixel;
 
 public class Kmeans_Processor {
+	private static final Logger LOGGER = Logger.getLogger(Kmeans_Processor.class.getName());
 
-	static public BufferedImage renderkmeans(BufferedImage image, int k) {
+	public static BufferedImage renderkmeans(BufferedImage image, int k) {
 		// Instanciacion de los puntos a partir de los valores de la imagen
-		List<Pixel> pixels_ordered = new ArrayList<Pixel>(ImgConvert.toPixelArrayList(image));
-		ArrayList<Pixel> pixel_list = new ArrayList<Pixel>();
+		ArrayList<Pixel> orderedPixels = new ArrayList<Pixel>(ImgConvert.toPixelArrayList(image));
+		ArrayList<Pixel> pixelList = new ArrayList<Pixel>();
 
-		System.out.println("Searching centroids.");
+		LOGGER.log(Level.FINE, "Searching centroids.");
 		KMeans kmeans = new KMeans();
-		KMeansResultado resultado = kmeans.calcular(pixels_ordered, k);
+		KMeansResultado resultado = kmeans.calcular(orderedPixels, k);
 
-		pixel_list.ensureCapacity(image.getWidth() * image.getHeight());
+		pixelList.ensureCapacity(image.getWidth() * image.getHeight());
 
-		System.out.println("Assigning centroids.");
+		LOGGER.log(Level.FINE, "Assigning centroids.");
 		for (int i = 0; i < image.getWidth() * image.getHeight(); i++) {
-			pixel_list.add(resultado.getCentroide(pixels_ordered.get(i)));
+			pixelList.add(resultado.getCentroide(orderedPixels.get(i)));
 		}
 
-		System.out.println(" Width:" + image.getWidth() + " Height:" + image.getHeight() + "\nCENTROIDES:");
+		LOGGER.log(Level.FINE, " Width:{0} Height:{1}\nCENTROIDES:", new Object[] { image.getWidth(), image.getHeight() });
 		for (Cluster p : resultado.getClusters()) {
-			System.out.println(p.getCentroide());
+			LOGGER.log(Level.FINE, p.getCentroide().toString());
 		}
-		System.out.println(k + " K-means done.");
+		LOGGER.log(Level.FINE, "{0} K-means done.", k);
 
-		return ImgConvert.toBuffImg(pixel_list, image.getWidth(), image.getHeight());
+		return ImgConvert.toBuffImg(pixelList, image.getWidth(), image.getHeight());
 	}
 }

@@ -1,21 +1,24 @@
 package main.filters.geometric;
 
 import java.awt.image.BufferedImage;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ImgFixedRotation {
+	private static final Logger LOGGER = Logger.getLogger(ImgFixedRotation.class.getName());
 
-	static public BufferedImage rotate90(BufferedImage image) {
-		System.out.println("90� rotation done.");
+	public static BufferedImage rotate90(BufferedImage image) {
+		LOGGER.log(Level.FINE, "90� rotation done.");
 		return ImgMirror.vertical(ImgTranspose.transpose(image));
 	}
 
-	static public BufferedImage rotate180(BufferedImage image) {
-		System.out.println("180� rotation done.");
+	public static BufferedImage rotate180(BufferedImage image) {
+		LOGGER.log(Level.FINE, "180� rotation done.");
 		return ImgMirror.vertical(ImgMirror.horizontal(image));
 	}
 	
-	static public BufferedImage rotate270(BufferedImage image) {
-		System.out.println("270� rotation done.");
+	public static BufferedImage rotate270(BufferedImage image) {
+		LOGGER.log(Level.FINE, "270� rotation done.");
 		return ImgMirror.horizontal(ImgTranspose.transpose(image));
 	}
 }

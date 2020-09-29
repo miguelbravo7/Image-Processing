@@ -31,14 +31,15 @@ public class KMeans {
 	 * @return centroides
 	 */
 	private List<Cluster> elegirCentroides(List<Pixel> puntos, Integer k) {
-		List<Cluster> centroides = new ArrayList<Cluster>();
+		ArrayList<Cluster> centroides = new ArrayList<Cluster>();
 
-		List<Float> maximos = new ArrayList<Float>();
-		List<Float> minimos = new ArrayList<Float>();
+		ArrayList<Float> maximos = new ArrayList<Float>();
+		ArrayList<Float> minimos = new ArrayList<Float>();
 		// se buscan los maximos y minimos de cada dimension
 
 		for (int i = 0; i < puntos.get(0).getGrado(); i++) {
-			Float min = 255f, max = 0f;
+			Float min = 255f;
+			Float max = 0f;
 
 			for (Pixel punto : puntos) {
 				min = min > punto.get(i) ? punto.get(0) : min;

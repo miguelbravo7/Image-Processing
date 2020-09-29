@@ -1,35 +1,33 @@
 package main.filters.geometric;
 
 import java.awt.image.BufferedImage;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import main.utils.Utility;
 
 public class ImgMirror {
+	private static final Logger LOGGER = Logger.getLogger(ImgMirror.class.getName());
 
-	static public BufferedImage vertical(BufferedImage image) {
+	public static BufferedImage vertical(BufferedImage image) {
 		BufferedImage img = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
-		
-		for (int i = 0; i < image.getHeight(); i++) {
-			for (int j = 0; j < image.getWidth(); j++) {
+		Utility.imgApply(image, (i, j) -> {
+			int pixel = image.getRGB(j, i);
 
-				int pixel = image.getRGB(j, i);
-
-				img.setRGB(j, image.getHeight() - i - 1, pixel);
-			}
-		}
-		System.out.println("Vertical mirror done.");
+			img.setRGB(j, image.getHeight() - i - 1, pixel);
+		});
+		LOGGER.log(Level.FINE, "Vertical mirror done.");
 		return img;
 	}
-	
-	static public BufferedImage horizontal(BufferedImage image) {
-		BufferedImage img = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
-		
-		for (int i = 0; i < image.getHeight(); i++) {
-			for (int j = 0; j < image.getWidth(); j++) {
-				int pixel = image.getRGB(j, i);
 
-				img.setRGB(image.getWidth() - j - 1, i, pixel);
-			}
-		}
-		System.out.println("horizontal mirror done.");
+	public static BufferedImage horizontal(BufferedImage image) {
+		BufferedImage img = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
+		Utility.imgApply(image, (i, j) -> {
+			int pixel = image.getRGB(j, i);
+
+			img.setRGB(image.getWidth() - j - 1, i, pixel);
+		});
+		LOGGER.log(Level.FINE, "horizontal mirror done.");
 		return img;
 	}
 

@@ -1,65 +1,70 @@
 package main.filters.point;
 
 import java.awt.image.BufferedImage;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import main.utils.ImgConvert;
+import main.utils.Utility;
 
 public class ImgColorDepth {
+	private static final Logger LOGGER = Logger.getLogger(ImgColorDepth.class.getName());
 
-	static public BufferedImage colorDepthShift(BufferedImage image, int depth) {
+	public static BufferedImage colorDepthShift(BufferedImage image, int depth) {
 		BufferedImage img = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
 
-		for (int i = 0; i < image.getHeight(); i++) {
-			for (int j = 0; j < image.getWidth(); j++) {
+		Utility.imgApply(image, (i, j) -> {
+			int pixel = image.getRGB(j, i);
 
-				int pixel = image.getRGB(j, i);
+			int alpha = (pixel >> 24) & 0xff;
+			int red = (pixel >> 16) & 0xff;
+			int green = (pixel >> 8) & 0xff;
+			int blue = (pixel) & 0xff;
 
-				int alpha = (pixel >> 24) & 0xff;
-				int red = (pixel >> 16) & 0xff;
-				int green = (pixel >> 8) & 0xff;
-				int blue = (pixel) & 0xff;
+			int calc = 8 - depth;
 
-				int calc = 8 - depth;
+			pixel = (alpha << 24) | (((red >> calc) << calc) << 16) | (((green >> calc) << calc) << 8)
+					| ((blue >> calc) << calc);
 
-				pixel = (alpha << 24) | ((int) ((red >> calc) << calc) << 16) | ((int) ((green >> calc) << calc) << 8)
-						| (int) ((blue >> calc) << calc);
-
-				img.setRGB(j, i, pixel);
-			}
-		}
-		System.out.println("Color depth by shift done.");
+			img.setRGB(j, i, pixel);
+		});
+		LOGGER.log(Level.FINE, "Color depth by shift done.");
 		return img;
 	}
 
-	static public BufferedImage colorDepthRegion(BufferedImage image, int region) {
+	public static BufferedImage colorDepthRegion(BufferedImage image, int region) {
 		BufferedImage img = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
 		Integer[][] array = ImgConvert.toIntArray(image);
-		System.out.println(array.length);
-		System.out.println(array[0].length);
+		LOGGER.log(Level.FINE, Integer.toString(array.length));
+		LOGGER.log(Level.FINE, Integer.toString(array[0].length));
 
 		for (int i = 0; i < image.getHeight(); i += region) {
 			for (int j = 0; j < image.getWidth(); j += region) {
-				int acc_a = 0, acc_r = 0, acc_g = 0, acc_b = 0, n_cells = 0;
+				int aAcc = 0;
+				int rAcc = 0;
+				int gAcc = 0;
+				int bAcc = 0;
+				int nCells = 0;
 
 				for (int h_gap = 0; h_gap < region && i + h_gap < image.getHeight(); h_gap++) {
 					for (int w_gap = 0; w_gap < region && j + w_gap < image.getWidth(); w_gap++) {
-						acc_a += (array[i + h_gap][j + w_gap] >> 24) & 0xff;
-						acc_r += (array[i + h_gap][j + w_gap] >> 16) & 0xff;
-						acc_g += (array[i + h_gap][j + w_gap] >> 8) & 0xff;
-						acc_b += (array[i + h_gap][j + w_gap]) & 0xff;
-						n_cells++;
+						aAcc += (array[i + h_gap][j + w_gap] >> 24) & 0xff;
+						rAcc += (array[i + h_gap][j + w_gap] >> 16) & 0xff;
+						gAcc += (array[i + h_gap][j + w_gap] >> 8) & 0xff;
+						bAcc += (array[i + h_gap][j + w_gap]) & 0xff;
+						nCells++;
 					}
 				}
 
-				int pixel = ((acc_a / n_cells) << 24) | ((acc_r / n_cells) << 16) | ((acc_g / n_cells) << 8)
-						| (acc_b / n_cells);
+				int pixel = ((aAcc / nCells) << 24) | ((rAcc / nCells) << 16) | ((gAcc / nCells) << 8)
+						| (bAcc / nCells);
 
 				for (int h_gap = 0; h_gap < region && i + h_gap < image.getHeight(); h_gap++)
 					for (int w_gap = 0; w_gap < region && j + w_gap < image.getWidth(); w_gap++)
 						img.setRGB(j + w_gap, i + h_gap, pixel);
 			}
 		}
-		System.out.println("Color depth by region done.");
+		LOGGER.log(Level.FINE, "Color depth by region done.");
 		return img;
 	}
 }

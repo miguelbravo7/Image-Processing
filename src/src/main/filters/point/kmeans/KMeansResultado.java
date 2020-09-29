@@ -19,12 +19,12 @@ public class KMeansResultado {
 	}
 
 	public Pixel getCentroide(Pixel punto) {
-		int cluster_index = -1;
+		int clusterIndex = -1;
 
-		while (!clusters.get(++cluster_index).contains(punto))
+		while (!clusters.get(++clusterIndex).contains(punto))
 			;
 
-		return clusters.get(cluster_index).getCentroide();
+		return clusters.get(clusterIndex).getCentroide();
 	}
 
 	public Double getOfv() {

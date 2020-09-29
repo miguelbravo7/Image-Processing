@@ -21,7 +21,7 @@ public class Graph extends JPanel {
 	protected static final int MIN_BAR_WIDTH = 1;
 	protected static final int MIN_BAR_HEIGHT = 100;
 	private Map<Integer, Number> mapHistory;
-	private Map<Rectangle2D, String> rectValue = new HashMap<Rectangle2D, String>();
+	private transient Map<Rectangle2D, String> rectValue = new HashMap<Rectangle2D, String>();
 	private Color color;
 	private Integer median;
 

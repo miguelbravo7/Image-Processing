@@ -1,30 +1,32 @@
 package main.filters.point;
 
 import java.awt.image.BufferedImage;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import main.utils.Utility;
 
 public class ImgMonochrome {
+	private static final Logger LOGGER = Logger.getLogger(ImgMonochrome.class.getName());
 
-	static public BufferedImage renderPal(BufferedImage image) {
+	public static BufferedImage renderPal(BufferedImage image) {
 		BufferedImage img = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
+		Utility.imgApply(image, (i, j) -> {
 
-		for (int i = 0; i < image.getHeight(); i++) {
-			for (int j = 0; j < image.getWidth(); j++) {
+			int pixel = image.getRGB(j, i);
 
-				int pixel = image.getRGB(j, i);
+			int alpha = (pixel >> 24) & 0xff;
+			int red = (pixel >> 16) & 0xff;
+			int green = (pixel >> 8) & 0xff;
+			int blue = (pixel) & 0xff;
 
-				int alpha = (pixel >> 24) & 0xff;
-				int red = (pixel >> 16) & 0xff;
-				int green = (pixel >> 8) & 0xff;
-				int blue = (pixel) & 0xff;
+			int greyVal = Math.round(red * 0.222f + green * 0.707f + blue * 0.071f);
 
-				int grey_value = Math.round(red * 0.222f + green * 0.707f + blue * 0.071f);
+			pixel = (alpha << 24) | (greyVal << 16) | (greyVal << 8) | greyVal;
 
-				pixel = (alpha << 24) | (grey_value << 16) | (grey_value << 8) | grey_value; // pixel
-
-				img.setRGB(j, i, pixel);
-			}
-		}
-		System.out.println("ImgMonochrome PAL done.");
+			img.setRGB(j, i, pixel);
+		});
+		LOGGER.log(Level.FINE, "ImgMonochrome PAL done.");
 		return img;
 	}
 }

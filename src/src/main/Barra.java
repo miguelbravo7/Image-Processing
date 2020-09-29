@@ -1,11 +1,8 @@
 package main;
 
-import main.filters.*;
 import main.filters.geometric.*;
 import main.filters.point.*;
 import main.filters.point.kmeans.Kmeans_Processor;
-import main.graphs.*;
-import main.utils.*;
 
 import java.awt.Component;
 import java.awt.Container;
@@ -16,6 +13,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -35,16 +34,18 @@ import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class Barra extends JMenuBar {
+	private static final Logger LOGGER = Logger.getLogger(Barra.class.getName());
 	private static final long serialVersionUID = 1L;
-	Menu program;
+	transient Menu program;
 	JFrame frame;
-	JTextField brillo, contraste;
+	JTextField brillo;
+	JTextField contraste;
 	JSlider umbral;
 	JTextArea textarea;
-	final static int BRI_MIN = 0;
-	final int BRI_MAX = 255;
-	final int CONT_MIN = 0;
-	final int CONT_MAX = 255;
+	static final int BRI_MIN = 0;
+	static final int BRI_MAX = 255;
+	static final int CONT_MIN = 0;
+	static final int CONT_MAX = 255;
 
 	public Barra(Menu program) {
 		this.program = program;
@@ -96,7 +97,7 @@ public class Barra extends JMenuBar {
 		d_region.addActionListener(new ActFilterImageDepthRegion());
 		digitalization.add(d_region);
 		op_punto.add(digitalization);
-		
+
 		JMenuItem change = new JMenuItem("Cambio brillo-contraste");
 		change.addActionListener(new ActChangeBC());
 		op_punto.add(change);
@@ -112,7 +113,7 @@ public class Barra extends JMenuBar {
 		JMenuItem linear = new JMenuItem("Transformaci�n lineal");
 		linear.addActionListener(new ActLinealTransform());
 		op_punto.add(linear);
-		
+
 		filtros.add(op_punto);
 
 		JMenu op_geom = new JMenu("Operaciones geometricas");
@@ -137,7 +138,7 @@ public class Barra extends JMenuBar {
 		rotar270.addActionListener(new ActGeomRotate270());
 		f_rotations.add(rotar270);
 		espejo.add(f_rotations);
-		
+
 		op_geom.add(espejo);
 
 		JMenu rotar = new JMenu("Rotar");
@@ -153,7 +154,7 @@ public class Barra extends JMenuBar {
 		JMenuItem rdbilinear = new JMenuItem("Bilinear Directa");
 		rdbilinear.addActionListener(new ActGeomRotateDirect("Bilinear"));
 		rotar.add(rdbilinear);
-		
+
 		op_geom.add(rotar);
 
 		JMenu scale = new JMenu("Cambio de escala");
@@ -163,9 +164,9 @@ public class Barra extends JMenuBar {
 		JMenuItem bilinear = new JMenuItem("Bilinear");
 		bilinear.addActionListener(new ActGeomScale("Bilinear"));
 		scale.add(bilinear);
-		
+
 		op_geom.add(scale);
-		
+
 		filtros.add(op_geom);
 
 		this.add(filtros);
@@ -195,8 +196,7 @@ public class Barra extends JMenuBar {
 			int returnVal = chooser.showOpenDialog(frame);
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				filepath = chooser.getSelectedFile().getAbsolutePath();
-				System.out.println(
-						"You chose to open this file: " + filepath);
+				LOGGER.log(Level.FINE, "You chose to open this file: {0}", filepath);
 				program.openImage(filepath);
 			}
 		}
@@ -211,8 +211,9 @@ public class Barra extends JMenuBar {
 			chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 			int returnVal = chooser.showSaveDialog(frame);
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
-				System.out.println(
-						"You chose to save on this folder: " + (filepath = chooser.getSelectedFile().getPath()));
+				filepath = chooser.getSelectedFile().getPath();
+				LOGGER.log(Level.FINE, 
+						"You chose to save on this folder: {0}", filepath);
 				program.saveImage(program.currentImage(), filepath);
 			}
 		}
@@ -241,19 +242,21 @@ public class Barra extends JMenuBar {
 			JTextField gamma = new JTextField(1);
 
 			JFrame popup = new JFrame("Correccion de gamma");
-			popup.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			popup.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 			popup.setLayout(new GridLayout(3, 1));
 
 			JPanel panel = new JPanel(new GridLayout(2, 1));
 			panel.add(new JLabel("Gamma"));
 			panel.add(gamma);
 			popup.add(panel);
-			
+
 			JButton okbutton = new JButton("Ok");
 
 			okbutton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					program.addToPane(ImgGammaCorrection.gammaCorrection(program.currentImage(), Double.valueOf(gamma.getText())), "Gamma");
+					program.addToPane(
+							ImgGammaCorrection.gammaCorrection(program.currentImage(), Double.valueOf(gamma.getText())),
+							"Gamma");
 					popup.dispose();
 				}
 			});
@@ -268,19 +271,21 @@ public class Barra extends JMenuBar {
 			JTextField means = new JTextField(1);
 
 			JFrame popup = new JFrame("K-means");
-			popup.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			popup.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 			popup.setLayout(new GridLayout(3, 1));
 
 			JPanel panel = new JPanel(new GridLayout(2, 1));
 			panel.add(new JLabel("Number of means"));
 			panel.add(means);
 			popup.add(panel);
-			
+
 			JButton okbutton = new JButton("Ok");
 
 			okbutton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					program.addToPane(Kmeans_Processor.renderkmeans(program.currentImage(), Integer.valueOf(means.getText())), means.getText() + "-means");
+					program.addToPane(
+							Kmeans_Processor.renderkmeans(program.currentImage(), Integer.valueOf(means.getText())),
+							means.getText() + "-means");
 					popup.dispose();
 				}
 			});
@@ -292,7 +297,7 @@ public class Barra extends JMenuBar {
 
 	public class ActFilterImageCrossSection implements ActionListener {
 		public void actionPerformed(ActionEvent evt) {
-			program.cross_section_flag = true;
+			program.crossSectionFlag = true;
 		}
 	}
 
@@ -301,19 +306,21 @@ public class Barra extends JMenuBar {
 			JTextField depth = new JTextField(1);
 
 			JFrame popup = new JFrame("Digitalizacion");
-			popup.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			popup.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 			popup.setLayout(new GridLayout(3, 1));
 
 			JPanel panel = new JPanel(new GridLayout(2, 1));
 			panel.add(new JLabel("Numero de bits"));
 			panel.add(depth);
 			popup.add(panel);
-			
+
 			JButton okbutton = new JButton("Ok");
 
 			okbutton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					program.addToPane(ImgColorDepth.colorDepthShift(program.currentImage(), Integer.valueOf(depth.getText())), depth.getText() + " bit depth");
+					program.addToPane(
+							ImgColorDepth.colorDepthShift(program.currentImage(), Integer.valueOf(depth.getText())),
+							depth.getText() + " bit depth");
 					popup.dispose();
 				}
 			});
@@ -328,19 +335,21 @@ public class Barra extends JMenuBar {
 			JTextField depth = new JTextField(1);
 
 			JFrame popup = new JFrame("Digitalizacion");
-			popup.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			popup.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 			popup.setLayout(new GridLayout(3, 1));
 
 			JPanel panel = new JPanel(new GridLayout(2, 1));
 			panel.add(new JLabel("Tama�o de la celda"));
 			panel.add(depth);
 			popup.add(panel);
-			
+
 			JButton okbutton = new JButton("Ok");
 
 			okbutton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					program.addToPane(ImgColorDepth.colorDepthRegion(program.currentImage(), Integer.valueOf(depth.getText())), depth.getText() + " bit depth");
+					program.addToPane(
+							ImgColorDepth.colorDepthRegion(program.currentImage(), Integer.valueOf(depth.getText())),
+							depth.getText() + " bit depth");
 					popup.dispose();
 				}
 			});
@@ -349,16 +358,15 @@ public class Barra extends JMenuBar {
 			popup.setVisible(true);
 		}
 	}
-	
+
 	public class ActChangeBC implements ActionListener {
 		public void actionPerformed(ActionEvent evt) {
 			brillo = new JTextField(program.currentHist().med[0].toString());
 
 			contraste = new JTextField(program.currentHist().dev[0].toString());
 
-
 			JFrame popup = new JFrame("Cambio brillo-contraste");
-			popup.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			popup.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 			popup.setLayout(new GridLayout(3, 1));
 
 			JPanel panel = new JPanel(new GridLayout(2, 1));
@@ -374,11 +382,9 @@ public class Barra extends JMenuBar {
 
 			okbutton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					program.addToPane(ImgBrightContrast.adjustImg(
-							program.currentImage(),
-							program.currentHist(),
-							Double.valueOf(brillo.getText()),
-							Double.valueOf(contraste.getText())),
+					program.addToPane(
+							ImgBrightContrast.adjustImg(program.currentImage(), program.currentHist(),
+									Double.valueOf(brillo.getText()), Double.valueOf(contraste.getText())),
 							"Conversion");
 					popup.dispose();
 				}
@@ -388,11 +394,11 @@ public class Barra extends JMenuBar {
 			popup.setVisible(true);
 		}
 	}
-	
+
 	public class ActImgHistSpec implements ActionListener {
 		public void actionPerformed(ActionEvent evt) {
 			ArrayList<String> pestanas = new ArrayList<String>();
-			
+
 			for (int i = 0; i < program.tabbedPane.getTabCount(); i++) {
 				pestanas.add(program.tabbedPane.getTitleAt(i));
 			}
@@ -400,9 +406,9 @@ public class Barra extends JMenuBar {
 			JComboBox<Object> img1 = new JComboBox<Object>(pestanas.toArray());
 
 			JComboBox<Object> img2 = new JComboBox<Object>(pestanas.toArray());
-			
+
 			JFrame popup = new JFrame("Especificacion de histograma.");
-			popup.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			popup.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 			popup.setLayout(new GridLayout(3, 1));
 
 			JPanel panel = new JPanel(new GridLayout(2, 1));
@@ -417,25 +423,23 @@ public class Barra extends JMenuBar {
 			JButton okbutton = new JButton("Ok");
 
 			okbutton.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {					
-					popup.dispose();					
-					program.addToPane(ImgSpecHist.convertHist(
-							program.imagelist.get(img1.getSelectedIndex()),
+				public void actionPerformed(ActionEvent e) {
+					popup.dispose();
+					program.addToPane(ImgSpecHist.convertHist(program.imagelist.get(img1.getSelectedIndex()),
 							program.imagehist.get(img1.getSelectedIndex()),
-							program.imagehist.get(img2.getSelectedIndex())),
-							"Spec. hist.");
+							program.imagehist.get(img2.getSelectedIndex())), "Spec. hist.");
 				}
 			});
 			popup.add(okbutton);
 			popup.pack();
-			popup.setVisible(true);			
+			popup.setVisible(true);
 		}
 	}
 
 	public class ActImgDifference implements ActionListener {
 		public void actionPerformed(ActionEvent evt) {
 			ArrayList<String> pestanas = new ArrayList<String>();
-			
+
 			for (int i = 0; i < program.tabbedPane.getTabCount(); i++) {
 				pestanas.add(program.tabbedPane.getTitleAt(i));
 			}
@@ -443,9 +447,9 @@ public class Barra extends JMenuBar {
 			JComboBox<Object> img1 = new JComboBox<Object>(pestanas.toArray());
 
 			JComboBox<Object> img2 = new JComboBox<Object>(pestanas.toArray());
-			
+
 			JFrame popup = new JFrame("Diferencia de imagen.");
-			popup.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			popup.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 			popup.setLayout(new GridLayout(3, 1));
 
 			JPanel panel = new JPanel(new GridLayout(2, 1));
@@ -460,61 +464,59 @@ public class Barra extends JMenuBar {
 			JButton okbutton = new JButton("Ok");
 
 			okbutton.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {					
+				public void actionPerformed(ActionEvent e) {
 					popup.dispose();
-					
-					program.addToPane(ImgDifference.difference(
-							program.imagelist.get(img1.getSelectedIndex()),
-							program.imagelist.get(img2.getSelectedIndex())),
-							"Diferencia");
+
+					program.addToPane(ImgDifference.difference(program.imagelist.get(img1.getSelectedIndex()),
+							program.imagelist.get(img2.getSelectedIndex())), "Diferencia");
 					umbralPopup();
 				}
 			});
 			popup.add(okbutton);
 			popup.pack();
-			popup.setVisible(true);			
+			popup.setVisible(true);
 		}
-	}
-	
-	private void umbralPopup() {
-		umbral = new JSlider(JSlider.HORIZONTAL, BRI_MIN, BRI_MAX, 255);
-		umbral.setName("Brillo");
-		
-		// Turn on labels at major tick marks.
-		umbral.setMajorTickSpacing(50);
-		umbral.setMinorTickSpacing(1);
-		umbral.setPaintTicks(true);
-		umbral.setPaintLabels(true);
-		umbral.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
-				ImgDifference.changeUmbral(program.currentImage(), umbral.getValue());
-				program.doRedraw();
-			}
-		});
-		
-		JFrame popup_umbral = new JFrame("Diferencia de imagen");
-		popup_umbral.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		popup_umbral.setLayout(new GridLayout(1, 1));
-		
-		JPanel panel_umbral = new JPanel(new GridLayout(2, 1));
-		panel_umbral.add(new JLabel("Umbral"));
-		panel_umbral.add(umbral);
-		popup_umbral.add(panel_umbral);
-		
-		popup_umbral.pack();
-		popup_umbral.setVisible(true);		
+
+		private void umbralPopup() {
+			umbral = new JSlider(javax.swing.SwingConstants.HORIZONTAL, BRI_MIN, BRI_MAX, 255);
+			umbral.setName("Brillo");
+
+			// Turn on labels at major tick marks.
+			umbral.setMajorTickSpacing(50);
+			umbral.setMinorTickSpacing(1);
+			umbral.setPaintTicks(true);
+			umbral.setPaintLabels(true);
+			umbral.addChangeListener(new ChangeListener() {
+				public void stateChanged(ChangeEvent e) {
+					ImgDifference.changeUmbral(program.currentImage(), umbral.getValue());
+					program.doRedraw();
+				}
+			});
+
+			JFrame popup_umbral = new JFrame("Diferencia de imagen");
+			popup_umbral.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+			popup_umbral.setLayout(new GridLayout(1, 1));
+
+			JPanel panel_umbral = new JPanel(new GridLayout(2, 1));
+			panel_umbral.add(new JLabel("Umbral"));
+			panel_umbral.add(umbral);
+			popup_umbral.add(panel_umbral);
+
+			popup_umbral.pack();
+			popup_umbral.setVisible(true);
+		}
 	}
 
 	public class ActLinealTransform implements ActionListener {
 		public void actionPerformed(ActionEvent evt) {
 			JFrame popup = new JFrame("Diferencia de imagen");
-			popup.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			popup.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 			JPanel panelx = new JPanel();
 			JPanel panely = new JPanel();
 			panelx.setLayout(new BoxLayout(panelx, BoxLayout.Y_AXIS));
 			panely.setLayout(new BoxLayout(panely, BoxLayout.Y_AXIS));
-			panelx.add(new JTextField("x:",6));
-			panely.add(new JTextField("y:",6));
+			panelx.add(new JTextField("x:", 6));
+			panely.add(new JTextField("y:", 6));
 			popup.setLayout(new FlowLayout());
 
 			JButton addpoint = new JButton("Anadir punto");
@@ -539,7 +541,8 @@ public class Barra extends JMenuBar {
 
 			okbutton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					program.addToPane(ImgLinealTransform.LinealTransform(program.currentImage(), iterateOverJTextFields(panelx, panely)), "Trans. lineal");
+					program.addToPane(ImgLinealTransform.LinealTransform(program.currentImage(),
+							iterateOverJTextFields(panelx, panely)), "Trans. lineal");
 					popup.dispose();
 				}
 			});
@@ -569,7 +572,7 @@ public class Barra extends JMenuBar {
 
 	public class ActToggleRegion implements ActionListener {
 		public void actionPerformed(ActionEvent evt) {
-			program.subimage_flag = true;
+			program.subimageFlag = true;
 		}
 	}
 
@@ -590,29 +593,33 @@ public class Barra extends JMenuBar {
 			program.addToPane(ImgTranspose.transpose(program.currentImage()), "Transpuesta");
 		}
 	}
-	
+
 	public class ActGeomRotate implements ActionListener {
 		String function;
+
 		public ActGeomRotate(String function) {
 			this.function = function;
 		}
+
 		public void actionPerformed(ActionEvent evt) {
 			JTextField means = new JTextField(0);
 
 			JFrame popup = new JFrame("Rotacion");
-			popup.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			popup.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 			popup.setLayout(new GridLayout(3, 1));
 
 			JPanel panel = new JPanel(new GridLayout(2, 1));
 			panel.add(new JLabel("Angulo"));
 			panel.add(means);
 			popup.add(panel);
-			
+
 			JButton okbutton = new JButton("Ok");
 
 			okbutton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					program.addToPane(ImgRotation.rotate(program.currentImage(), Double.valueOf(means.getText()), function), means.getText() + "�_" + function);
+					program.addToPane(
+							ImgRotation.rotate(program.currentImage(), Double.valueOf(means.getText()), function),
+							means.getText() + "�_" + function);
 					popup.dispose();
 				}
 			});
@@ -624,26 +631,30 @@ public class Barra extends JMenuBar {
 
 	public class ActGeomRotateDirect implements ActionListener {
 		String function;
+
 		public ActGeomRotateDirect(String function) {
 			this.function = function;
 		}
+
 		public void actionPerformed(ActionEvent evt) {
 			JTextField means = new JTextField(0);
 
 			JFrame popup = new JFrame("Rotacion");
-			popup.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			popup.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 			popup.setLayout(new GridLayout(3, 1));
 
 			JPanel panel = new JPanel(new GridLayout(2, 1));
 			panel.add(new JLabel("Angulo"));
 			panel.add(means);
 			popup.add(panel);
-			
+
 			JButton okbutton = new JButton("Ok");
 
 			okbutton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					program.addToPane(ImgRotation.rotateDirect(program.currentImage(), Double.valueOf(means.getText()), function), means.getText() + "�_" + function);
+					program.addToPane(
+							ImgRotation.rotateDirect(program.currentImage(), Double.valueOf(means.getText()), function),
+							means.getText() + "�_" + function);
 					popup.dispose();
 				}
 			});
@@ -652,7 +663,7 @@ public class Barra extends JMenuBar {
 			popup.setVisible(true);
 		}
 	}
-	
+
 	public class ActGeomRotate90 implements ActionListener {
 		public void actionPerformed(ActionEvent evt) {
 			program.addToPane(ImgFixedRotation.rotate90(program.currentImage()), "90�");
@@ -673,17 +684,18 @@ public class Barra extends JMenuBar {
 
 	public class ActGeomScale implements ActionListener {
 		String function;
+
 		public ActGeomScale(String function) {
 			this.function = function;
 		}
+
 		public void actionPerformed(ActionEvent evt) {
 			JTextField width = new JTextField();
 
 			JTextField height = new JTextField();
 
-
 			JFrame popup = new JFrame("Cambio de escala");
-			popup.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			popup.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 			popup.setLayout(new GridLayout(3, 1));
 
 			JPanel panel = new JPanel(new GridLayout(2, 1));
@@ -699,12 +711,8 @@ public class Barra extends JMenuBar {
 
 			okbutton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					program.addToPane(ImgScale.scale(
-							program.currentImage(),
-							Double.valueOf(width.getText()),
-							Double.valueOf(height.getText()),
-							function),
-							"Bilinear");
+					program.addToPane(ImgScale.scale(program.currentImage(), Double.valueOf(width.getText()),
+							Double.valueOf(height.getText()), function), "Bilinear");
 					popup.dispose();
 				}
 			});
@@ -713,7 +721,7 @@ public class Barra extends JMenuBar {
 			popup.setVisible(true);
 		}
 	}
-	
+
 	public class ActImageHist implements ActionListener {
 		public void actionPerformed(ActionEvent evt) {
 			program.currentHist().histogram();
