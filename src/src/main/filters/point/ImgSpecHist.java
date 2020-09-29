@@ -14,9 +14,9 @@ public class ImgSpecHist {
 
 	public static BufferedImage convertHist(BufferedImage image, Histogram imgHist, Histogram refImgHist) {
 		BufferedImage img = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
-		Map<Integer, Integer> rLut = makeLut(refImgHist.normColorsAcc.get(0), imgHist.normColorsAcc.get(0));
-		Map<Integer, Integer> gLut = makeLut(refImgHist.normColorsAcc.get(1), imgHist.normColorsAcc.get(1));
-		Map<Integer, Integer> bLut = makeLut(refImgHist.normColorsAcc.get(2), imgHist.normColorsAcc.get(2));
+		TreeMap<Integer, Integer> rLut = makeLut(refImgHist.normColorsAcc.get(0), imgHist.normColorsAcc.get(0));
+		TreeMap<Integer, Integer> gLut = makeLut(refImgHist.normColorsAcc.get(1), imgHist.normColorsAcc.get(1));
+		TreeMap<Integer, Integer> bLut = makeLut(refImgHist.normColorsAcc.get(2), imgHist.normColorsAcc.get(2));
 
 		Utility.imgApply(image, (i, j) -> {
 			int pixel = image.getRGB(j, i);
@@ -38,8 +38,8 @@ public class ImgSpecHist {
 		return img;
 	}
 
-	static Map<Integer, Integer> makeLut(Map<Integer, Double> reference, Map<Integer, Double> original) {
-		Map<Integer, Integer> res = new TreeMap<Integer, Integer>();
+	static TreeMap<Integer, Integer> makeLut(Map<Integer, Double> reference, Map<Integer, Double> original) {
+		TreeMap<Integer, Integer> res = new TreeMap<Integer, Integer>();
 		for (Map.Entry<Integer, Double> entry : original.entrySet()) {
 			int i = 0;
 			while (i < reference.size() && entry.getValue() > reference.get(i)) {
