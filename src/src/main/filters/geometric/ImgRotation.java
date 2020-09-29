@@ -13,7 +13,6 @@ public class ImgRotation {
 	private static final Logger LOGGER = Logger.getLogger(ImgRotation.class.getName());
 
 	public static BufferedImage rotate(BufferedImage image, Double degrees, String function) {
-		// degrees %= 360;
 		Double deg = degrees % 360;
 
 		int alpha = 0 & 0xff;

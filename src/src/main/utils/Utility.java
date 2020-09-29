@@ -96,10 +96,6 @@ public class Utility {
 	}
 
 	public static int nearestNeighbour(Integer[][] color, double xPosition, double yPosition, int width, int height) {
-		if(xPosition < 0 || yPosition < 0){
-			System.out.println(xPosition);
-			System.out.println(yPosition);
-		}
 		int w = Math.round(xPosition) == width ? width - 1 : (int) Math.round(xPosition);
 		int h = Math.round(yPosition) == height ? height - 1 : (int) Math.round(yPosition);
 
@@ -139,10 +135,10 @@ public class Utility {
 		public L x;
 		public R y;
 
-		public Pair(L left, R right) {
-			assert left != null;
-			assert right != null;
-
+		public Pair(L left, R right) {			
+			if (left != null || right != null) {
+				throw new IllegalArgumentException("Invalid arguments: " + left + "," + right);
+			}
 			this.x = left;
 			this.y = right;
 		}
