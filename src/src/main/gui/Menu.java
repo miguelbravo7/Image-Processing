@@ -1,4 +1,4 @@
-package main;
+package main.gui;
 
 import main.filters.point.*;
 import main.graphs.*;
@@ -32,14 +32,14 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTabbedPane;
 
-public class Menu {
+public final class Menu {
 	private static final int WINDOW_SIZE = 800;
 	static String format = "jpg";
 	JFrame frame = new JFrame("Editor");
-	JTabbedPane tabbedPane = new JTabbedPane();
+	public JTabbedPane tabbedPane = new JTabbedPane();
 	File file;
-	ArrayList<Histogram> imagehist = new ArrayList<Histogram>();
-	ArrayList<BufferedImage> imagelist = new ArrayList<BufferedImage>();
+	public ArrayList<Histogram> imagehist = new ArrayList<Histogram>();
+	public ArrayList<BufferedImage> imagelist = new ArrayList<BufferedImage>();
 	JLabel text = new JLabel("");
 	boolean subimageFlag;
 	boolean crossSectionFlag;
@@ -118,7 +118,7 @@ public class Menu {
 		frame.setLocation(100, 100);
 
 		frame.add(tabbedPane, BorderLayout.CENTER);
-		frame.add(new Barra(this), BorderLayout.NORTH);
+		frame.add(new MenuBar(this), BorderLayout.NORTH);
 		frame.add(text, BorderLayout.SOUTH);
 
 		frame.setVisible(true);

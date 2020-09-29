@@ -1,5 +1,7 @@
 package main;
 
+import main.gui.Menu;
+
 public class Start {
 
 	public static void main(String[] args) {
