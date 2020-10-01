@@ -1,17 +1,13 @@
 package main.gui;
 
-import main.filters.point.*;
 import main.graphs.*;
 import main.utils.*;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
-import java.awt.Point;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
@@ -20,8 +16,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.function.Consumer;
 import java.util.stream.IntStream;
 
 import javax.imageio.ImageIO;
@@ -33,76 +28,17 @@ import javax.swing.JLabel;
 import javax.swing.JTabbedPane;
 
 public final class Menu {
-	private static final int WINDOW_SIZE = 800;
-	static String format = "jpg";
-	JFrame frame = new JFrame("Editor");
+	public JFrame frame = new JFrame("Editor");
 	public JTabbedPane tabbedPane = new JTabbedPane();
+	public final ArrayList<Histogram> imagehist = new ArrayList<Histogram>();
+	public final ArrayList<BufferedImage> imagelist = new ArrayList<BufferedImage>();
 	File file;
-	public ArrayList<Histogram> imagehist = new ArrayList<Histogram>();
-	public ArrayList<BufferedImage> imagelist = new ArrayList<BufferedImage>();
-	JLabel text = new JLabel("");
-	boolean subimageFlag;
-	boolean crossSectionFlag;
-	int xAcc;
-	int yAcc;
+	static String format = "jpg";
 	Integer imgCount = 0;
+	private static final int WINDOW_SIZE = 800;
+	public static Consumer<ImageViewer> unpressAction = null;
 
 	public Menu() {
-		final Logger LOGGER = Logger.getLogger(Menu.class.getName());
-		tabbedPane.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseEntered(MouseEvent e) {
-
-				int tabIndex = tabbedPane.getSelectedIndex();
-				if (tabIndex != -1) {
-					JLabel label = (JLabel) getComponentImg(tabIndex);
-					BufferedImage img = imagelist.get(tabIndex);
-					if (label.getMouseListeners().length == 0) {
-						String imgSizeText = "Tamano " + img.getWidth() + "x" + img.getHeight();
-						label.addMouseMotionListener(new MouseAdapter() {
-							@Override
-							public void mouseMoved(MouseEvent e) {
-								int pixel = img.getRGB(e.getX(), e.getY());
-
-								int alpha = (pixel >> 24) & 0xff;
-								int red = (pixel >> 16) & 0xff;
-								int green = (pixel >> 8) & 0xff;
-								int blue = (pixel) & 0xff;
-
-								text.setText(imgSizeText + "    Posicion (x:" + e.getX() + ", y:" + e.getY()
-										+ ")      Colores a: " + alpha + " r: " + red + " g: " + green + " b: " + blue);
-							}
-						});
-						label.addMouseListener(new MouseAdapter() {
-							@Override
-							public void mousePressed(MouseEvent e) {
-								if (subimageFlag || crossSectionFlag) {
-									LOGGER.log(Level.FINE, "Mouse pressed; start: x: {0}  y: {1}",
-											new Object[] { xAcc, yAcc });
-									xAcc = e.getX();
-									yAcc = e.getY();
-								}
-							}
-
-							@Override
-							public void mouseReleased(MouseEvent e) {
-								LOGGER.log(Level.FINE, "Mouse released; end: x: {0} y: {1}",
-										new Object[] { e.getX(), e.getY() });
-								if (subimageFlag) {
-									addToPane(img.getSubimage(xAcc, yAcc, e.getX() - xAcc, e.getY() - yAcc),
-											"Imagen recortada");
-									subimageFlag = false;
-								} else if (crossSectionFlag) {
-									CrossSection.profile(currentImage(), new Point(xAcc, yAcc),
-											new Point(e.getX(), e.getY()));
-									crossSectionFlag = false;
-								}
-							}
-						});
-					}
-				}
-			}
-		});
 		tabbedPane.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent key) {
@@ -119,7 +55,6 @@ public final class Menu {
 
 		frame.add(tabbedPane, BorderLayout.CENTER);
 		frame.add(new MenuBar(this), BorderLayout.NORTH);
-		frame.add(text, BorderLayout.SOUTH);
 
 		frame.setVisible(true);
 
