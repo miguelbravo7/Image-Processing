@@ -18,7 +18,7 @@ public class ActSaveFile implements ActionListener {
         chooser.setControlButtonsAreShown(true);
         chooser.setDialogTitle("Specify a file to save");
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        int returnVal = chooser.showSaveDialog(MenuBar.frame);
+        int returnVal = chooser.showSaveDialog(MenuBar.program.frame);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             filepath = chooser.getSelectedFile().getPath();
             LOGGER.log(Level.FINE, 

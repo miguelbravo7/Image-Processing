@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 
 import main.utils.ImgConvert;
 import main.utils.Utility;
+import main.utils.Pair;
 
 public class Rotation {
 	private static final Logger LOGGER = Logger.getLogger(Rotation.class.getName());
@@ -22,10 +23,10 @@ public class Rotation {
 
 		int def = (alpha << 24) | (red << 16) | (green << 8) | blue;
 
-		Utility.Pair<Double, Double> poo = new Utility.Pair<Double, Double>(0d, 0d);
-		Utility.Pair<Double, Double> pxo = translatePoint(new Point(image.getWidth(), 0), degrees);
-		Utility.Pair<Double, Double> poy = translatePoint(new Point(0, image.getHeight()), degrees);
-		Utility.Pair<Double, Double> pxy = translatePoint(new Point(image.getWidth(), image.getHeight()), degrees);
+		Pair<Double, Double> poo = new Pair<Double, Double>(0d, 0d);
+		Pair<Double, Double> pxo = translatePoint(new Point(image.getWidth(), 0), degrees);
+		Pair<Double, Double> poy = translatePoint(new Point(0, image.getHeight()), degrees);
+		Pair<Double, Double> pxy = translatePoint(new Point(image.getWidth(), image.getHeight()), degrees);
 
 		int minX = (int) Math.min(poo.x, Math.min(pxo.x, Math.min(poy.x, pxy.x)));
 		int minY = (int) Math.min(poo.y, Math.min(pxo.y, Math.min(poy.y, pxy.y)));
@@ -44,7 +45,7 @@ public class Rotation {
 		BufferedImage img = new BufferedImage(width, height, image.getType());
 
 		Utility.imgApply(img, (i, j) -> {
-			Utility.Pair<Double, Double> og = translatePoint(new Point(j + minX, i + minY), -deg);
+			Pair<Double, Double> og = translatePoint(new Point(j + minX, i + minY), -deg);
 
 			if (og.y >= 0 && og.y < image.getHeight() && og.x >= 0 && og.x < image.getWidth()) {
 				try {
@@ -61,19 +62,19 @@ public class Rotation {
 		return img;
 	}
 
-	static Utility.Pair<Double, Double> translatePoint(Point p, double rotation) {
+	static Pair<Double, Double> translatePoint(Point p, double rotation) {
 		double cos = Math.cos(Math.toRadians(rotation));
 		double sin = Math.sin(Math.toRadians(rotation));
-		return new Utility.Pair<Double, Double>(p.x * cos - p.y * sin, p.x * sin + p.y * cos);
+		return new Pair<Double, Double>(p.x * cos - p.y * sin, p.x * sin + p.y * cos);
 	}
 
-	public static BufferedImage rotateDirect(BufferedImage image, Double degrees, String function) {
-		final Double deg = degrees % 360;
+	public static BufferedImage rotateDirect(BufferedImage image, Double degrees, String funcName) {
+		final Double modDeg = degrees % 360;
 
-		Utility.Pair<Double, Double> poo = new Utility.Pair<Double, Double>(0d, 0d);
-		Utility.Pair<Double, Double> pxo = translatePoint(new Point(image.getWidth(), 0), degrees);
-		Utility.Pair<Double, Double> poy = translatePoint(new Point(0, image.getHeight()), degrees);
-		Utility.Pair<Double, Double> pxy = translatePoint(new Point(image.getWidth(), image.getHeight()), degrees);
+		Pair<Double, Double> poo = new Pair<Double, Double>(0d, 0d);
+		Pair<Double, Double> pxo = translatePoint(new Point(image.getWidth(), 0), modDeg);
+		Pair<Double, Double> poy = translatePoint(new Point(0, image.getHeight()), modDeg);
+		Pair<Double, Double> pxy = translatePoint(new Point(image.getWidth(), image.getHeight()), modDeg);
 
 		double minX = Math.min(poo.x, Math.min(pxo.x, Math.min(poy.x, pxy.x)));
 		double minY = Math.min(poo.y, Math.min(pxo.y, Math.min(poy.y, pxy.y)));
@@ -92,20 +93,20 @@ public class Rotation {
 		BufferedImage img = new BufferedImage(width, height, image.getType());
 
 		Utility.imgApply(image, (i, j) -> {
-			Utility.Pair<Double, Double> og = translatePoint(new Point(j, i), deg);
+			Pair<Double, Double> og = translatePoint(new Point(j, i), modDeg);
 			og.x += Math.abs(minX);
 			og.y += Math.abs(minY);
 			int mappedX = (int) Math.floor(og.x) == width ? width - 1 : (int) Math.floor(og.x);
 			int mappedY = (int) Math.floor(og.y) == height ? height - 1 : (int) Math.floor(og.y);
 			try {
-				img.setRGB(mappedX, mappedY, (int) Utility.methodMap.get(function).invoke(new Object(), array,
+				img.setRGB(mappedX, mappedY, (int) Utility.methodMap.get(funcName).invoke(new Object(), array,
 						j + og.x % 1, i + og.y % 1, image.getWidth(), image.getHeight()));
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 				// break;
 			}
 		});
 
-		LOGGER.log(Level.FINE, "{0} direct rotation done.", function);
+		LOGGER.log(Level.FINE, "{0} direct rotation done.", funcName);
 		return img;
 	}
 

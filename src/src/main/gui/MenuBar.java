@@ -5,6 +5,7 @@ import main.gui.actions.*;
 import main.filters.geometric.*;
 import main.filters.point.*;
 
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -12,19 +13,16 @@ import java.awt.image.BufferedImage;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 
-public class MenuBar extends JMenuBar {
+public final class MenuBar extends JMenuBar {
 	private static final long serialVersionUID = 1L;
 	public static Menu program;
-	public static JFrame frame;
 
 	public MenuBar(Menu program) {
 		this.program = program;
-		this.frame = program.frame;
 
 		JMenu menu = new JMenu("Archivo");
 		menu.setMnemonic(KeyEvent.VK_A);
@@ -41,18 +39,18 @@ public class MenuBar extends JMenuBar {
 		pointOperations.add(this.simpleMenuItem("Ecualizacion", new PaneAdderAction(() -> LinealTransform.ecualize(program.currentImage(), program.currentHist()), "Ecualizada")));
 		pointOperations.add(this.simpleMenuItem("Correccion de gamma", new ActImageGammaCorrection()));
 		pointOperations.add(this.simpleMenuItem("K-means", new ActFilterImageKmeans()));
-		pointOperations.add(this.simpleMenuItem("Perfil de imagen", new SimpleMenuAction(unused -> program.crossSectionFlag = true)));
-
+		pointOperations.add(this.simpleMenuItem("Perfil de imagen", new SimpleMenuAction(unused -> Menu.unpressAction = panel -> CrossSection.profile(panel.image, new Point(panel.xPressed, panel.yPressed), new Point(panel.xReleased, panel.yReleased)))));
+		
 		JMenu digitalization = new JMenu("Operaciones sobre punto");
 		digitalization.add(this.simpleMenuItem("Digitalizacion por shifteo", new ActFilterImageDepthShift()));
 		digitalization.add(this.simpleMenuItem("Digitalizacion por region", new ActFilterImageDepthRegion()));
-
+		
 		pointOperations.add(digitalization);
-
+		
 		pointOperations.add(this.simpleMenuItem("Cambio brillo-contraste", new ActChangeBC()));
 		pointOperations.add(this.simpleMenuItem("Especificacion de histograma", new ActImgHistSpec()));
 		pointOperations.add(this.simpleMenuItem("Diferencia de imagen", new ActImgDifference()));
-		pointOperations.add(this.simpleMenuItem("Region de interes", new SimpleMenuAction(unused -> program.subimageFlag = true)));
+		pointOperations.add(this.simpleMenuItem("Region de interes", new SimpleMenuAction(unused -> Menu.unpressAction = panel -> program.addToPane(panel.image.getSubimage(panel.xPressed, panel.yPressed, panel.xReleased - panel.xPressed, panel.yReleased - panel.yPressed), "Imagen recortada"))));
 		pointOperations.add(this.simpleMenuItem("Transformacion lineal", new ActLinealTransform()));
 
 		filtros.add(pointOperations);
@@ -107,7 +105,7 @@ public class MenuBar extends JMenuBar {
 		return menuItem;
 	}
 
-	public class PaneAdderAction implements ActionListener {
+	private final class PaneAdderAction implements ActionListener {
 		Supplier<BufferedImage> method;
 		String tabName;
 
@@ -121,7 +119,7 @@ public class MenuBar extends JMenuBar {
 		}
 	}
 
-	public class SimpleMenuAction implements ActionListener {
+	private final class SimpleMenuAction implements ActionListener {
 		Consumer<Void> method;
 
 		public SimpleMenuAction(Consumer<Void> method) {

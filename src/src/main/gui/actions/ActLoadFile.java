@@ -17,7 +17,7 @@ public class ActLoadFile implements ActionListener {
         JFileChooser chooser = new JFileChooser(".");
         String filepath = "";
         chooser.setFileFilter(new FileNameExtensionFilter("JPG & PNG Images", "jpg", "png"));
-        int returnVal = chooser.showOpenDialog(MenuBar.frame);
+        int returnVal = chooser.showOpenDialog(MenuBar.program.frame);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             filepath = chooser.getSelectedFile().getAbsolutePath();
             LOGGER.log(Level.FINE, "You chose to open this file: {0}", filepath);
