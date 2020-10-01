@@ -64,8 +64,8 @@ public class Histogram implements Runnable {
 		Arrays.fill(med, 0);
 
 		Utility.imgApply(image, (i, j) -> {
-			for (int w = 0; w < colorBits; w++) {
-				this.valores[colorBits - w - 1][(image.getRGB(j, i) >> (8 * w)) & 0xff]++;
+			for (int offset = 0; offset < colorBits; offset++) {
+				this.valores[colorBits - offset - 1][(image.getRGB(j, i) >> (8 * offset)) & 0xff]++;
 			}
 		});
 
@@ -122,8 +122,7 @@ public class Histogram implements Runnable {
 	private void acumulado() {
 		for (int i = 0; i < 256; i++) {
 			for (int j = 0; j < colorBits; j++) {
-				colorsAcc.get(j).put(i,
-						valores[j][i] + colorsAcc.get(j).getOrDefault(i - 1 < 0 ? 0 : i - 1, (double) 0));
+				colorsAcc.get(j).put(i, valores[j][i] + colorsAcc.get(j).getOrDefault(i - 1 < 0 ? 0 : i - 1, 0.));
 			}
 		}
 	}
@@ -133,8 +132,8 @@ public class Histogram implements Runnable {
 		for (int i = 0; i < 256; i++) {
 			for (int j = 0; j < colorBits; j++) {
 				normColors.get(j).put(i, valores[j][i] / (double) colorsAcc.get(j).get(255));
-				normColorsAcc.get(j).put(i, normColors.get(j).getOrDefault(i, (double) 0)
-						+ normColorsAcc.get(j).getOrDefault(i - 1 < 0 ? 0 : i - 1, (double) 0));
+				normColorsAcc.get(j).put(i, normColors.get(j).getOrDefault(i, 0.)
+						+ normColorsAcc.get(j).getOrDefault(i - 1 < 0 ? 0 : i - 1, 0.));
 			}
 		}
 	}
@@ -144,7 +143,7 @@ public class Histogram implements Runnable {
 		for (int i = 0; i < colorBits; i++) {
 			double acc = 0;
 			for (int j = 0; j < 256; j++) {
-				acc += j * normColors.get(i).getOrDefault(j, (double) 0);
+				acc += j * normColors.get(i).getOrDefault(j, 0.);
 			}
 			med[i] = (int) acc;
 		}
@@ -155,7 +154,7 @@ public class Histogram implements Runnable {
 		for (int i = 0; i < colorBits; i++) {
 			double acc = 0;
 			for (int j = 0; j < 255; j++) {
-				double val = normColors.get(i).getOrDefault(j, (double) 0) * (j - med[i]) * (j - med[i]);
+				double val = normColors.get(i).getOrDefault(j, 0.) * (j - med[i]) * (j - med[i]);
 				if (Double.isFinite(val) && !Double.isNaN(val)) {
 					acc += val;
 				}
@@ -169,8 +168,8 @@ public class Histogram implements Runnable {
 		for (int i = 0; i < colorBits; i++) {
 			double acc = 0;
 			for (int j = 0; j < 255; j++) {
-				double val = normColors.get(i).getOrDefault(j, (double) 0)
-						* Math.log10(normColors.get(i).getOrDefault(j, (double) 0)) / Math.log10(2);
+				double val = normColors.get(i).getOrDefault(j, 0.0) * Math.log10(normColors.get(i).getOrDefault(j, 0.0))
+						/ Math.log10(2);
 				if (Double.isFinite(val) && !Double.isNaN(val)) {
 					acc += val;
 				}
@@ -196,6 +195,27 @@ public class Histogram implements Runnable {
 	}
 
 	private void initializeGraph(List<Map<Integer, Double>> hmArray) {
+		JFrame frame = new JFrame("Histogram");
+		frame.setLayout(new BorderLayout());
+		
+		JPanel texto = new JPanel();
+		texto.add(new JLabel("<html>" + this.toString().replace("\n", "<br/>").replace("\t", "&ensp;") + "<html>",
+		SwingConstants.LEFT));
+		texto.setBackground(Color.LIGHT_GRAY);
+		
+		Container container = graphicHistogram(hmArray);
+		container.setLayout(new GridLayout(displayedGraphs + 1, 1));
+		container.add(texto);
+
+		frame.add(container);
+		
+		frame.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+		frame.pack();
+		frame.setLocationRelativeTo(null);
+		frame.setVisible(true);
+	}
+
+	private Container graphicHistogram(List<Map<Integer, Double>> hmArray) {
 		Container container = new Container();
 
 		if (displayedGraphs == 3) {
@@ -203,29 +223,8 @@ public class Histogram implements Runnable {
 			container.add(new Graph(hmArray.get(1), Color.GREEN, med[1]));
 			container.add(new Graph(hmArray.get(2), Color.BLUE, med[2]));
 		} else
-			container.add(new Graph(hmArray.get(0), Color.GRAY, med[0]));
+			container.add(new Graph(hmArray.get(0), Color.GRAY, med[0]), -1);
 
-		graphicHistogram(container);
-	}
-
-	private void graphicHistogram(Container container) {
-		JFrame frame = new JFrame("Histogram");
-
-		JPanel texto = new JPanel();
-		texto.add(new JLabel("<html>" + this.toString().replaceAll("\n", "<br/>").replaceAll("\t", "&ensp;") + "<html>",
-				SwingConstants.LEFT));
-		texto.setBackground(new Color(213, 202, 189));
-		container.add(texto);
-
-		container.setLayout(new GridLayout(displayedGraphs + 1, 1));
-
-		frame.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-		frame.setLayout(new BorderLayout());
-
-		frame.add(container);
-
-		frame.pack();
-		frame.setLocationRelativeTo(null);
-		frame.setVisible(true);
+		return container;
 	}
 }
