@@ -7,6 +7,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
+import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,19 +19,23 @@ import main.utils.Utility;
 
 public class Graph extends JPanel {
 	private static final long serialVersionUID = 1L;
-	protected static final int MIN_BAR_WIDTH = 1;
-	protected static final int MIN_BAR_HEIGHT = 100;
+	private static final int MIN_BAR_WIDTH = 1;
+	private static final int MIN_BAR_HEIGHT = 100;
 	private Map<Integer, Number> mapHistory;
-	private transient Map<Rectangle2D, String> rectValue = new HashMap<Rectangle2D, String>();
-	private Color color;
+	private transient Map<Line2D, String> lineValues = new HashMap<Line2D, String>();
+	private final Color color;
 	private Integer median;
+	private final int xOffset;
+	private final int yOffset;
 
 	@SuppressWarnings("unchecked")
 	public Graph(Map<Integer, ?> mapHistory, Color color, Integer median) {
 		this.mapHistory = (Map<Integer, Number>) mapHistory;
 		this.color = color;
 		this.median = median;
-		int width = (mapHistory.size() * MIN_BAR_WIDTH) + 11;
+		int width = (mapHistory.size() * MIN_BAR_WIDTH);
+		this.xOffset = 5;
+		this.yOffset = 5;
 
 		setBackground(new Color(213, 202, 189));
 		setMinimumSize(new Dimension(width, MIN_BAR_HEIGHT));
@@ -39,11 +44,12 @@ public class Graph extends JPanel {
 		addMouseMotionListener(new MouseMotionListener() {
 			@Override
 			public void mouseMoved(MouseEvent e) {
-				for (Rectangle2D rect : rectValue.keySet()) {
-					if (rect.contains(e.getPoint()))
-						setToolTipText(rectValue.get(rect));
+				Rectangle2D cursorArea = new Rectangle2D.Float(e.getX(), e.getY(), 1, 1);
+				for (Map.Entry<Line2D, String> entry : lineValues.entrySet()) {
+					if (entry.getKey().intersects(cursorArea)) {
+						setToolTipText(entry.getValue());
+					}
 				}
-
 				ToolTipManager.sharedInstance().mouseMoved(e);
 			}
 
@@ -57,54 +63,54 @@ public class Graph extends JPanel {
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		if (mapHistory != null) {
-			int xOffset = 5;
-			int yOffset = 5;
-			int width = getWidth() - 1 - (xOffset * 2);
-			int height = getHeight() - 1 - (yOffset * 2);
-			double maxValue = 0.0000000000000001;
-			int barWidth = Math.max(MIN_BAR_WIDTH, width / mapHistory.size());
-
 			Graphics2D g2d = (Graphics2D) g.create();
-			g2d.setColor(Color.BLACK);
-			g2d.setStroke(new BasicStroke(0f));
-			g2d.drawRect(xOffset, yOffset, width, height);
+			Line2D line;
+			float maxValue = 0.0000000000001f;
+			int frameWidth = getWidth() - (xOffset * 2);
+			int frameHeight = getHeight() - (yOffset * 2);
+			float barWidth = (float) frameWidth / mapHistory.size();
+			float xPos = xOffset * 1.5f;
+			float yPos;
+			float barHeight;
+			float value;
 
-			float hue = (float) Math.floor(Utility.getHue(this.color));
-
-			for (Number value : mapHistory.values())
-				maxValue = Math.max(maxValue,
-						value.doubleValue() % 1 != 0 ? value.doubleValue() * 100 : value.doubleValue());
-
-			int xPos = xOffset;
-			for (Integer key : mapHistory.keySet()) {
-				double value = mapHistory.get(key).doubleValue();
-				value = value % 1 != 0 ? value * 100 : value;
-				double barHeight = (value / (float) maxValue) * height;
-				double yPos = height + yOffset - barHeight;
-
-				Rectangle2D bar;
-
-				if (key.equals(median)) {
-					bar = new Rectangle2D.Float(xPos, yOffset, barWidth, height);
-					rectValue.put(bar, "Valor medio:" + key);
-					g2d.fill(bar);
-					g2d.draw(bar);
-				}
-
-				float light = key.equals(0) ? 0f : (key / 255f) / 2f;
-
-				g2d.setColor(Color.getHSBColor(hue / 360f, 1f, light));
-
-				bar = new Rectangle2D.Float(xPos, (float) yPos - 1, barWidth, (float) barHeight + 1);
-				rectValue.put(bar, String.valueOf((value % 1 != 0 ? value + "%" : (int) value)));
-
-				g2d.fill(bar);
-				g2d.setColor(Color.DARK_GRAY);
-				g2d.draw(bar);
-
-				xPos += barWidth;
+			for (Number mapValue : mapHistory.values()) {
+				float doubleValue = mapValue.floatValue();
+				maxValue = Math.max(maxValue, doubleValue % 1 != 0 ? doubleValue * 100 : doubleValue);
 			}
 
+			g2d.setStroke(new BasicStroke(barWidth+1));
+			
+			for (Map.Entry<Integer, Number> entry : mapHistory.entrySet()) {
+				value = entry.getValue().floatValue();
+				value = value % 1 != 0 ? value * 100 : value;
+				barHeight = (value / maxValue) * (frameHeight-1);
+				yPos = frameHeight + yOffset - barHeight;
+				
+				if (entry.getKey().equals(this.median)) {
+					line = new Line2D.Float(xPos, yOffset, xPos, getHeight() - (float) yOffset);
+					lineValues.put(line, "Valor medio:" + entry.getKey());
+					g2d.setColor(Color.DARK_GRAY);
+					g2d.draw(line);
+				}
+				
+				line = new Line2D.Float(xPos, getHeight() - yOffset, xPos, yPos);
+				lineValues.put(line, String.valueOf(value % 1 != 0 ? value + "%" : (int) value));
+				
+				float hue = (float) Math.floor(Utility.getHue(this.color));
+				float light = entry.getKey() / 255f / 2f;
+				int hsbColor = Color.getHSBColor(hue / 360f, 1f, light).getRGB();
+				hsbColor &= ~(0xff << 24);
+				hsbColor |= (128 & 0xff) << 24;
+				g2d.setColor(new Color(hsbColor, true));
+				g2d.draw(line);
+				
+				xPos += barWidth;
+			}
+			
+			g2d.setColor(Color.BLACK);
+			g2d.setStroke(new BasicStroke(.5f));
+			g2d.drawRect(xOffset, yOffset, frameWidth, frameHeight);
 			g2d.dispose();
 		}
 	}
