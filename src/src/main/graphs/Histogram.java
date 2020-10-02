@@ -16,6 +16,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
+import main.gui.LayeredGraph;
 import main.utils.Pixel;
 import main.utils.Utility;
 
@@ -196,35 +197,22 @@ public class Histogram implements Runnable {
 
 	private void initializeGraph(List<Map<Integer, Double>> hmArray) {
 		JFrame frame = new JFrame("Histogram");
-		frame.setLayout(new BorderLayout());
+		// frame.setLayout(new BorderLayout());
+		frame.setLayout(new GridLayout(2, 1));
 		
 		JPanel texto = new JPanel();
 		texto.add(new JLabel("<html>" + this.toString().replace("\n", "<br/>").replace("\t", "&ensp;") + "<html>",
 		SwingConstants.LEFT));
 		texto.setBackground(Color.LIGHT_GRAY);
 		
-		Container container = graphicHistogram(hmArray);
-		container.setLayout(new GridLayout(displayedGraphs + 1, 1));
-		container.add(texto);
-
+		Container container = new LayeredGraph(hmArray, med);
+		
 		frame.add(container);
+		frame.add(texto);
 		
 		frame.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 		frame.pack();
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
-	}
-
-	private Container graphicHistogram(List<Map<Integer, Double>> hmArray) {
-		Container container = new Container();
-
-		if (displayedGraphs == 3) {
-			container.add(new Graph(hmArray.get(0), Color.RED, med[0]));
-			container.add(new Graph(hmArray.get(1), Color.GREEN, med[1]));
-			container.add(new Graph(hmArray.get(2), Color.BLUE, med[2]));
-		} else
-			container.add(new Graph(hmArray.get(0), Color.GRAY, med[0]), -1);
-
-		return container;
 	}
 }
