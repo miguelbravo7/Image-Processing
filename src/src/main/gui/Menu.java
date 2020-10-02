@@ -27,19 +27,17 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTabbedPane;
 
-public final class Menu {
-	public JFrame frame = new JFrame("Editor");
-	public JTabbedPane tabbedPane = new JTabbedPane();
-	public final ArrayList<Histogram> imagehist = new ArrayList<Histogram>();
-	public final ArrayList<BufferedImage> imagelist = new ArrayList<BufferedImage>();
-	File file;
+public final class Menu extends JFrame{
+	public final JTabbedPane tabbedPane = new JTabbedPane();
+	public static Consumer<ImageViewer> unpressAction = null;
+	public final transient ArrayList<Histogram> imagehist = new ArrayList<Histogram>();
+	public final transient ArrayList<BufferedImage> imagelist = new ArrayList<BufferedImage>();
 	static String format = "jpg";
 	Integer imgCount = 0;
 	private static final int WINDOW_SIZE = 800;
-	public static Consumer<ImageViewer> unpressAction = null;
 
 	public Menu() {
-		tabbedPane.addKeyListener(new KeyAdapter() {
+		this.tabbedPane.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent key) {
 				if (key.getKeyCode() == KeyEvent.VK_DELETE) {
@@ -48,20 +46,21 @@ public final class Menu {
 			}
 		});
 		// Interfaz grafica
-		frame.setLayout(new BorderLayout());
-		frame.setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-		frame.setSize(WINDOW_SIZE, WINDOW_SIZE);
-		frame.setLocation(100, 100);
+		this.setTitle("Editor");
+		this.setLayout(new BorderLayout());
+		this.setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+		this.setSize(WINDOW_SIZE, WINDOW_SIZE);
+		this.setLocation(100, 100);
 
-		frame.add(tabbedPane, BorderLayout.CENTER);
-		frame.add(new MenuBar(this), BorderLayout.NORTH);
+		this.add(this.tabbedPane, BorderLayout.CENTER);
+		this.add(new MenuBar(this), BorderLayout.NORTH);
 
-		frame.setVisible(true);
+		this.setVisible(true);
 
 	}
 
 	public void deleteFromPane(int tabIndex) {
-		tabbedPane.remove(tabIndex);
+		this.tabbedPane.remove(tabIndex);
 		imagehist.remove(tabIndex);
 		imagelist.remove(tabIndex);
 	}
@@ -73,19 +72,19 @@ public final class Menu {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		tabbedPane.addTab(text + "_" + imgCount++, new ImageViewer(image).getContentPane());
+		this.tabbedPane.addTab(text + "_" + imgCount++, new ImageViewer(image).getContentPane());
 	}
 	
 	public Histogram currentHist() {
-		return imagehist.get(tabbedPane.getSelectedIndex());
+		return imagehist.get(this.tabbedPane.getSelectedIndex());
 	}
 	
 	public BufferedImage currentImage() {
-		return imagelist.get(tabbedPane.getSelectedIndex());
+		return imagelist.get(this.tabbedPane.getSelectedIndex());
 	}
 	
 	public BufferedImage setcurrentImage(BufferedImage img) {
-		return imagelist.set(tabbedPane.getSelectedIndex(), img);
+		return imagelist.set(this.tabbedPane.getSelectedIndex(), img);
 	}
 	
 	private static List<Component> getAllComponents(final Container c) {
@@ -101,7 +100,7 @@ public final class Menu {
     }
 	
 	public Component getComponentImg(int index) {
-		List<Component> comp = getAllComponents(tabbedPane.getFocusCycleRootAncestor());
+		List<Component> comp = getAllComponents(this.tabbedPane.getFocusCycleRootAncestor());
 		List<JLabel> labels = new ArrayList<JLabel>();
 		for(Component c : comp) {
 			if (c instanceof JLabel) {
@@ -153,6 +152,7 @@ public final class Menu {
 	}
 	
 	public void saveImage(BufferedImage image, String filepath) {
+		File file = new File("");
 		try {
 			file = new File(filepath + "_result."+ format);
 			ImageIO.write(image, format, file);
@@ -163,7 +163,7 @@ public final class Menu {
 	}
 	
 	public void doRedraw(){
-        ((JComponent) getComponentImg(tabbedPane.getSelectedIndex())).getTopLevelAncestor().revalidate();
-        ((JComponent) getComponentImg(tabbedPane.getSelectedIndex())).getTopLevelAncestor().repaint();
+        ((JComponent) getComponentImg(this.tabbedPane.getSelectedIndex())).getTopLevelAncestor().revalidate();
+        ((JComponent) getComponentImg(this.tabbedPane.getSelectedIndex())).getTopLevelAncestor().repaint();
     }
 }
