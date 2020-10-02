@@ -1,6 +1,5 @@
 package main.graphs;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.GridLayout;
@@ -22,7 +21,7 @@ import main.utils.Utility;
 
 public class Histogram implements Runnable {
 	Thread thread;
-	ArrayList<Pixel> image = new ArrayList<Pixel>();
+	ArrayList<Pixel> image = new ArrayList<>();
 	public final List<Map<Integer, Double>> colors;
 	public final List<Map<Integer, Double>> colorsAcc;
 	public final List<Map<Integer, Double>> normColors;
@@ -41,16 +40,16 @@ public class Histogram implements Runnable {
 		this.colorBits = 3;
 		this.displayedGraphs = image.getType() == BufferedImage.TYPE_BYTE_GRAY ? 1 : 3;
 
-		colors = new ArrayList<Map<Integer, Double>>(colorBits);
-		colorsAcc = new ArrayList<Map<Integer, Double>>(colorBits);
-		normColors = new ArrayList<Map<Integer, Double>>(colorBits);
-		normColorsAcc = new ArrayList<Map<Integer, Double>>(colorBits);
+		colors = new ArrayList<>(colorBits);
+		colorsAcc = new ArrayList<>(colorBits);
+		normColors = new ArrayList<>(colorBits);
+		normColorsAcc = new ArrayList<>(colorBits);
 
 		for (int i = 0; i < colorBits; i++) {
-			colors.add(i, new TreeMap<Integer, Double>());
-			colorsAcc.add(i, new TreeMap<Integer, Double>());
-			normColors.add(i, new TreeMap<Integer, Double>());
-			normColorsAcc.add(i, new TreeMap<Integer, Double>());
+			colors.add(i, new TreeMap<>());
+			colorsAcc.add(i, new TreeMap<>());
+			normColors.add(i, new TreeMap<>());
+			normColorsAcc.add(i, new TreeMap<>());
 		}
 
 		valores = new int[colorBits][256];
@@ -197,7 +196,6 @@ public class Histogram implements Runnable {
 
 	private void initializeGraph(List<Map<Integer, Double>> hmArray) {
 		JFrame frame = new JFrame("Histogram");
-		// frame.setLayout(new BorderLayout());
 		frame.setLayout(new GridLayout(2, 1));
 		
 		JPanel texto = new JPanel();

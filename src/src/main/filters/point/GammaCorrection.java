@@ -9,6 +9,10 @@ import main.utils.Utility;
 public class GammaCorrection {
 	private static final Logger LOGGER = Logger.getLogger(GammaCorrection.class.getName());
 
+	private GammaCorrection() {
+		throw new IllegalStateException("Utility class");
+	}
+
 	public static BufferedImage gammaCorrection(BufferedImage image, double gamma) {
 		BufferedImage img = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
 

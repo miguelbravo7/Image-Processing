@@ -6,7 +6,7 @@ import java.util.Set;
 import main.utils.Pixel;
 
 public class Cluster {
-	private Set<Pixel> puntos = new HashSet<Pixel>();
+	private Set<Pixel> puntos = new HashSet<>();
 	private Pixel centroide;
 	private boolean termino = false;
 

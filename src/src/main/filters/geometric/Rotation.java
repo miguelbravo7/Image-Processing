@@ -13,6 +13,10 @@ import main.utils.Pair;
 public class Rotation {
 	private static final Logger LOGGER = Logger.getLogger(Rotation.class.getName());
 
+	private Rotation() {
+		throw new IllegalStateException("Utility class");
+	}
+
 	public static BufferedImage rotate(BufferedImage image, Double degrees, String function) {
 		Double deg = degrees % 360;
 
@@ -23,7 +27,7 @@ public class Rotation {
 
 		int def = (alpha << 24) | (red << 16) | (green << 8) | blue;
 
-		Pair<Double, Double> poo = new Pair<Double, Double>(0d, 0d);
+		Pair<Double, Double> poo = new Pair<>(0d, 0d);
 		Pair<Double, Double> pxo = translatePoint(new Point(image.getWidth(), 0), degrees);
 		Pair<Double, Double> poy = translatePoint(new Point(0, image.getHeight()), degrees);
 		Pair<Double, Double> pxy = translatePoint(new Point(image.getWidth(), image.getHeight()), degrees);
@@ -33,10 +37,10 @@ public class Rotation {
 		int maxX = (int) Math.max(poo.x, Math.max(pxo.x, Math.max(poy.x, pxy.x)));
 		int maxY = (int) Math.max(poo.y, Math.max(pxo.y, Math.max(poy.y, pxy.y)));
 
-		LOGGER.log(Level.FINE, Integer.toString(minX));
-		LOGGER.log(Level.FINE, Integer.toString(minY));
-		LOGGER.log(Level.FINE, Integer.toString(maxX));
-		LOGGER.log(Level.FINE, Integer.toString(maxY));
+		LOGGER.log(Level.FINE, "min x {0}", minX);
+		LOGGER.log(Level.FINE, "min y {0}", minY);
+		LOGGER.log(Level.FINE, "max x {0}", maxX);
+		LOGGER.log(Level.FINE, "max y {0}", maxY);
 
 		int width = maxX - minX;
 		int height = maxY - minY;
@@ -65,13 +69,13 @@ public class Rotation {
 	static Pair<Double, Double> translatePoint(Point p, double rotation) {
 		double cos = Math.cos(Math.toRadians(rotation));
 		double sin = Math.sin(Math.toRadians(rotation));
-		return new Pair<Double, Double>(p.x * cos - p.y * sin, p.x * sin + p.y * cos);
+		return new Pair<>(p.x * cos - p.y * sin, p.x * sin + p.y * cos);
 	}
 
 	public static BufferedImage rotateDirect(BufferedImage image, Double degrees, String funcName) {
 		final Double modDeg = degrees % 360;
 
-		Pair<Double, Double> poo = new Pair<Double, Double>(0d, 0d);
+		Pair<Double, Double> poo = new Pair<>(0d, 0d);
 		Pair<Double, Double> pxo = translatePoint(new Point(image.getWidth(), 0), modDeg);
 		Pair<Double, Double> poy = translatePoint(new Point(0, image.getHeight()), modDeg);
 		Pair<Double, Double> pxy = translatePoint(new Point(image.getWidth(), image.getHeight()), modDeg);

@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseMotionAdapter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -21,7 +21,7 @@ public class LayeredGraph extends JLabel {
     public LayeredGraph(List<Map<Integer, Double>> hmArray, Integer[] med) {
         this.setMinimumSize(new Dimension(256, 100));
         this.setPreferredSize(new Dimension(256, 200));
-        this.graphs = new ArrayList<Graph>();
+        this.graphs = new ArrayList<>();
         Color[] colors = {Color.RED, Color.GREEN, Color.BLUE};
         double[] max = new double[hmArray.size()];
         double biggestMax = 1;
@@ -35,16 +35,13 @@ public class LayeredGraph extends JLabel {
             this.graphs.add(new Graph(hmArray.get(i), colors[i], med[i]));
             this.graphs.get(i).heightScale = (float) (max[i] / biggestMax);
         }
-        this.addMouseMotionListener(new MouseMotionListener() {
+        this.addMouseMotionListener(new MouseMotionAdapter() {
             @Override
             public void mouseMoved(MouseEvent e) {
                 for (Graph graph : graphs) {
                     graph.dispatchEvent(e);
                 }
             }
-
-            @Override
-            public void mouseDragged(MouseEvent e) {}
         });
     }
 

@@ -9,6 +9,10 @@ import main.utils.Utility;
 public class Monochrome {
 	private static final Logger LOGGER = Logger.getLogger(Monochrome.class.getName());
 
+	private Monochrome() {
+		throw new IllegalStateException("Utility class");
+	}
+
 	public static BufferedImage renderPal(BufferedImage image) {
 		BufferedImage img = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
 		Utility.imgApply(image, (i, j) -> {

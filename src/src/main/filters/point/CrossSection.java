@@ -18,9 +18,13 @@ import main.graphs.Graph;
 public class CrossSection {
 	private static final Logger LOGGER = Logger.getLogger(CrossSection.class.getName());
 
+	private CrossSection() {
+		throw new IllegalStateException("Utility class");
+	}
+
 	public static void profile(BufferedImage image, Point p1, Point p2) {
-		Map<Integer, Integer> monochrome = new TreeMap<Integer, Integer>();
-		Map<Integer, Double> derivative = new TreeMap<Integer, Double>();
+		Map<Integer, Integer> monochrome = new TreeMap<>();
+		Map<Integer, Double> derivative = new TreeMap<>();
 
 		if (p1.x > p2.x) {
 			Point tmp = (Point) p1.clone();
@@ -32,10 +36,10 @@ public class CrossSection {
 		double pendiente = (p2.y - p1.y) / (double) (p2.x - p1.x);
 		double offset = p1.y - p1.x * pendiente;
 
-		LOGGER.log(Level.FINE, p1.toString());
-		LOGGER.log(Level.FINE, p2.toString());
-		LOGGER.log(Level.FINE, Double.toString(pendiente));
-		LOGGER.log(Level.FINE, Double.toString(offset));
+		LOGGER.log(Level.FINE, "{0}", p1);
+		LOGGER.log(Level.FINE, "{0}", p2);
+		LOGGER.log(Level.FINE, "{0}", pendiente);
+		LOGGER.log(Level.FINE, "{0}", offset);
 
 		for (Integer point_x = p1.x; point_x <= p2.x; point_x++) {
 			int yPoint = (int) (pendiente * point_x + offset);
@@ -54,7 +58,7 @@ public class CrossSection {
 
 			double monopixel = red * 0.222d + green * 0.707d + blue * 0.071d;
 			double nextMonopixel = nextRed * 0.222d + nextGreen * 0.707d + nextBlue * 0.071d;
-			LOGGER.log(Level.FINE, Double.toString(nextMonopixel / monopixel));
+			LOGGER.log(Level.FINE, "{0}", nextMonopixel / monopixel);
 
 			monochrome.put(point_x, (int) (monopixel));
 			derivative.put(point_x, (1d + nextMonopixel / monopixel) / 2d + .00001);

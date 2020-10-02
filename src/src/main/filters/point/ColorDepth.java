@@ -10,6 +10,10 @@ import main.utils.Utility;
 public class ColorDepth {
 	private static final Logger LOGGER = Logger.getLogger(ColorDepth.class.getName());
 
+	private ColorDepth() {
+		throw new IllegalStateException("Utility class");
+	}
+
 	public static BufferedImage colorDepthShift(BufferedImage image, int depth) {
 		BufferedImage img = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
 
@@ -35,8 +39,8 @@ public class ColorDepth {
 	public static BufferedImage colorDepthRegion(BufferedImage image, int region) {
 		BufferedImage img = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
 		Integer[][] array = ImgConvert.toIntArray(image);
-		LOGGER.log(Level.FINE, Integer.toString(array.length));
-		LOGGER.log(Level.FINE, Integer.toString(array[0].length));
+		LOGGER.log(Level.FINE, "{0}", array.length);
+		LOGGER.log(Level.FINE, "{0}", array[0].length);
 
 		for (int i = 0; i < image.getHeight(); i += region) {
 			for (int j = 0; j < image.getWidth(); j += region) {
@@ -56,6 +60,7 @@ public class ColorDepth {
 					}
 				}
 
+				nCells = nCells == 0 ? 1 : nCells;
 				int pixel = ((aAcc / nCells) << 24) | ((rAcc / nCells) << 16) | ((gAcc / nCells) << 8)
 						| (bAcc / nCells);
 

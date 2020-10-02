@@ -27,17 +27,18 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTabbedPane;
 
-public final class Menu extends JFrame{
-	public final JTabbedPane tabbedPane = new JTabbedPane();
+public final class Menu{
+	public final static JTabbedPane tabbedPane = new JTabbedPane();
+	public static final JFrame MENU_FRAME = new JFrame();
 	public static Consumer<ImageViewer> unpressAction = null;
-	public final transient ArrayList<Histogram> imagehist = new ArrayList<Histogram>();
-	public final transient ArrayList<BufferedImage> imagelist = new ArrayList<BufferedImage>();
-	static String format = "jpg";
-	Integer imgCount = 0;
+	public static final List<Histogram> imagehist = new ArrayList<>();
+	public static final List<BufferedImage> imagelist = new ArrayList<>();
+	private static final String FORMAT = "jpg";
+	private static Integer imgCount = 0;
 	private static final int WINDOW_SIZE = 800;
 
 	public Menu() {
-		this.tabbedPane.addKeyListener(new KeyAdapter() {
+		tabbedPane.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent key) {
 				if (key.getKeyCode() == KeyEvent.VK_DELETE) {
@@ -46,50 +47,50 @@ public final class Menu extends JFrame{
 			}
 		});
 		// Interfaz grafica
-		this.setTitle("Editor");
-		this.setLayout(new BorderLayout());
-		this.setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-		this.setSize(WINDOW_SIZE, WINDOW_SIZE);
-		this.setLocation(100, 100);
+		MENU_FRAME.setTitle("Editor");
+		MENU_FRAME.setLayout(new BorderLayout());
+		MENU_FRAME.setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+		MENU_FRAME.setSize(WINDOW_SIZE, WINDOW_SIZE);
+		MENU_FRAME.setLocation(100, 100);
 
-		this.add(this.tabbedPane, BorderLayout.CENTER);
-		this.add(new MenuBar(this), BorderLayout.NORTH);
+		MENU_FRAME.add(tabbedPane, BorderLayout.CENTER);
+		MENU_FRAME.add(new MenuBar(), BorderLayout.NORTH);
 
-		this.setVisible(true);
+		MENU_FRAME.setVisible(true);
 
 	}
 
 	public void deleteFromPane(int tabIndex) {
-		this.tabbedPane.remove(tabIndex);
+		tabbedPane.remove(tabIndex);
 		imagehist.remove(tabIndex);
 		imagelist.remove(tabIndex);
 	}
 
-	public void addToPane(BufferedImage image, String text) {
+	public static void addToPane(BufferedImage image, String text) {
 		imagelist.add(image);
 		try {
 			imagehist.add(new Histogram(image));
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		this.tabbedPane.addTab(text + "_" + imgCount++, new ImageViewer(image).getContentPane());
+		tabbedPane.addTab(text + "_" + imgCount++, new ImageViewer(image));
 	}
-	
-	public Histogram currentHist() {
-		return imagehist.get(this.tabbedPane.getSelectedIndex());
+
+	public static Histogram currentHist() {
+		return imagehist.get(tabbedPane.getSelectedIndex());
 	}
-	
-	public BufferedImage currentImage() {
-		return imagelist.get(this.tabbedPane.getSelectedIndex());
+
+	public static BufferedImage currentImage() {
+		return imagelist.get(tabbedPane.getSelectedIndex());
 	}
 	
 	public BufferedImage setcurrentImage(BufferedImage img) {
-		return imagelist.set(this.tabbedPane.getSelectedIndex(), img);
+		return imagelist.set(tabbedPane.getSelectedIndex(), img);
 	}
 	
 	private static List<Component> getAllComponents(final Container c) {
 	    Component[] comps = c.getComponents();
-	    List<Component> compList = new ArrayList<Component>();
+	    List<Component> compList = new ArrayList<>();
 	    for (Component comp : comps) {
 			compList.add(comp);
 			if (comp instanceof Container) {
@@ -99,9 +100,9 @@ public final class Menu extends JFrame{
 	    return compList;
     }
 	
-	public Component getComponentImg(int index) {
-		List<Component> comp = getAllComponents(this.tabbedPane.getFocusCycleRootAncestor());
-		List<JLabel> labels = new ArrayList<JLabel>();
+	private static Component getComponentImg(int index) {
+		List<Component> comp = getAllComponents(tabbedPane.getFocusCycleRootAncestor());
+		List<JLabel> labels = new ArrayList<>();
 		for(Component c : comp) {
 			if (c instanceof JLabel) {
 				labels.add((JLabel) c);				
@@ -110,12 +111,12 @@ public final class Menu extends JFrame{
 		return labels.get(index);
 	}
 	
-	public void openImage(String filepath) {
+	public static void openImage(String filepath) {
 		BufferedImage image = openTiffCompatibleImg(new File(filepath));
 		addToPane(image, "Imagen");
 	}
 	
-	private BufferedImage openTiffCompatibleImg(File file) {
+	private static BufferedImage openTiffCompatibleImg(File file) {
 		BufferedImage tiff = null;
 		try {
 			try (InputStream is = new FileInputStream(file)) {
@@ -151,19 +152,19 @@ public final class Menu extends JFrame{
 		return convertedImg;
 	}
 	
-	public void saveImage(BufferedImage image, String filepath) {
+	public static void saveImage(BufferedImage image, String filepath) {
 		File file = new File("");
 		try {
-			file = new File(filepath + "_result."+ format);
-			ImageIO.write(image, format, file);
+			file = new File(filepath + "_result."+ FORMAT);
+			ImageIO.write(image, FORMAT, file);
 		} catch (IOException e) {	
 			Utility.getAllFiles(file, "");		
 			e.printStackTrace();
 		}
 	}
 	
-	public void doRedraw(){
-        ((JComponent) getComponentImg(this.tabbedPane.getSelectedIndex())).getTopLevelAncestor().revalidate();
-        ((JComponent) getComponentImg(this.tabbedPane.getSelectedIndex())).getTopLevelAncestor().repaint();
+	public static void doRedraw(){
+        ((JComponent) getComponentImg(tabbedPane.getSelectedIndex())).getTopLevelAncestor().revalidate();
+        ((JComponent) getComponentImg(tabbedPane.getSelectedIndex())).getTopLevelAncestor().repaint();
     }
 }

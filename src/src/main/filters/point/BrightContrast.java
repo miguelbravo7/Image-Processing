@@ -10,6 +10,10 @@ import main.utils.Utility;
 public class BrightContrast {
 	private static final Logger LOGGER = Logger.getLogger(BrightContrast.class.getName());
 
+	private BrightContrast() {
+		throw new IllegalStateException("Utility class");
+	}
+
 	public static BufferedImage adjustImg(BufferedImage image, Histogram imgHist, double newBrightness,
 			double newContrast) {
 		BufferedImage img = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());

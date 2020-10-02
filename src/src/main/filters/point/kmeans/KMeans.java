@@ -8,6 +8,7 @@ import java.util.Random;
 import main.utils.Pixel;
 
 public class KMeans {
+	Random random = new Random();
 
 	public KMeansResultado calcular(List<Pixel> puntos, Integer k) {
 		List<Cluster> clusters = elegirCentroides(puntos, k);
@@ -31,10 +32,10 @@ public class KMeans {
 	 * @return centroides
 	 */
 	private List<Cluster> elegirCentroides(List<Pixel> puntos, Integer k) {
-		ArrayList<Cluster> centroides = new ArrayList<Cluster>();
+		ArrayList<Cluster> centroides = new ArrayList<>();
 
-		ArrayList<Float> maximos = new ArrayList<Float>();
-		ArrayList<Float> minimos = new ArrayList<Float>();
+		ArrayList<Float> maximos = new ArrayList<>();
+		ArrayList<Float> minimos = new ArrayList<>();
 		// se buscan los maximos y minimos de cada dimension
 
 		for (int i = 0; i < puntos.get(0).getGrado(); i++) {
@@ -52,13 +53,11 @@ public class KMeans {
 
 		// Se generan los clusters dentro de la region en la que estan situados los
 		// puntos
-		Random random = new Random();
-
 		for (int i = 0; i < k; i++) {
 			Float[] data = new Float[puntos.get(0).getGrado()];
 			Arrays.fill(data, 0f);
 			for (int d = 0; d < puntos.get(0).getGrado(); d++) {
-				data[d] = random.nextFloat() * (maximos.get(d) - minimos.get(d)) + minimos.get(d);
+				data[d] = this.random.nextFloat() * (maximos.get(d) - minimos.get(d)) + minimos.get(d);
 			}
 
 			Cluster c = new Cluster();

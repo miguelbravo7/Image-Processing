@@ -14,13 +14,17 @@ import main.utils.Utility;
 public class LinealTransform {
 	private static final Logger LOGGER = Logger.getLogger(LinealTransform.class.getName());
 
-	public static BufferedImage LinealTransform(BufferedImage image, List<Point> points) {
+	private LinealTransform() {
+		throw new IllegalStateException("Utility class");
+	}
+
+	public static BufferedImage transform(BufferedImage image, List<Point> points) {
 		BufferedImage img = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
 
 		Collections.sort(points, new PointCompare());
 		traducePoints(points);
 		for (Point p : points) {
-			LOGGER.log(Level.FINE, p.toString());
+			LOGGER.log(Level.FINE, "{0}", p);
 		}
 
 		Utility.imgApply(image, (i, j) -> {

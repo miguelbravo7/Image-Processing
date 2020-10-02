@@ -11,17 +11,16 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import main.filters.point.BrightContrast;
-import main.gui.MenuBar;
-
+import main.gui.Menu;
 
 public class ActChangeBC implements ActionListener {
-	JTextField brillo;
+    JTextField brillo;
     JTextField contraste;
-    
-    public void actionPerformed(ActionEvent evt) {
-        brillo = new JTextField(MenuBar.program.currentHist().med[0].toString());
 
-        contraste = new JTextField(MenuBar.program.currentHist().dev[0].toString());
+    public void actionPerformed(ActionEvent evt) {
+        brillo = new JTextField(Menu.currentHist().med[0].toString());
+
+        contraste = new JTextField(Menu.currentHist().dev[0].toString());
 
         JFrame popup = new JFrame("Cambio brillo-contraste");
         popup.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -38,14 +37,13 @@ public class ActChangeBC implements ActionListener {
 
         JButton okbutton = new JButton("Ok");
 
-        okbutton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                MenuBar.program.addToPane(
-                        BrightContrast.adjustImg(MenuBar.program.currentImage(), MenuBar.program.currentHist(),
-                                Double.valueOf(brillo.getText()), Double.valueOf(contraste.getText())),
-                        "Conversion");
-                popup.dispose();
-            }
+        okbutton.addActionListener((ActionEvent e) -> {
+            Menu
+                    .addToPane(
+                            BrightContrast.adjustImg(Menu.currentImage(), Menu.currentHist(),
+                                    Double.valueOf(brillo.getText()), Double.valueOf(contraste.getText())),
+                            "Conversion");
+            popup.dispose();
         });
         popup.add(okbutton);
         popup.pack();

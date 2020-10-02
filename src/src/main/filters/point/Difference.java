@@ -9,6 +9,10 @@ import main.utils.Utility;
 public class Difference {
 	private static final Logger LOGGER = Logger.getLogger(Difference.class.getName());
 
+	private Difference() {
+		throw new IllegalStateException("Utility class");
+	}
+
 	public static BufferedImage difference(BufferedImage image1, BufferedImage image2) {
 		BufferedImage img = new BufferedImage(image1.getWidth(), image1.getHeight(), image1.getType());
 

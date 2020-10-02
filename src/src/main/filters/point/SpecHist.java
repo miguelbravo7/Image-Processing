@@ -12,6 +12,10 @@ import main.utils.Utility;
 public class SpecHist {
 	private static final Logger LOGGER = Logger.getLogger(SpecHist.class.getName());
 
+	private SpecHist() {
+		throw new IllegalStateException("Utility class");
+	}
+
 	public static BufferedImage convertHist(BufferedImage image, Histogram imgHist, Histogram refImgHist) {
 		BufferedImage img = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
 		TreeMap<Integer, Integer> rLut = makeLut(refImgHist.normColorsAcc.get(0), imgHist.normColorsAcc.get(0));
@@ -39,15 +43,16 @@ public class SpecHist {
 	}
 
 	static TreeMap<Integer, Integer> makeLut(Map<Integer, Double> reference, Map<Integer, Double> original) {
-		TreeMap<Integer, Integer> res = new TreeMap<Integer, Integer>();
+		TreeMap<Integer, Integer> res = new TreeMap<>();
 		for (Map.Entry<Integer, Double> entry : original.entrySet()) {
 			int i = 0;
 			while (i < reference.size() && entry.getValue() > reference.get(i)) {
 				i++;
 			}
-			if (nearestValue(entry.getValue(), reference.getOrDefault(i - 1, 0d), reference.get(i)) == reference.get(i)) {
+			if (nearestValue(entry.getValue(), reference.getOrDefault(i - 1, 0d), reference.get(i)) == reference
+					.get(i)) {
 				res.put(entry.getKey(), i);
-			} else{
+			} else {
 				res.put(entry.getKey(), i - 1);
 			}
 		}

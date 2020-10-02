@@ -12,19 +12,19 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import main.filters.point.SpecHist;
-import main.gui.MenuBar;
+import main.gui.Menu;
 
 public class ActImgHistSpec implements ActionListener {
     public void actionPerformed(ActionEvent evt) {
-        ArrayList<String> pestanas = new ArrayList<String>();
+        ArrayList<String> pestanas = new ArrayList<>();
 
-        for (int i = 0; i < MenuBar.program.tabbedPane.getTabCount(); i++) {
-            pestanas.add(MenuBar.program.tabbedPane.getTitleAt(i));
+        for (int i = 0; i < Menu.tabbedPane.getTabCount(); i++) {
+            pestanas.add(Menu.tabbedPane.getTitleAt(i));
         }
 
-        JComboBox<Object> img1 = new JComboBox<Object>(pestanas.toArray());
+        JComboBox<Object> img1 = new JComboBox<>(pestanas.toArray());
 
-        JComboBox<Object> img2 = new JComboBox<Object>(pestanas.toArray());
+        JComboBox<Object> img2 = new JComboBox<>(pestanas.toArray());
 
         JFrame popup = new JFrame("Especificacion de histograma.");
         popup.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -41,13 +41,11 @@ public class ActImgHistSpec implements ActionListener {
 
         JButton okbutton = new JButton("Ok");
 
-        okbutton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                popup.dispose();
-                MenuBar.program.addToPane(SpecHist.convertHist(MenuBar.program.imagelist.get(img1.getSelectedIndex()),
-                        MenuBar.program.imagehist.get(img1.getSelectedIndex()),
-                        MenuBar.program.imagehist.get(img2.getSelectedIndex())), "Spec. hist.");
-            }
+        okbutton.addActionListener((ActionEvent e) -> {
+            popup.dispose();
+            Menu.addToPane(SpecHist.convertHist(Menu.imagelist.get(img1.getSelectedIndex()),
+                    Menu.imagehist.get(img1.getSelectedIndex()),
+                    Menu.imagehist.get(img2.getSelectedIndex())), "Spec. hist.");
         });
         popup.add(okbutton);
         popup.pack();

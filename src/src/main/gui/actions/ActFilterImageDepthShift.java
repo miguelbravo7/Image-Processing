@@ -11,8 +11,7 @@ import javax.swing.JTextField;
 import java.awt.GridLayout;
 
 import main.filters.point.ColorDepth;
-import main.gui.MenuBar;
-
+import main.gui.Menu;
 
 public class ActFilterImageDepthShift implements ActionListener {
     public void actionPerformed(ActionEvent evt) {
@@ -29,13 +28,11 @@ public class ActFilterImageDepthShift implements ActionListener {
 
         JButton okbutton = new JButton("Ok");
 
-        okbutton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                MenuBar.program.addToPane(
-                        ColorDepth.colorDepthShift(MenuBar.program.currentImage(), Integer.valueOf(depth.getText())),
-                        depth.getText() + " bit depth");
-                popup.dispose();
-            }
+        okbutton.addActionListener((ActionEvent e) -> {
+            Menu.addToPane(
+                    ColorDepth.colorDepthShift(Menu.currentImage(), Integer.valueOf(depth.getText())),
+                    depth.getText() + " bit depth");
+            popup.dispose();
         });
         popup.add(okbutton);
         popup.pack();

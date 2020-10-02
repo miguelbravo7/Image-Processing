@@ -9,6 +9,10 @@ import main.utils.Utility;
 public class Negative {
 	private static final Logger LOGGER = Logger.getLogger(Negative.class.getName());
 
+	private Negative() {
+		throw new IllegalStateException("Utility class");
+	}
+
 	public static BufferedImage render(BufferedImage image) {
 		BufferedImage img = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
 		Utility.imgApply(image, (i, j) -> {

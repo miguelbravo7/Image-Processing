@@ -9,6 +9,10 @@ import main.utils.Utility;
 public class Mirror {
 	private static final Logger LOGGER = Logger.getLogger(Mirror.class.getName());
 
+	private Mirror() {
+		throw new IllegalStateException("Utility class");
+	}
+
 	public static BufferedImage vertical(BufferedImage image) {
 		BufferedImage img = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
 		Utility.imgApply(image, (i, j) -> {

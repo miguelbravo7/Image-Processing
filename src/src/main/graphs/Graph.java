@@ -1,12 +1,11 @@
 package main.graphs;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseMotionAdapter;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.Polygon;
@@ -21,7 +20,7 @@ public class Graph extends JLabel {
 	private static final int MIN_BAR_WIDTH = 1;
 	private static final int MIN_BAR_HEIGHT = 100;
 	private Map<Integer, Number> mapHistory;
-	private transient Map<Line2D, String> lineValues = new HashMap<Line2D, String>();
+	private transient Map<Line2D, String> lineValues = new HashMap<>();
 	private final Color color;
 	private Integer median;
 	public float heightScale = 1f;
@@ -37,7 +36,7 @@ public class Graph extends JLabel {
 		this.setMinimumSize(new Dimension(width, MIN_BAR_HEIGHT));
 		this.setPreferredSize(new Dimension(width, MIN_BAR_HEIGHT * 2));
 
-		addMouseMotionListener(new MouseMotionListener() {
+		addMouseMotionListener(new MouseMotionAdapter() {
 			@Override
 			public void mouseMoved(MouseEvent e) {
 				Rectangle2D cursorArea = new Rectangle2D.Float(e.getX(), e.getY(), 1, 1);
@@ -47,10 +46,6 @@ public class Graph extends JLabel {
 					}
 				}
 				ToolTipManager.sharedInstance().mouseMoved(e);
-			}
-
-			@Override
-			public void mouseDragged(MouseEvent e) {
 			}
 		});
 	}
@@ -62,18 +57,19 @@ public class Graph extends JLabel {
 		Polygon polygon = new Polygon();
 		Line2D line;
 		float maxValue = 0.0000000000001f;
-		double barWidth = (double) getWidth() / mapHistory.size();
+		double valueWidthOffset = (double) getWidth() / mapHistory.size();
 		float xPos = 0;
 		float yPos = 0;
 		float barHeight;
 		float value;
+		
+		g2d.setColor(Color.LIGHT_GRAY);
 
 		for (Number mapValue : mapHistory.values()) {
 			float doubleValue = mapValue.floatValue();
 			maxValue = Math.max(maxValue, doubleValue % 1 != 0 ? doubleValue * 100 : doubleValue);
 		}
 
-		g2d.setStroke(new BasicStroke((float) barWidth));
 		polygon.addPoint((int)xPos, getHeight());
 		
 		for (Map.Entry<Integer, Number> entry : mapHistory.entrySet()) {
@@ -85,14 +81,13 @@ public class Graph extends JLabel {
 			if (entry.getKey().equals(this.median)) {
 				line = new Line2D.Float(xPos, 0, xPos, getHeight());
 				lineValues.put(line, "Valor medio:" + entry.getKey());
-				g2d.setColor(Color.LIGHT_GRAY);
 				g2d.draw(line);
 			}
 			
 			line = new Line2D.Float(xPos, getHeight(), xPos, yPos);
-			polygon.addPoint((int)xPos, (int)yPos);
 			lineValues.put(line, String.valueOf(value % 1 != 0 ? value + "%" : (int) value));
-			xPos += barWidth;
+			polygon.addPoint((int)xPos, (int)yPos);
+			xPos += valueWidthOffset;
 		}
 		polygon.addPoint((int)xPos, (int)yPos);
 		polygon.addPoint(getWidth(), getHeight());

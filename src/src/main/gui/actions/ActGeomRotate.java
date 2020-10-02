@@ -11,8 +11,7 @@ import javax.swing.JTextField;
 import java.awt.GridLayout;
 
 import main.filters.geometric.Rotation;
-import main.gui.MenuBar;
-
+import main.gui.Menu;
 
 public class ActGeomRotate implements ActionListener {
     String function;
@@ -35,13 +34,11 @@ public class ActGeomRotate implements ActionListener {
 
         JButton okbutton = new JButton("Ok");
 
-        okbutton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                MenuBar.program.addToPane(
-                        Rotation.rotate(MenuBar.program.currentImage(), Double.valueOf(means.getText()), function),
-                        means.getText() + "�_" + function);
-                popup.dispose();
-            }
+        okbutton.addActionListener((ActionEvent e) -> {
+            Menu.addToPane(
+                    Rotation.rotate(Menu.currentImage(), Double.valueOf(means.getText()), function),
+                    means.getText() + "�_" + function);
+            popup.dispose();
         });
         popup.add(okbutton);
         popup.pack();

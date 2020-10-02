@@ -6,21 +6,27 @@ import java.io.File;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.BiConsumer;
+import java.util.function.ObjIntConsumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.IntStream;
 
 public class Utility {
-	private static final Logger LOGGER = Logger.getLogger( Utility.class.getName() );
+	private static final Logger LOGGER = Logger.getLogger(Utility.class.getName());
 	public static final Map<String, Method> methodMap = createMap();
+	public static final String BILINEAR = "Bilinear";
+	public static final String NEIGHBOUR = "Neighbour";
+
+	private Utility() {
+		throw new IllegalStateException("Utility class");
+	}
 
 	private static Map<String, Method> createMap() {
-		Map<String, Method> myMap = new HashMap<String, Method>();
+		Map<String, Method> myMap = new HashMap<>();
 		try {
-			myMap.put("Bilinear", Utility.class.getMethod("bilinearInterpolation", Integer[][].class, double.class,
+			myMap.put(Utility.BILINEAR, Utility.class.getMethod("bilinearInterpolation", Integer[][].class, double.class,
 					double.class, int.class, int.class));
-			myMap.put("Neighbour", Utility.class.getMethod("nearestNeighbour", Integer[][].class, double.class,
+			myMap.put(Utility.NEIGHBOUR, Utility.class.getMethod("nearestNeighbour", Integer[][].class, double.class,
 					double.class, int.class, int.class));
 		} catch (NoSuchMethodException | SecurityException e) {
 			e.printStackTrace();
@@ -37,18 +43,15 @@ public class Utility {
 				getAllFiles(f, level + " | ");
 			}
 			if (f.isFile()) {
-				LOGGER.log(Level.FINE, "{0}{1}", new Object[]{level, f.getName()});
+				LOGGER.log(Level.FINE, "{0} {1}", new Object[] { level, f.getName() });
 			}
 		}
 	}
 
-	public static void imgApply(BufferedImage image, BiConsumer<Integer, Integer> function) {
+	public static void imgApply(BufferedImage image, ObjIntConsumer<Integer> function) {
 		// Seen unstable behaviour when implemented on toPixelArrayList
-		IntStream.range(0, image.getHeight()).parallel().forEach(i -> 
-			IntStream.range(0, image.getWidth()).parallel().forEach(j ->
-				function.accept(i, j)
-			)
-		);
+		IntStream.range(0, image.getHeight()).parallel()
+				.forEach(i -> IntStream.range(0, image.getWidth()).parallel().forEach(j -> function.accept(i, j)));
 	}
 
 	public static int bilinearInterpolation(Integer[][] color, double xPosition, double yPosition, int width,

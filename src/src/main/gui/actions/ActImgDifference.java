@@ -11,28 +11,26 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.GridLayout;
 
 import main.filters.point.Difference;
-import main.gui.MenuBar;
-
+import main.gui.Menu;
 
 public class ActImgDifference implements ActionListener {
-	static final int BRI_MIN = 0;
+    static final int BRI_MIN = 0;
     static final int BRI_MAX = 255;
-	JSlider umbral;
-    
-    public void actionPerformed(ActionEvent evt) {
-        ArrayList<String> pestanas = new ArrayList<String>();
+    JSlider umbral;
 
-        for (int i = 0; i < MenuBar.program.tabbedPane.getTabCount(); i++) {
-            pestanas.add(MenuBar.program.tabbedPane.getTitleAt(i));
+    public void actionPerformed(ActionEvent evt) {
+        ArrayList<String> pestanas = new ArrayList<>();
+
+        for (int i = 0; i < Menu.tabbedPane.getTabCount(); i++) {
+            pestanas.add(Menu.tabbedPane.getTitleAt(i));
         }
 
-        JComboBox<Object> img1 = new JComboBox<Object>(pestanas.toArray());
+        JComboBox<Object> img1 = new JComboBox<>(pestanas.toArray());
 
-        JComboBox<Object> img2 = new JComboBox<Object>(pestanas.toArray());
+        JComboBox<Object> img2 = new JComboBox<>(pestanas.toArray());
 
         JFrame popup = new JFrame("Diferencia de imagen.");
         popup.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -49,14 +47,11 @@ public class ActImgDifference implements ActionListener {
 
         JButton okbutton = new JButton("Ok");
 
-        okbutton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                popup.dispose();
-
-                MenuBar.program.addToPane(Difference.difference(MenuBar.program.imagelist.get(img1.getSelectedIndex()),
-                MenuBar.program.imagelist.get(img2.getSelectedIndex())), "Diferencia");
-                umbralPopup();
-            }
+        okbutton.addActionListener((ActionEvent e) -> {
+            popup.dispose();
+            Menu.addToPane(Difference.difference(Menu.imagelist.get(img1.getSelectedIndex()),
+                    Menu.imagelist.get(img2.getSelectedIndex())), "Diferencia");
+            umbralPopup();
         });
         popup.add(okbutton);
         popup.pack();
@@ -72,11 +67,9 @@ public class ActImgDifference implements ActionListener {
         umbral.setMinorTickSpacing(1);
         umbral.setPaintTicks(true);
         umbral.setPaintLabels(true);
-        umbral.addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent e) {
-                Difference.changeUmbral(MenuBar.program.currentImage(), umbral.getValue());
-                MenuBar.program.doRedraw();
-            }
+        umbral.addChangeListener((ChangeEvent e) -> {
+            Difference.changeUmbral(Menu.currentImage(), umbral.getValue());
+            Menu.doRedraw();
         });
 
         JFrame popupUmbral = new JFrame("Diferencia de imagen");

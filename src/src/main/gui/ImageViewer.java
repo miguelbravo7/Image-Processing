@@ -2,14 +2,12 @@ package main.gui;
 
 import java.awt.BorderLayout;
 import java.awt.GridBagLayout;
-import java.awt.Point;
 import java.awt.Color;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 
 import javax.swing.ImageIcon;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -17,9 +15,9 @@ import javax.swing.border.EmptyBorder;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class ImageViewer extends JFrame {
+public class ImageViewer extends JPanel {
     private static final long serialVersionUID = 1L;
-    private final Logger LOGGER = Logger.getLogger(ImageViewer.class.getName());
+    private final transient Logger LOGGER = Logger.getLogger(ImageViewer.class.getName());
     transient BufferedImage image;
     JLabel imageCanvas;
     JLabel text;
@@ -35,7 +33,6 @@ public class ImageViewer extends JFrame {
     int yReleased;
 
     public ImageViewer(BufferedImage image) {
-        super("Image Viewer");
         this.image = image;
         this.text = new JLabel();
         this.imageCanvas = new JLabel();
@@ -72,13 +69,10 @@ public class ImageViewer extends JFrame {
                 releaseDispatcher();
             }
         });
-        this.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         this.initComponents();
 
         this.add(text, BorderLayout.SOUTH);
         this.setImage(image);
-        this.pack();
-        this.setLocationByPlatform(true);
     }
 
     /** Set the image as icon of the image canvas (display it). */
@@ -101,7 +95,6 @@ public class ImageViewer extends JFrame {
         imagecenter.add(this.imageCanvas);
         JScrollPane imagescroll = new JScrollPane(imagecenter);
         add(imagescroll, BorderLayout.CENTER);
-        // this.add(imagecenter, BorderLayout.CENTER);
 
     }
 

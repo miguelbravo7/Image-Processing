@@ -15,7 +15,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import main.filters.point.LinealTransform;
-import main.gui.MenuBar;
+import main.gui.Menu;
 
 public class ActLinealTransform implements ActionListener {
     public void actionPerformed(ActionEvent evt) {
@@ -31,16 +31,14 @@ public class ActLinealTransform implements ActionListener {
 
         JButton addpoint = new JButton("Anadir punto");
 
-        addpoint.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                panelx.add(new JTextField(6));
-                panelx.revalidate();
-                panelx.repaint();
+        addpoint.addActionListener((ActionEvent e) -> {
+            panelx.add(new JTextField(6));
+            panelx.revalidate();
+            panelx.repaint();
 
-                panely.add(new JTextField(6));
-                panely.revalidate();
-                panely.repaint();
-            }
+            panely.add(new JTextField(6));
+            panely.revalidate();
+            panely.repaint();
         });
         popup.add(addpoint);
         JPanel panels = new JPanel();
@@ -49,12 +47,10 @@ public class ActLinealTransform implements ActionListener {
 
         JButton okbutton = new JButton("Ok");
 
-        okbutton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                MenuBar.program.addToPane(LinealTransform.LinealTransform(MenuBar.program.currentImage(),
-                        iterateOverJTextFields(panelx, panely)), "Trans. lineal");
-                popup.dispose();
-            }
+        okbutton.addActionListener((ActionEvent e) -> {
+            Menu.addToPane(LinealTransform.transform(Menu.currentImage(),
+                    iterateOverJTextFields(panelx, panely)), "Trans. lineal");
+            popup.dispose();
         });
         popup.add(okbutton);
         popup.add(panels);
@@ -64,8 +60,8 @@ public class ActLinealTransform implements ActionListener {
     }
 
     private ArrayList<Point> iterateOverJTextFields(Container xcontainer, Container ycontainer) {
-        ArrayList<Integer> x = new ArrayList<Integer>();
-        ArrayList<Point> points = new ArrayList<Point>();
+        ArrayList<Integer> x = new ArrayList<>();
+        ArrayList<Point> points = new ArrayList<>();
         for (Component component : xcontainer.getComponents()) {
             if (component instanceof JTextField) {
                 x.add(Integer.parseInt(((JTextField) component).getText()));

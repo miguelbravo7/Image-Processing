@@ -5,10 +5,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ImgConvert {
+	
+	private ImgConvert() {
+		throw new IllegalStateException("Utility class");
+	}
 
 	public static List<Pixel> toPixelArrayList(BufferedImage image) {
 		// Instanciacion de los puntos a partir de los valores de la imagen
-		ArrayList<Pixel> pixels = new ArrayList<Pixel>();
+		ArrayList<Pixel> pixels = new ArrayList<>();
 
 		Utility.imgApply(image, (i, j) -> {
 			int pixel = image.getRGB(j, i);

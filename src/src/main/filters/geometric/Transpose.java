@@ -6,8 +6,12 @@ import java.util.logging.Logger;
 
 import main.utils.Utility;
 
-public class Transpose {	
+public class Transpose {
 	private static final Logger LOGGER = Logger.getLogger(Transpose.class.getName());
+
+	private Transpose() {
+		throw new IllegalStateException("Utility class");
+	}
 
 	public static BufferedImage transpose(BufferedImage image) {
 		BufferedImage img = new BufferedImage(image.getHeight(), image.getWidth(), image.getType());

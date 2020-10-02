@@ -11,8 +11,7 @@ import javax.swing.JTextField;
 import java.awt.GridLayout;
 
 import main.filters.point.GammaCorrection;
-import main.gui.MenuBar;
-
+import main.gui.Menu;
 
 public class ActImageGammaCorrection implements ActionListener {
     public void actionPerformed(ActionEvent evt) {
@@ -29,13 +28,11 @@ public class ActImageGammaCorrection implements ActionListener {
 
         JButton okbutton = new JButton("Ok");
 
-        okbutton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                MenuBar.program.addToPane(
-                        GammaCorrection.gammaCorrection(MenuBar.program.currentImage(), Double.valueOf(gamma.getText())),
-                        "Gamma");
-                popup.dispose();
-            }
+        okbutton.addActionListener((ActionEvent e) -> {
+            Menu.addToPane(
+                    GammaCorrection.gammaCorrection(Menu.currentImage(), Double.valueOf(gamma.getText())),
+                    "Gamma");
+            popup.dispose();
         });
         popup.add(okbutton);
         popup.pack();

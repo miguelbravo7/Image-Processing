@@ -6,7 +6,7 @@ import java.util.List;
 import main.utils.Pixel;
 
 public class KMeansResultado {
-	private List<Cluster> clusters = new ArrayList<Cluster>();
+	private List<Cluster> clusters = new ArrayList<>();
 	private Double ofv;
 
 	public KMeansResultado(List<Cluster> clusters, Double ofv) {

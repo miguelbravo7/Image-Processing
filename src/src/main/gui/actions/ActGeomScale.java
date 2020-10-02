@@ -11,7 +11,7 @@ import javax.swing.JTextField;
 import java.awt.GridLayout;
 
 import main.filters.geometric.Scale;
-import main.gui.MenuBar;
+import main.gui.Menu;
 
 public class ActGeomScale implements ActionListener {
     String function;
@@ -40,12 +40,10 @@ public class ActGeomScale implements ActionListener {
 
         JButton okbutton = new JButton("Ok");
 
-        okbutton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                MenuBar.program.addToPane(Scale.scale(MenuBar.program.currentImage(), Double.valueOf(width.getText()),
+        okbutton.addActionListener((ActionEvent e) -> {
+                Menu.addToPane(Scale.scale(Menu.currentImage(), Double.valueOf(width.getText()),
                         Double.valueOf(height.getText()), function), "Bilinear");
                 popup.dispose();
-            }
         });
         popup.add(okbutton);
         popup.pack();

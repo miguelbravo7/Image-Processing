@@ -10,8 +10,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import main.filters.point.kmeans.Kmeans_Processor;
-import main.gui.MenuBar;
+import main.filters.point.kmeans.KmeansProcessor;
+import main.gui.Menu;
 
 public class ActFilterImageKmeans implements ActionListener {
     public void actionPerformed(ActionEvent evt) {
@@ -28,13 +28,11 @@ public class ActFilterImageKmeans implements ActionListener {
 
         JButton okbutton = new JButton("Ok");
 
-        okbutton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                MenuBar.program.addToPane(
-                        Kmeans_Processor.renderkmeans(MenuBar.program.currentImage(), Integer.valueOf(means.getText())),
-                        means.getText() + "-means");
-                popup.dispose();
-            }
+        okbutton.addActionListener((ActionEvent e) -> {
+            Menu.addToPane(
+                    KmeansProcessor.renderkmeans(Menu.currentImage(), Integer.valueOf(means.getText())),
+                    means.getText() + "-means");
+            popup.dispose();
         });
         popup.add(okbutton);
         popup.pack();
