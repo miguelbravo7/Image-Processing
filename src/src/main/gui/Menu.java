@@ -28,7 +28,7 @@ import javax.swing.JLabel;
 import javax.swing.JTabbedPane;
 
 public final class Menu{
-	public final static JTabbedPane tabbedPane = new JTabbedPane();
+	public static final JTabbedPane tabbedPane = new JTabbedPane();
 	public static final JFrame MENU_FRAME = new JFrame();
 	public static Consumer<ImageViewer> unpressAction = null;
 	public static final List<Histogram> imagehist = new ArrayList<>();
@@ -37,7 +37,11 @@ public final class Menu{
 	private static Integer imgCount = 0;
 	private static final int WINDOW_SIZE = 800;
 
-	public Menu() {
+	private Menu() {
+		throw new IllegalStateException("Utility class");
+	}
+
+	static {
 		tabbedPane.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent key) {
@@ -60,7 +64,7 @@ public final class Menu{
 
 	}
 
-	public void deleteFromPane(int tabIndex) {
+	public static void deleteFromPane(int tabIndex) {
 		tabbedPane.remove(tabIndex);
 		imagehist.remove(tabIndex);
 		imagelist.remove(tabIndex);
