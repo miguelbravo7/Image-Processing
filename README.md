@@ -1,3 +1,3 @@
 # Editor de imagenes simple 
 
-![Editor](img/Sreenshot_1.png)
+![Editor](img/Screenshot_1.png)
