@@ -1,4 +1,4 @@
-package main.gui;
+package main.gui.graphs;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -12,13 +12,11 @@ import java.util.Optional;
 
 import javax.swing.JLabel;
 
-import main.graphs.Graph;
-
 public class LayeredGraph extends JLabel {
     private static final long serialVersionUID = 1L;
     private List<Graph> graphs;
 
-    public LayeredGraph(List<Map<Integer, Double>> hmArray, Integer[] med) {
+    public LayeredGraph(List<Map<Integer, Double>> hmArray, Double[] med) {
         this.setMinimumSize(new Dimension(256, 100));
         this.setPreferredSize(new Dimension(256, 200));
         this.graphs = new ArrayList<>();
@@ -32,7 +30,7 @@ public class LayeredGraph extends JLabel {
         }
 
         for (int i = 0; i < hmArray.size(); i++) {
-            this.graphs.add(new Graph(hmArray.get(i), colors[i], med[i]));
+            this.graphs.add(new Graph(hmArray.get(i), colors[i], med[i].intValue()));
             this.graphs.get(i).heightScale = (float) (max[i] / biggestMax);
         }
         this.addMouseMotionListener(new MouseMotionAdapter() {

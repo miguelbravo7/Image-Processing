@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 
 import javax.swing.JFrame;
 
-import main.graphs.Graph;
+import main.gui.graphs.Graph;
 
 public class CrossSection {
 	private static final Logger LOGGER = Logger.getLogger(CrossSection.class.getName());

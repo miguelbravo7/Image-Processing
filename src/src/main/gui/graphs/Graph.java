@@ -1,4 +1,4 @@
-package main.graphs;
+package main.gui.graphs;
 
 import java.awt.Color;
 import java.awt.Dimension;

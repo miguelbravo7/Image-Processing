@@ -4,7 +4,7 @@ import java.awt.image.BufferedImage;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import main.graphs.Histogram;
+import main.gui.Histogram;
 import main.utils.Utility;
 
 public class BrightContrast {

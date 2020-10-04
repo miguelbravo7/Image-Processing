@@ -1,6 +1,5 @@
 package main.gui;
 
-import main.graphs.*;
 import main.utils.*;
 
 import java.awt.BorderLayout;
