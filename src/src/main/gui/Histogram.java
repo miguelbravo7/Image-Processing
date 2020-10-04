@@ -17,7 +17,6 @@ import javax.swing.SwingConstants;
 
 import main.gui.graphs.LayeredGraph;
 import main.utils.Pixel;
-import main.utils.Utility;
 
 public class Histogram implements Runnable {
 	private static final double ZERO = 0.0;
@@ -27,31 +26,32 @@ public class Histogram implements Runnable {
 	public final List<Map<Integer, Double>> colorsAcc;
 	public final List<Map<Integer, Double>> normColors;
 	public final List<Map<Integer, Double>> normColorsAcc;
+	List<Integer[]> valores;
 	public final Double[] med;
 	public final Double[] dev;
 	public final Double[] ent;
 	public final Integer[] min;
 	public final Integer[] max;
-	int[][] valores;
 	int[] colorSizes;
 	int numColors;
 
 	public Histogram(BufferedImage image) throws InterruptedException {
 		this.numColors = image.getColorModel().getNumColorComponents();
 		this.colorSizes = new int[this.numColors];
-		this.valores = new int[numColors][];
+		this.valores = new ArrayList<>(numColors);
 		this.colors = new ArrayList<>(numColors);
 		this.colorsAcc = new ArrayList<>(numColors);
 		this.normColors = new ArrayList<>(numColors);
 		this.normColorsAcc = new ArrayList<>(numColors);
 
 		for (int i = 0; i < numColors; i++) {
-			this.valores[i] = new int[colorSizes[i]];
-			this.colors.add(i, new TreeMap<>());
-			this.colorsAcc.add(i, new TreeMap<>());
-			this.normColors.add(i, new TreeMap<>());
-			this.normColorsAcc.add(i, new TreeMap<>());
 			this.colorSizes[i] = (int) Math.pow(2, image.getColorModel().getComponentSize()[i]);
+			this.valores.add(new Integer[colorSizes[i]]);
+			Arrays.fill(this.valores.get(i), 0);
+			this.colors.add(new TreeMap<>());
+			this.colorsAcc.add(new TreeMap<>());
+			this.normColors.add(new TreeMap<>());
+			this.normColorsAcc.add(new TreeMap<>());
 		}
 
 		this.med = new Double[numColors];
@@ -63,17 +63,19 @@ public class Histogram implements Runnable {
 		Arrays.fill(min, -1);
 		Arrays.fill(med, ZERO);
 
-		Utility.imgApply(image, (i, j) -> {
-			int colorIndex = numColors;
-			int offsetAcc = 0;
-			int bitMask = 0xff;
-			for (int colorSize : image.getColorModel().getComponentSize()) {
-				int colorValue = (image.getRGB(j, i) & bitMask) >> offsetAcc;
-				this.valores[--colorIndex][colorValue]++;
-				bitMask <<= colorSize;
-				offsetAcc += colorSize;
+		for (int i = 0; i < image.getHeight(); i++) {
+			for (int j = 0; j < image.getWidth(); j++) {
+				int colorIndex = numColors;
+				int offsetAcc = 0;
+				int bitMask = 0xff;
+				for (int colorSize : image.getColorModel().getComponentSize()) {
+					int colorValue = (image.getRGB(j, i) & bitMask) >> offsetAcc;
+					this.valores.get(--colorIndex)[colorValue]++;
+					bitMask <<= colorSize;
+					offsetAcc += colorSize;
+				}
 			}
-		});
+		}
 
 		this.thread = new Thread(this, "histogram");
 		this.thread.start();
@@ -117,11 +119,11 @@ public class Histogram implements Runnable {
 	private void maxminhm() {
 		for (int i = 0; i < numColors; i++) {
 			for (int j = 0; j < colorSizes[i]; j++) {
-				colors.get(i).put(j, (double) valores[i][j]);
+				colors.get(i).put(j, (double) valores.get(i)[j]);
 
-				if (min[i] == -1 && valores[i][j] > 0)
+				if (min[i] == -1 && valores.get(i)[j] > 0)
 					min[i] = j;
-				if (valores[i][j] != 0)
+				if (valores.get(i)[j] != 0)
 					max[i] = j;
 			}
 		}
@@ -131,7 +133,7 @@ public class Histogram implements Runnable {
 	private void acumulado() {
 		for (int i = 0; i < numColors; i++) {
 			for (int j = 0; j < colorSizes[i]; j++) {
-				colorsAcc.get(i).put(j, valores[i][j] + colorsAcc.get(i).getOrDefault(j - 1 < 0 ? 0 : j - 1, ZERO));
+				colorsAcc.get(i).put(j, valores.get(i)[j] + colorsAcc.get(i).getOrDefault(j - 1 < 0 ? 0 : j - 1, ZERO));
 			}
 		}
 	}
@@ -140,7 +142,7 @@ public class Histogram implements Runnable {
 	private void normValues() {
 		for (int i = 0; i < numColors; i++) {
 			for (int j = 0; j < colorSizes[i]; j++) {
-				normColors.get(i).put(j, valores[i][j] / colorsAcc.get(i).get(255));
+				normColors.get(i).put(j, valores.get(i)[j] / colorsAcc.get(i).get(255));
 				normColorsAcc.get(i).put(j, normColors.get(i).getOrDefault(j, ZERO)
 						+ normColorsAcc.get(i).getOrDefault(j - 1 < 0 ? 0 : j - 1, ZERO));
 			}
