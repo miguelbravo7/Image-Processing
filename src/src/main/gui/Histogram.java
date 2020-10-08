@@ -15,13 +15,11 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
-import main.gui.graphs.LayeredGraph;
-import main.utils.Pixel;
+import main.gui.graphs.LayeredColorGraph;
 
 public class Histogram implements Runnable {
 	private static final double ZERO = 0.0;
 	Thread thread;
-	ArrayList<Pixel> image = new ArrayList<>();
 	public final List<Map<Integer, Double>> colors;
 	public final List<Map<Integer, Double>> colorsAcc;
 	public final List<Map<Integer, Double>> normColors;
@@ -82,6 +80,16 @@ public class Histogram implements Runnable {
 		this.thread.join();
 	}
 
+	@Override
+	public void run() {
+		maxminhm();
+		acumulado();
+		normValues();
+		media();
+		stdDev();
+		entropy();
+	}
+
 	public String toString() {
 		String[] colorNames = { "red", "green", "blue", "alpha" };
 		String stringFormat = "%.5f";
@@ -101,18 +109,6 @@ public class Histogram implements Runnable {
 		for (int i = 0; i < this.numColors; i++)
 			msg.append(colorNames[i] + " " + String.format(stringFormat, ent[i]) + " ");
 		return msg.toString();
-	}
-
-	@Override
-	public void run() {
-		maxminhm();
-		acumulado();
-		normValues();
-		media();
-		stdDev();
-		entropy();
-
-		image.clear();
 	}
 
 	// Valores minimos maximos y paso de valores al hashmap
@@ -214,7 +210,7 @@ public class Histogram implements Runnable {
 				SwingConstants.LEFT));
 		texto.setBackground(Color.LIGHT_GRAY);
 
-		Container container = new LayeredGraph(hmArray, med);
+		Container container = new LayeredColorGraph(hmArray, med);
 
 		frame.add(container);
 		frame.add(texto);

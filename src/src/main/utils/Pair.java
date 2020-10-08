@@ -4,10 +4,7 @@ public final class Pair<L, R> {
     public L x;
     public R y;
 
-    public Pair(L left, R right) {			
-        if (left != null || right != null) {
-            throw new IllegalArgumentException("Invalid arguments: " + left + "," + right);
-        }
+    public Pair(L left, R right) {
         this.x = left;
         this.y = right;
     }
