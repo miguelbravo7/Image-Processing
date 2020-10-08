@@ -6,6 +6,8 @@ import java.awt.Container;
 import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Level;
@@ -13,7 +15,7 @@ import java.util.logging.Logger;
 
 import javax.swing.JFrame;
 
-import main.gui.graphs.Graph;
+import main.gui.graphs.ColorGraph;
 
 public class CrossSection {
 	private static final Logger LOGGER = Logger.getLogger(CrossSection.class.getName());
@@ -24,29 +26,17 @@ public class CrossSection {
 
 	public static void profile(BufferedImage image, Point p1, Point p2) {
 		Map<Integer, Integer> monochrome = new TreeMap<>();
-		Map<Integer, Double> derivative = new TreeMap<>();
-
-		if (p1.x > p2.x) {
-			Point tmp = (Point) p1.clone();
-			p1 = (Point) p2.clone();
-			p2 = (Point) tmp.clone();
-
-		}
-
-		double pendiente = (p2.y - p1.y) / (double) (p2.x - p1.x);
-		double offset = p1.y - p1.x * pendiente;
-
+		Map<Integer, Integer> derivative = new TreeMap<>();
 		LOGGER.log(Level.FINE, "{0}", p1);
 		LOGGER.log(Level.FINE, "{0}", p2);
-		LOGGER.log(Level.FINE, "{0}", pendiente);
-		LOGGER.log(Level.FINE, "{0}", offset);
 
-		for (Integer point_x = p1.x; point_x <= p2.x; point_x++) {
-			int yPoint = (int) (pendiente * point_x + offset);
-			int nextyPoint = (int) (pendiente * (point_x + 1 >= image.getWidth() ? point_x : point_x + 1) + offset);
+		List<Point> linePoints = bresenhamAlgorithm(p1, p2);
+		Point prev = linePoints.remove(0);
+		int i = 0;
 
-			int pixel = image.getRGB(point_x, yPoint);
-			int nextPixel = image.getRGB(point_x, nextyPoint);
+		for (Point curr : linePoints) {
+			int pixel = image.getRGB(prev.x, prev.y);
+			int nextPixel = image.getRGB(curr.x, curr.y);
 
 			// get separate colors
 			int red = (pixel >> 16) & 0xff;
@@ -60,13 +50,15 @@ public class CrossSection {
 			double nextMonopixel = nextRed * 0.222d + nextGreen * 0.707d + nextBlue * 0.071d;
 			LOGGER.log(Level.FINE, "{0}", nextMonopixel / monopixel);
 
-			monochrome.put(point_x, (int) (monopixel));
-			derivative.put(point_x, (1d + nextMonopixel / monopixel) / 2d + .00001);
+			monochrome.put(i, (int) (monopixel));
+			derivative.put(i, (int) (nextMonopixel - monopixel));
+			prev = curr;
+			i++;
 		}
 
 		Container container = new Container();
-		container.add(new Graph(monochrome, Color.BLACK, -1));
-		container.add(new Graph(derivative, Color.BLACK, -1));
+		container.add(new ColorGraph(monochrome, Color.BLACK, -1));
+		container.add(new ColorGraph(derivative, Color.BLACK, -1));
 
 		JFrame frame = new JFrame("Perfil de la imagen");
 
@@ -80,6 +72,53 @@ public class CrossSection {
 		frame.pack();
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
+	}
+
+	public static List<Point> bresenhamAlgorithm(Point p1, Point p2) {
+		List<Point> res = new ArrayList<>();
+		p1 = (Point) p1.clone();
+		p2 = (Point) p2.clone();
+		int w = p2.x - p1.x;
+		int h = p2.y - p1.y;
+		int dx1 = 0;
+		int dy1 = 0;
+		int dx2 = 0;
+		int dy2 = 0;
+		if (w < 0){
+			dx1 = dx2 = -1;
+		}
+		else if (w > 0) {
+			dx1 = dx2 = 1;
+		}
+		if (h < 0)
+			dy1 = -1;
+		else if (h > 0)
+			dy1 = 1;
+		int longest = Math.abs(w);
+		int shortest = Math.abs(h);
+		if (longest <= shortest) {
+			longest = Math.abs(h);
+			shortest = Math.abs(w);
+			if (h < 0)
+				dy2 = -1;
+			else if (h > 0)
+				dy2 = 1;
+			dx2 = 0;
+		}
+		int numerator = longest >> 1;
+		for (int i = 0; i <= longest; i++) {
+			res.add(new Point(p1.x, p1.y));
+			numerator += shortest;
+			if (numerator >= longest) {
+				numerator -= longest;
+				p1.x += dx1;
+				p1.y += dy1;
+			} else {
+				p1.x += dx2;
+				p1.y += dy2;
+			}
+		}
+		return res;
 	}
 
 }
