@@ -12,31 +12,33 @@ import java.util.Optional;
 
 import javax.swing.JLabel;
 
-public class LayeredGraph extends JLabel {
+public class LayeredColorGraph extends JLabel {
     private static final long serialVersionUID = 1L;
-    private List<Graph> graphs;
+    private List<ColorGraph> graphs;
 
-    public LayeredGraph(List<Map<Integer, Double>> hmArray, Double[] med) {
+    public LayeredColorGraph(List<Map<Integer, Double>> hmArray, Double[] med) {
         this.setMinimumSize(new Dimension(256, 100));
         this.setPreferredSize(new Dimension(256, 200));
         this.graphs = new ArrayList<>();
-        Color[] colors = {Color.RED, Color.GREEN, Color.BLUE};
+        Color[] colors = { Color.RED, Color.GREEN, Color.BLUE };
         double[] max = new double[hmArray.size()];
-        double biggestMax = 1;
-        for(int i = 0; i < hmArray.size(); i++){
-            Optional<Map.Entry<Integer, Double>> entry = hmArray.get(i).entrySet().stream().max((entry1, entry2) -> entry1.getValue() > entry2.getValue() ? 1 : -1);
+        double highestVal = Double.MIN_VALUE;
+        
+        for (int i = 0; i < hmArray.size(); i++) {
+            Optional<Map.Entry<Integer, Double>> entry = hmArray.get(i).entrySet().stream()
+                    .max((entry1, entry2) -> entry1.getValue() > entry2.getValue() ? 1 : -1);
             max[i] = entry.isPresent() ? entry.get().getValue() : 1;
-            biggestMax = Math.max(biggestMax, max[i]);
+            highestVal = Math.max(highestVal, max[i]);
         }
 
         for (int i = 0; i < hmArray.size(); i++) {
-            this.graphs.add(new Graph(hmArray.get(i), colors[i], med[i].intValue()));
-            this.graphs.get(i).heightScale = (float) (max[i] / biggestMax);
+            this.graphs.add(new ColorGraph(hmArray.get(i), colors[i], med[i].intValue()));
+            this.graphs.get(i).heightScale = (float) (max[i] / highestVal);
         }
         this.addMouseMotionListener(new MouseMotionAdapter() {
             @Override
             public void mouseMoved(MouseEvent e) {
-                for (Graph graph : graphs) {
+                for (ColorGraph graph : graphs) {
                     graph.dispatchEvent(e);
                 }
             }
@@ -46,10 +48,10 @@ public class LayeredGraph extends JLabel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        for (Graph graph : this.graphs) {
+        for (ColorGraph graph : this.graphs) {
             graph.setBounds(this.getVisibleRect());
             graph.paintComponent(g);
         }
-        g.drawRect(0, 0, this.getWidth()-1, this.getHeight()-1);
+        g.drawRect(0, 0, this.getWidth() - 1, this.getHeight() - 1);
     }
 }
