@@ -22,7 +22,6 @@ public class ActGeomScale implements ActionListener {
 
     public void actionPerformed(ActionEvent evt) {
         JTextField width = new JTextField();
-
         JTextField height = new JTextField();
 
         JFrame popup = new JFrame("Cambio de escala");
@@ -41,9 +40,9 @@ public class ActGeomScale implements ActionListener {
         JButton okbutton = new JButton("Ok");
 
         okbutton.addActionListener((ActionEvent e) -> {
-                Menu.addToPane(Scale.scale(Menu.currentImage(), Double.valueOf(width.getText()),
-                        Double.valueOf(height.getText()), function), "Bilinear");
-                popup.dispose();
+            Menu.addImageToPane(Scale.scale(Menu.currentImage(), Double.valueOf(width.getText()),
+                    Double.valueOf(height.getText()), function), "Bilinear");
+            popup.dispose();
         });
         popup.add(okbutton);
         popup.pack();

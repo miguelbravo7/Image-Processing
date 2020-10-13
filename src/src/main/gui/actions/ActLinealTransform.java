@@ -98,7 +98,7 @@ public class ActLinealTransform implements ActionListener {
         gbc.gridwidth = 2;
         JButton okButton = new JButton("Ok");
         okButton.addActionListener((ActionEvent e) -> {
-            Menu.addToPane(LinealTransform.transform(Menu.currentImage(), iterateOverJTextFields(xPanel, yPanel)),
+            Menu.addImageToPane(LinealTransform.transform(Menu.currentImage(), iterateOverJTextFields(xPanel, yPanel)),
                     "Trans. lineal");
             popup.dispose();
         });

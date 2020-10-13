@@ -33,7 +33,7 @@ public class Histogram implements Runnable {
 	int[] colorSizes;
 	int numColors;
 
-	public Histogram(BufferedImage image) throws InterruptedException {
+	public Histogram(BufferedImage image) {
 		this.numColors = image.getColorModel().getNumColorComponents();
 		this.colorSizes = new int[this.numColors];
 		this.valores = new ArrayList<>(numColors);
@@ -77,7 +77,11 @@ public class Histogram implements Runnable {
 
 		this.thread = new Thread(this, "histogram");
 		this.thread.start();
-		this.thread.join();
+		try {
+			this.thread.join();
+		} catch (InterruptedException e) {
+			this.thread.interrupt();
+		}
 	}
 
 	@Override

@@ -21,7 +21,7 @@ public class ActGeomRotate implements ActionListener {
     }
 
     public void actionPerformed(ActionEvent evt) {
-        JTextField means = new JTextField(0);
+        JTextField angle = new JTextField(0);
 
         JFrame popup = new JFrame("Rotacion");
         popup.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -29,15 +29,15 @@ public class ActGeomRotate implements ActionListener {
 
         JPanel panel = new JPanel(new GridLayout(2, 1));
         panel.add(new JLabel("Angulo"));
-        panel.add(means);
+        panel.add(angle);
         popup.add(panel);
 
         JButton okbutton = new JButton("Ok");
 
         okbutton.addActionListener((ActionEvent e) -> {
-            Menu.addToPane(
-                    Rotation.rotate(Menu.currentImage(), Double.valueOf(means.getText()), function),
-                    means.getText() + "�_" + function);
+            Menu.addImageToPane(
+                    Rotation.rotate(Menu.currentImage(), Double.valueOf(angle.getText()), function),
+                    angle.getText() + "deg_" + function);
             popup.dispose();
         });
         popup.add(okbutton);

@@ -29,7 +29,7 @@ public class ActFilterImageKmeans implements ActionListener {
         JButton okbutton = new JButton("Ok");
 
         okbutton.addActionListener((ActionEvent e) -> {
-            Menu.addToPane(
+            Menu.addImageToPane(
                     KmeansProcessor.renderkmeans(Menu.currentImage(), Integer.valueOf(means.getText())),
                     means.getText() + "-means");
             popup.dispose();

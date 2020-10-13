@@ -29,7 +29,6 @@ public class ActImgDifference implements ActionListener {
         }
 
         JComboBox<Object> img1 = new JComboBox<>(pestanas.toArray());
-
         JComboBox<Object> img2 = new JComboBox<>(pestanas.toArray());
 
         JFrame popup = new JFrame("Diferencia de imagen.");
@@ -49,7 +48,7 @@ public class ActImgDifference implements ActionListener {
 
         okbutton.addActionListener((ActionEvent e) -> {
             popup.dispose();
-            Menu.addToPane(Difference.difference(Menu.imagelist.get(img1.getSelectedIndex()),
+            Menu.addImageToPane(Difference.difference(Menu.imagelist.get(img1.getSelectedIndex()),
                     Menu.imagelist.get(img2.getSelectedIndex())), "Diferencia");
             umbralPopup();
         });

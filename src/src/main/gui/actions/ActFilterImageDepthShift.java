@@ -29,7 +29,7 @@ public class ActFilterImageDepthShift implements ActionListener {
         JButton okbutton = new JButton("Ok");
 
         okbutton.addActionListener((ActionEvent e) -> {
-            Menu.addToPane(
+            Menu.addImageToPane(
                     ColorDepth.colorDepthShift(Menu.currentImage(), Integer.valueOf(depth.getText())),
                     depth.getText() + " bit depth");
             popup.dispose();

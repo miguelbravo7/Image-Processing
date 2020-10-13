@@ -29,7 +29,7 @@ public class ActImageGammaCorrection implements ActionListener {
         JButton okbutton = new JButton("Ok");
 
         okbutton.addActionListener((ActionEvent e) -> {
-            Menu.addToPane(
+            Menu.addImageToPane(
                     GammaCorrection.gammaCorrection(Menu.currentImage(), Double.valueOf(gamma.getText())),
                     "Gamma");
             popup.dispose();

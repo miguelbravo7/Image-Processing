@@ -17,7 +17,7 @@ import java.util.logging.Logger;
 
 public class ImageViewer extends JPanel {
     private static final long serialVersionUID = 1L;
-    private final transient Logger LOGGER = Logger.getLogger(ImageViewer.class.getName());
+    private static final transient Logger LOGGER = Logger.getLogger(ImageViewer.class.getName());
     transient BufferedImage image;
     JLabel imageCanvas;
     JLabel text;
@@ -66,7 +66,7 @@ public class ImageViewer extends JPanel {
                 xReleased = e.getX();
                 yReleased = e.getY();
                 LOGGER.log(Level.FINE, "Mouse released; end: x: {0} y: {1}", new Object[] { xReleased, yReleased });
-                releaseDispatcher();
+                callDispatcher();
             }
         });
         this.initComponents();
@@ -80,11 +80,8 @@ public class ImageViewer extends JPanel {
         this.imageCanvas.setIcon(new ImageIcon(image)); // BufferedImage extends image
     }
 
-    public void releaseDispatcher() {
-        if(Menu.unpressAction != null) {
-            Menu.unpressAction.accept(this);
-            Menu.unpressAction = null;
-        }
+    private void callDispatcher() {
+        Menu.releaseDispatcher(this);
     }
 
     private void initComponents() {

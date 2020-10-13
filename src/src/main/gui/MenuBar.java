@@ -47,7 +47,7 @@ public final class MenuBar extends JMenuBar {
 		pointOperations.add(this.simpleMenuItem("Cambio brillo-contraste", new ActChangeBC()));
 		pointOperations.add(this.simpleMenuItem("Especificacion de histograma", new ActImgHistSpec()));
 		pointOperations.add(this.simpleMenuItem("Diferencia de imagen", new ActImgDifference()));
-		pointOperations.add(this.simpleMenuItem("Region de interes", new SimpleMenuAction(unused -> Menu.unpressAction = panel -> Menu.addToPane(panel.image.getSubimage(panel.xPressed, panel.yPressed, panel.xReleased - panel.xPressed, panel.yReleased - panel.yPressed), "Imagen recortada"))));
+		pointOperations.add(this.simpleMenuItem("Region de interes", new SimpleMenuAction(unused -> Menu.unpressAction = panel -> Menu.addImageToPane(panel.image.getSubimage(panel.xPressed, panel.yPressed, panel.xReleased - panel.xPressed, panel.yReleased - panel.yPressed), "Imagen recortada"))));
 		pointOperations.add(this.simpleMenuItem("Transformacion lineal", new ActLinealTransform()));
 
 		filtros.add(pointOperations);
@@ -112,7 +112,7 @@ public final class MenuBar extends JMenuBar {
 			this.tabName = tabName;
 		}
 		public void actionPerformed(ActionEvent evt) {
-			Menu.addToPane(this.method.get(), this.tabName);
+			Menu.addImageToPane(this.method.get(), this.tabName);
 		}
 	}
 

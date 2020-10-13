@@ -23,7 +23,6 @@ public class ActImgHistSpec implements ActionListener {
         }
 
         JComboBox<Object> img1 = new JComboBox<>(pestanas.toArray());
-
         JComboBox<Object> img2 = new JComboBox<>(pestanas.toArray());
 
         JFrame popup = new JFrame("Especificacion de histograma.");
@@ -43,7 +42,7 @@ public class ActImgHistSpec implements ActionListener {
 
         okbutton.addActionListener((ActionEvent e) -> {
             popup.dispose();
-            Menu.addToPane(SpecHist.convertHist(Menu.imagelist.get(img1.getSelectedIndex()),
+            Menu.addImageToPane(SpecHist.convertHist(Menu.imagelist.get(img1.getSelectedIndex()),
                     Menu.imagehist.get(img1.getSelectedIndex()),
                     Menu.imagehist.get(img2.getSelectedIndex())), "Spec. hist.");
         });

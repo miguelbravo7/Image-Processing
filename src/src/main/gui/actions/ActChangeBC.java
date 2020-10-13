@@ -38,11 +38,8 @@ public class ActChangeBC implements ActionListener {
         JButton okbutton = new JButton("Ok");
 
         okbutton.addActionListener((ActionEvent e) -> {
-            Menu
-                    .addToPane(
-                            BrightContrast.adjustImg(Menu.currentImage(), Menu.currentHist(),
-                                    Double.valueOf(brillo.getText()), Double.valueOf(contraste.getText())),
-                            "Conversion");
+            Menu.addImageToPane(BrightContrast.adjustImg(Menu.currentImage(), Menu.currentHist(),
+                    Double.valueOf(brillo.getText()), Double.valueOf(contraste.getText())), "Conversion");
             popup.dispose();
         });
         popup.add(okbutton);

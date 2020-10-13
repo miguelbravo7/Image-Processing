@@ -29,8 +29,7 @@ public class ActFilterImageDepthRegion implements ActionListener {
         JButton okbutton = new JButton("Ok");
 
         okbutton.addActionListener((ActionEvent e) -> {
-            Menu.addToPane(
-                    ColorDepth.colorDepthRegion(Menu.currentImage(), Integer.valueOf(depth.getText())),
+            Menu.addImageToPane(ColorDepth.colorDepthRegion(Menu.currentImage(), Integer.valueOf(depth.getText())),
                     depth.getText() + " bit depth");
             popup.dispose();
         });
