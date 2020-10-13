@@ -7,11 +7,11 @@ import java.util.Random;
 
 import main.utils.Pixel;
 
-public class KMeans {
+public class KMeans<T1 extends Number, T2 extends Number> {
 	Random random = new Random();
 
-	public KMeansResultado calcular(List<Pixel> puntos, Integer k) {
-		List<Cluster> clusters = elegirCentroides(puntos, k);
+	public KMeansResultado<T1, T2> calcular(List<Pixel<T1>> puntos, Integer k) {
+		List<Cluster<T1, T2>> clusters = elegirCentroides(puntos, k);
 
 		while (!finalizo(clusters)) {
 			prepararClusters(clusters);
@@ -21,7 +21,7 @@ public class KMeans {
 
 		Double ofv = calcularFuncionObjetivo(clusters);
 
-		return new KMeansResultado(clusters, ofv);
+		return new KMeansResultado<>(clusters, ofv);
 	}
 
 	/**
@@ -31,37 +31,35 @@ public class KMeans {
 	 * @param k(numero de clases)
 	 * @return centroides
 	 */
-	private List<Cluster> elegirCentroides(List<Pixel> puntos, Integer k) {
-		ArrayList<Cluster> centroides = new ArrayList<>();
-
+	private List<Cluster<T1, T2>> elegirCentroides(List<Pixel<T1>> puntos, Integer k) {
+		ArrayList<Cluster<T1, T2>> centroides = new ArrayList<>();
 		ArrayList<Float> maximos = new ArrayList<>();
 		ArrayList<Float> minimos = new ArrayList<>();
-		// se buscan los maximos y minimos de cada dimension
 
+		// Se buscan los maximos y minimos de cada dimension
 		for (int i = 0; i < puntos.get(0).getGrado(); i++) {
-			Float min = 255f;
-			Float max = 0f;
+			Float min = Float.MAX_VALUE;
+			Float max = Float.MIN_VALUE;
 
-			for (Pixel punto : puntos) {
-				min = min > punto.get(i) ? punto.get(0) : min;
-				max = max < punto.get(i) ? punto.get(i) : max;
+			for (Pixel<T1> punto : puntos) {
+				min = Math.min(punto.get(i).floatValue(), min);
+				max = Math.max(punto.get(i).floatValue(), max);
 			}
 
 			maximos.add(max);
 			minimos.add(min);
 		}
 
-		// Se generan los clusters dentro de la region en la que estan situados los
-		// puntos
+		// Se generan los clusters dentro de la region en la que estan situados los puntos
 		for (int i = 0; i < k; i++) {
 			Float[] data = new Float[puntos.get(0).getGrado()];
 			Arrays.fill(data, 0f);
 			for (int d = 0; d < puntos.get(0).getGrado(); d++) {
-				data[d] = this.random.nextFloat() * (maximos.get(d) - minimos.get(d)) + minimos.get(d);
+				data[d] = random.nextFloat() * (maximos.get(d) - minimos.get(d)) + minimos.get(d);
 			}
 
-			Cluster c = new Cluster();
-			Pixel centroide = new Pixel(data);
+			Cluster<T1, T2> c = new Cluster<>();
+			Pixel<T2> centroide = new Pixel<>((T2[]) data);
 			c.setCentroide(centroide);
 			centroides.add(c);
 		}
@@ -75,8 +73,8 @@ public class KMeans {
 	 * @param clusters
 	 * @return boolean (posicion final en todos los clusters)
 	 */
-	private boolean finalizo(List<Cluster> clusters) {
-		for (Cluster cluster : clusters) {
+	private boolean finalizo(List<Cluster<T1, T2>> clusters) {
+		for (Cluster<T1, T2> cluster : clusters) {
 			if (!cluster.isTermino()) {
 				return false;
 			}
@@ -89,8 +87,8 @@ public class KMeans {
 	 * 
 	 * @param clusters
 	 */
-	private void prepararClusters(List<Cluster> clusters) {
-		for (Cluster c : clusters) {
+	private void prepararClusters(List<Cluster<T1, T2>> clusters) {
+		for (Cluster<T1, T2> c : clusters) {
 			c.limpiarPuntos();
 		}
 	}
@@ -101,18 +99,18 @@ public class KMeans {
 	 * @param puntos
 	 * @param clusters
 	 */
-	private void asignarPuntos(List<Pixel> puntos, List<Cluster> clusters) {
-		for (Pixel punto : puntos) {
-			Cluster masCercano = clusters.get(0);
+	private void asignarPuntos(List<Pixel<T1>> puntos, List<Cluster<T1, T2>> clusters) {
+		for (Pixel<T1> punto : puntos) {
+			Cluster<T1, T2> masCercano = clusters.get(0);
 			Double distanciaMinima = Double.MAX_VALUE;
-			for (Cluster cluster : clusters) {
+			for (Cluster<T1, T2> cluster : clusters) {
 				Double distancia = punto.distanciaEuclideana(cluster.getCentroide());
 				if (distanciaMinima > distancia) {
 					distanciaMinima = distancia;
 					masCercano = cluster;
 				}
 			}
-			masCercano.getPuntos().add(punto);
+			masCercano.addPunto(punto);
 		}
 	}
 
@@ -122,30 +120,29 @@ public class KMeans {
 	 * 
 	 * @param clusters
 	 */
-	private void recalcularCentroides(List<Cluster> clusters) {
-		for (Cluster c : clusters) {
-			if (c.getPuntos().isEmpty()) {
-				c.setTermino(true);
+	private void recalcularCentroides(List<Cluster<T1, T2>> clusters) {
+		for (Cluster<T1, T2> cluster : clusters) {
+			if (cluster.getPuntos().isEmpty()) {
+				cluster.setTermino(true);
 				continue;
 			}
+			Float[] accDist = new Float[cluster.getGrado()];
+			Arrays.fill(accDist, 0f);
 
-			Float[] d = new Float[4];
-			Arrays.fill(d, 0f);
-
-			for (Pixel p : c.getPuntos()) {
+			for (Pixel<T1> p : cluster.getPuntos()) {
 				for (int i = 0; i < p.getGrado(); i++) {
-					d[i] += (p.get(i) / c.getPuntos().size());
+					accDist[i] += p.get(i).floatValue() / cluster.numPuntos();
 				}
 			}
 
 			// Establecido el nuevo punto se compara con el anterior para ver si se ha
 			// movido
-			Pixel nuevoCentroide = new Pixel(d);
+			Pixel<T2> nuevoCentroide = new Pixel<>((T2[]) accDist);
 
-			if (nuevoCentroide.equals(c.getCentroide())) {
-				c.setTermino(true);
+			if (nuevoCentroide.equals(cluster.getCentroide())) {
+				cluster.setTermino(true);
 			} else {
-				c.setCentroide(nuevoCentroide);
+				cluster.setCentroide(nuevoCentroide);
 			}
 		}
 	}
@@ -156,16 +153,21 @@ public class KMeans {
 	 * @param clusters
 	 * @return double con err. acumulado
 	 */
-	private Double calcularFuncionObjetivo(List<Cluster> clusters) {
+	private Double calcularFuncionObjetivo(List<Cluster<T1, T2>> clusters) {
 		Double ofv = 0d;
-
-		for (Cluster cluster : clusters) {
-			for (Pixel punto : cluster.getPuntos()) {
+		for (Cluster<T1, T2> cluster : clusters) {
+			for (Pixel<T1> punto : cluster.getPuntos()) {
 				ofv += punto.distanciaEuclideana(cluster.getCentroide());
 			}
 		}
-
 		return ofv;
 	}
 
+	public static <T> T castInstance(Object o, Class<T> clazz) {
+		try {
+			return clazz.cast(o);
+		} catch (ClassCastException e) {
+			return null;
+		}
+	}
 }

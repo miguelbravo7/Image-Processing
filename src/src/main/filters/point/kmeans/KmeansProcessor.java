@@ -1,7 +1,7 @@
 package main.filters.point.kmeans;
 
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -17,26 +17,27 @@ public class KmeansProcessor {
 
 	public static BufferedImage renderkmeans(BufferedImage image, int k) {
 		// Instanciacion de los puntos a partir de los valores de la imagen
-		ArrayList<Pixel> orderedPixels = new ArrayList<>(ImgConvert.toPixelArrayList(image));
-		ArrayList<Pixel> pixelList = new ArrayList<>();
+		BufferedImage res = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
+		List<Pixel<Integer>> originalPixels = ImgConvert.toPixelArrayList(image);
+		KMeans<Integer, Float> kmeans = new KMeans<>();
 
 		LOGGER.log(Level.FINE, "Searching centroids.");
-		KMeans kmeans = new KMeans();
-		KMeansResultado resultado = kmeans.calcular(orderedPixels, k);
-
-		pixelList.ensureCapacity(image.getWidth() * image.getHeight());
+		KMeansResultado<Integer, Float> resultado = kmeans.calcular(originalPixels, k);
 
 		LOGGER.log(Level.FINE, "Assigning centroids.");
-		for (int i = 0; i < image.getWidth() * image.getHeight(); i++) {
-			pixelList.add(resultado.getCentroide(orderedPixels.get(i)));
+		for (int i = 0; i < image.getHeight(); i++) {
+			for (int j = 0; j < image.getWidth(); j++) {
+				Pixel<Float> p = resultado.getCentroide(originalPixels.get(j + i * image.getWidth()));
+				res.setRGB(j, i, p.getRGB());
+			}
 		}
 
 		LOGGER.log(Level.FINE, " Width:{0} Height:{1}\nCENTROIDES:", new Object[] { image.getWidth(), image.getHeight() });
-		for (Cluster p : resultado.getClusters()) {
+		for (Cluster<Integer, Float> p : resultado.getClusters()) {
 			LOGGER.log(Level.FINE, "{0}", p.getCentroide());
 		}
 		LOGGER.log(Level.FINE, "{0} K-means done.", k);
 
-		return ImgConvert.toBuffImg(pixelList, image.getWidth(), image.getHeight());
+		return res;
 	}
 }

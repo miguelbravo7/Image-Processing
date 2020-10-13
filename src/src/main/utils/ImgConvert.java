@@ -5,25 +5,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ImgConvert {
-	
+
 	private ImgConvert() {
 		throw new IllegalStateException("Utility class");
 	}
 
-	public static List<Pixel> toPixelArrayList(BufferedImage image) {
+	public static List<Pixel<Integer>> toPixelArrayList(BufferedImage image) {
 		// Instanciacion de los puntos a partir de los valores de la imagen
-		ArrayList<Pixel> pixels = new ArrayList<>();
+		ArrayList<Pixel<Integer>> pixels = new ArrayList<>(image.getWidth() * image.getHeight());
 
-		Utility.imgApply(image, (i, j) -> {
-			int pixel = image.getRGB(j, i);
+		for (int i = 0; i < image.getHeight(); i++) {
+			for (int j = 0; j < image.getWidth(); j++) {
+				int pixel = image.getRGB(j, i);
 
-			int alpha = (pixel >> 24) & 0xff;
-			int red = (pixel >> 16) & 0xff;
-			int green = (pixel >> 8) & 0xff;
-			int blue = (pixel) & 0xff;
+				int alpha = (pixel >> 24) & 0xff;
+				int red = (pixel >> 16) & 0xff;
+				int green = (pixel >> 8) & 0xff;
+				int blue = (pixel) & 0xff;
 
-			pixels.add(new Pixel(new Float[] { (float) alpha, (float) red, (float) green, (float) blue }));
-		});
+				pixels.add(new Pixel<>(new Integer[] { alpha, red, green, blue }));
+			}
+		}
 		return pixels;
 	}
 
@@ -35,13 +37,12 @@ public class ImgConvert {
 		return array;
 	}
 
-	public static BufferedImage toBuffImg(List<Pixel> pixelList, int width, int height) {
+	public static BufferedImage toBuffImg(List<Pixel<?>> pixelList, int width, int height) {
 		BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
 
 		Utility.imgApply(img, (i, j) -> {
 			int pixelOffset = i * height + j;
-			int pixel = (pixelList.get(pixelOffset).alpha() << 24) | (pixelList.get(pixelOffset).red() << 16)
-					| (pixelList.get(pixelOffset).green() << 8) | pixelList.get(pixelOffset).blue();
+			int pixel = pixelList.get(pixelOffset).getRGB();
 
 			img.setRGB(j, i, pixel);
 		});
